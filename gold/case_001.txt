@@ -1,0 +1,9 @@
+Synthetic dictation, authored for MediExtract testing. Not a real patient.
+
+Forty-two year old gentleman here for review of his type two diabetes. Sugars
+at home running high, fasting around nine to ten. Weight stable, no polyuria.
+Feet examined today, sensation intact, pedal pulses present.
+
+Plan: start metformin 500 mg po bid with meals, review in six weeks with
+repeat HbA1c. Counselled on GI upset in the first fortnight. He denies any
+drug allergies. Mother has hypertension on amlodipine.

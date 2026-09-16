@@ -1,0 +1,92 @@
+{
+  "schema_version": "gold-v1",
+  "provenance": {
+    "dataset": "local:gold",
+    "revision": null,
+    "language_subset": "n/a",
+    "rows_total_in_split": 2,
+    "rows_taken": "first 2 by filename",
+    "via": "local .txt files",
+    "pulled_at": "2026-09-16T07:57:03+00:00",
+    "row_map": {
+      "case_001": {
+        "row_idx": 0,
+        "source_id": "case_001",
+        "text_md5": "4110dc7ebbe7e8feb91465f269d20614",
+        "chars": 497
+      },
+      "case_002": {
+        "row_idx": 1,
+        "source_id": "case_002_traps",
+        "text_md5": "e8541ee6cac793e39a89338c7535a04c",
+        "chars": 561
+      }
+    },
+    "fields": [
+      "medication",
+      "dose",
+      "frequency",
+      "allergy"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "case_001",
+      "source_text": "Synthetic dictation, authored for MediExtract testing. Not a real patient.\n\nForty-two year old gentleman here for review of his type two diabetes. Sugars\nat home running high, fasting around nine to ten. Weight stable, no polyuria.\nFeet examined today, sensation intact, pedal pulses present.\n\nPlan: start metformin 500 mg po bid with meals, review in six weeks with\nrepeat HbA1c. Counselled on GI upset in the first fortnight. He denies any\ndrug allergies. Mother has hypertension on amlodipine.\n",
+      "ground_truth": {
+        "medication": {
+          "value": "Metformin",
+          "evidence": "metformin",
+          "status": "found"
+        },
+        "dose": {
+          "value": "500 mg",
+          "evidence": "500 mg",
+          "status": "found"
+        },
+        "frequency": {
+          "value": "twice daily",
+          "evidence": "po bid",
+          "status": "found"
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": "not_stated"
+        }
+      },
+      "labeller": "rohit",
+      "labelled_at": "2026-09-16T07:57:49+00:00",
+      "notes": "mother's amlodipine is attribution, not the patient's medication"
+    },
+    {
+      "case_id": "case_002",
+      "source_text": "Synthetic dictation, authored for MediExtract testing. Not a real patient.\n\nFifty-eight year old lady, follow up hypertension. BP today 148 over 92,\nrepeat 144 over 90. She was on amlodipine 5 mg daily until March but stopped\nit herself because of ankle swelling. Nil since.\n\nReports a rash to penicillin as a child, tolerates augmentin apparently, so\nquery the history. Father is on metformin for diabetes.\n\nPlan: consider starting losartan if readings stay above 140 systolic at home.\nHome BP diary for two weeks, review then. No new medication issued today.\n",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": "not_stated"
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": "not_stated"
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": "not_stated"
+        },
+        "allergy": {
+          "value": "Penicillin - childhood rash, but tolerates augmentin",
+          "evidence": "rash to penicillin",
+          "status": "unsure"
+        }
+      },
+      "labeller": "rohit",
+      "labelled_at": "2026-09-16T07:57:49+00:00",
+      "notes": "amlodipine stopped in March, losartan only contemplated, metformin is father's"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+Synthetic dictation, authored for MediExtract testing. Not a real patient.
+
+Fifty-eight year old lady, follow up hypertension. BP today 148 over 92,
+repeat 144 over 90. She was on amlodipine 5 mg daily until March but stopped
+it herself because of ankle swelling. Nil since.
+
+Reports a rash to penicillin as a child, tolerates augmentin apparently, so
+query the history. Father is on metformin for diabetes.
+
+Plan: consider starting losartan if readings stay above 140 systolic at home.
+Home BP diary for two weeks, review then. No new medication issued today.

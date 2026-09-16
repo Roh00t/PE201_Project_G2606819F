@@ -1,0 +1,7 @@
+# MediExtract - deliberately thin. The orchestration is the standard library.
+google-genai>=1.0        # Gemini 2.5 Flash, native JSON-schema decoding
+pydantic>=2.7            # the four-field schema, also the response schema
+
+# Optional. Only needed for `label_gold_v1.py template --via datasets`, the
+# parquet fallback for when the HF rows API truncates a long transcript.
+# datasets>=2.19
