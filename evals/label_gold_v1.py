@@ -20,14 +20,14 @@ Typical week 1:
 
     # HF_TOKEN=<token> in .env at the repo root
     python evals/label_gold_v1.py profile
-    python evals/label_gold_v1.py template --n 30 --seed 42
+    python evals/label_gold_v1.py template            # = --script latin --n all
     python evals/label_gold_v1.py label --labeller rohit
     python evals/label_gold_v1.py validate --seal
     git tag -a gold-v1 ...          (validate prints the exact commands)
 
-The sample is drawn from the whole 156-row split rather than its head, and
-the profile is printed before anything is written, so a skewed head is
-visible rather than silently inherited.
+The whole 156-row split is profiled before anything is written. The gold set
+is then every Latin-script row (67); `--n 30 --seed 42` draws a seeded sample
+from that pool instead, and `--script any` includes the Devanagari rows.
 """
 
 import argparse
@@ -49,17 +49,43 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from guardrails import BLANKED, verify_evidence  # noqa: E402
-from schema import CRITICAL_FIELDS, GoldCase, GoldField, GoldSet, Status  # noqa: E402
+from schema import (  # noqa: E402
+    CRITICAL_FIELDS, FIELD_RULES, GoldCase, GoldField, GoldSet, Status, render_field_rules,
+)
 
 DATASET = "ekacare/clinical_note_generation_dataset"
 DATASET_REVISION = "662c58a1d03255e26461519be4c9c4e597fdd3fd"  # pin it or it is not reproducible
 TEXT_FIELD = "text"
 ID_FIELD = "session_id"
 MD5_FIELD = "text_md5"
+RUBRICS_FIELD = "rubrics"
+
+# The dataset ships its own reference labels inside each row's rubric text,
+# as "Category ID: <name>" lines. Mapping them onto our four fields gives a
+# real entity count to profile with, instead of guessing by regex.
+REFERENCE_CATEGORIES = {
+    "medication": {"medication_name"},
+    "dose": {"medication_dose"},
+    "frequency": {"medication_frequency"},
+    "allergy": {"drugAllergy_name", "foodOtherAllergy_name"},
+    "current_med": {"current_medication_name"},
+}
+RUBRIC_CATEGORY = re.compile(r"Category ID:\s*(\S+)")
 
 API = "https://datasets-server.huggingface.co"
 EXPECTED_ROWS = 156  # per the dataset card at DATASET_REVISION
 DEFAULT_SEED = 42
+# Decided 2026-09-16 after profiling: the gold set is every Latin-script row.
+DEFAULT_SCRIPT = "latin"
+DEFAULT_N = "all"
+
+# Rows whose text the assistant read (first ~420 chars) during format
+# inspection on 2026-09-16, before the pool was chosen. They were outside the
+# seed-42 mixed sample at the time and are gold cases now. Recorded so the
+# exposure is on file rather than remembered. No prompt wording was taken
+# from them; the examples in FIELD_RULES come from the rubric boilerplate
+# that is identical across all 156 rows.
+INSPECTED_ROW_IDX = [0, 2, 3, 9, 13]
 
 # Representativeness thresholds for the sample-vs-population check.
 MEDIAN_DRIFT = 0.25        # sample median words/turns more than 25% off
@@ -73,7 +99,7 @@ SEALED_PATH = GOLD_DIR / "gold_v1.json"
 SCRIPT = "./.venv/bin/python evals/label_gold_v1.py"
 # No `export HF_TOKEN=...` here: the token is read from .env, and a pasted
 # placeholder export would override it.
-TEMPLATE_COMMAND = f"{SCRIPT} template --n 30 --seed {DEFAULT_SEED}"
+TEMPLATE_COMMAND = f"{SCRIPT} template --script {DEFAULT_SCRIPT} --n {DEFAULT_N}"
 
 STATUS_KEYS = {
     "f": Status.FOUND,
@@ -210,11 +236,8 @@ def _base_provenance(**extra) -> dict:
         "config": "default",
         "split": "test",
         "rows_in_split": EXPECTED_ROWS,
-        "language": (
-            "English. The dataset card declares language:en for its single config "
-            "and single test split, so no language filter was applied; the per-row "
-            "script check below is what was actually measured."
-        ),
+        # Overwritten in cmd_template with what the per-row check measured.
+        "language": "dataset card declares language:en (not verified per row here)",
         "pulled_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         **extra,
     }
@@ -316,8 +339,11 @@ def load_rows(args) -> tuple[list[dict], dict]:
 # any model has seen these notes, so the profile cannot use one either.
 # ---------------------------------------------------------------------------
 #
-# The entity counts are regex PROXIES. They answer "does the sample look like
-# the population", not "what is in the note" - that is what labelling is for.
+# Two kinds of entity count. REFERENCE counts come from the dataset's own
+# rubric categories and are the ones to trust. The regex PROXIES are
+# English-only and undercount (a dictated "paracetamol 500" has no unit);
+# they remain for local notes, which have no rubrics. Neither says what is in
+# a given note - that is what labelling is for.
 
 ENTITY_PROXIES = {
     "dose": re.compile(
@@ -350,16 +376,42 @@ HINGLISH_MARKERS = frozenset(
     "dawa theek thik accha acha kaise kitne abhi bahut karo karna lena lijiye "
     "raha rahi gaya hua hui".split()
 )
+# Marker words that separate the two Devanagari languages seen in this
+# split. Heuristic: counts, not a language-ID model.
+MARATHI_MARKERS = frozenset("आहे आहेत म्हणजे झाले काय मला तुम्ही होते आणि असं नाहीये".split())
+HINDI_MARKERS = frozenset("है हैं नहीं मुझे आप क्या रहा रही और था".split())
+
 SPEAKER_TURN = re.compile(r"^\s*\[?[A-Za-z][A-Za-z .]{0,24}\]?\s*:", re.M)
 WORD = re.compile(r"[A-Za-zऀ-ॿ']+")
+
+
+def _script_group(text: str) -> str:
+    if any("\u0900" <= ch <= "\u097F" for ch in text):
+        return "devanagari"
+    if any(ch.isalpha() and not ch.isascii() for ch in text):
+        return "other-script"
+    return "latin"
+
+
+def _reference_counts(row: dict) -> dict:
+    categories = RUBRIC_CATEGORY.findall(row.get(RUBRICS_FIELD) or "")
+    return {
+        field: sum(1 for c in categories if c in names)
+        for field, names in REFERENCE_CATEGORIES.items()
+    }
 
 
 def _profile_row(row: dict) -> dict:
     text = row.get(TEXT_FIELD) or ""
     words = WORD.findall(text)
     lowered = [w.lower() for w in words]
+    tokens = set(text.replace("\u0964", " ").split())
     recorded_md5 = row.get(MD5_FIELD)
     return {
+        "script": _script_group(text),
+        "reference": _reference_counts(row),
+        "marathi_hits": len(tokens & MARATHI_MARKERS),
+        "hindi_hits": len(tokens & HINDI_MARKERS),
         "row_idx": row["_row_idx"],
         "chars": len(text),
         "words": len(words),
@@ -392,6 +444,11 @@ def summarise(profiles: list[dict]) -> dict:
         "chars": _quantiles([p["chars"] for p in profiles]),
         "words": _quantiles([p["words"] for p in profiles]),
         "turns": _quantiles([p["turns"] for p in profiles]),
+        "reference_prevalence": {
+            name: round(sum(1 for p in profiles if p["reference"][name]) / n, 3)
+            for name in REFERENCE_CATEGORIES
+        },
+        "medications_per_row": _quantiles([p["reference"]["medication"] for p in profiles]),
         "entity_prevalence": {
             name: round(sum(1 for p in profiles if p["entities"][name]) / n, 3)
             for name in ENTITY_PROXIES
@@ -401,13 +458,22 @@ def summarise(profiles: list[dict]) -> dict:
             for name in ENTITY_PROXIES
         },
         "language_check": {
+            "script_groups": {
+                g: sum(1 for p in profiles if p["script"] == g)
+                for g in ("latin", "devanagari", "other-script")
+            },
+            "devanagari_likely_marathi": sum(
+                1 for p in profiles if p["devanagari"] and p["marathi_hits"] > p["hindi_hits"]),
+            "devanagari_likely_hindi": sum(
+                1 for p in profiles if p["devanagari"] and p["marathi_hits"] <= p["hindi_hits"]),
             "rows_with_devanagari": sum(1 for p in profiles if p["devanagari"]),
             "rows_possibly_code_mixed": len(code_mixed),
             "code_mixed_row_idx": code_mixed[:20],
             "rows_ascii_letters_only": sum(1 for p in profiles if p["non_ascii_letters"] == 0),
             "method": (
-                f"Devanagari codepoints, non-ASCII letters, and >= {CODE_MIXED_MIN_HITS} "
-                "romanised-Hindi marker tokens per row. A heuristic, not a classifier."
+                f"Devanagari codepoints, non-ASCII letters, >= {CODE_MIXED_MIN_HITS} "
+                "romanised-Hindi marker tokens per row, and Marathi-vs-Hindi marker "
+                "words. A heuristic, not a language-ID model."
             ),
         },
         "integrity": {
@@ -420,8 +486,8 @@ def summarise(profiles: list[dict]) -> dict:
 def select_indices(total: int, n: int, seed: int | None) -> list[int]:
     """Seeded sample of positions, returned sorted so case_001 is the lowest row."""
     if n > total:
-        sys.exit(f"asked for {n} cases but the split only has {total} rows")
-    if seed is None:
+        sys.exit(f"asked for {n} cases but the pool only has {total} rows")
+    if seed is None or n == total:
         return list(range(n))
     return sorted(random.Random(seed).sample(range(total), n))
 
@@ -436,6 +502,12 @@ def representativeness(population: dict, sample: dict) -> list[str]:
                 f"median {metric} is {smp} vs {pop} in the full split "
                 f"({(smp - pop) / pop:+.0%})"
             )
+    for name, pop in population["reference_prevalence"].items():
+        smp = sample["reference_prevalence"][name]
+        if abs(smp - pop) > PREVALENCE_DRIFT:
+            warnings.append(
+                f"reference {name} is in {smp:.0%} of sampled rows vs {pop:.0%} in the pool"
+            )
     for name, pop in population["entity_prevalence"].items():
         smp = sample["entity_prevalence"][name]
         if abs(smp - pop) > PREVALENCE_DRIFT:
@@ -445,49 +517,57 @@ def representativeness(population: dict, sample: dict) -> list[str]:
     return warnings
 
 
-def print_profile(population: dict, columns: dict[str, dict]) -> None:
-    """Population first, then each candidate selection beside it."""
-    names = ["all"] + list(columns)
-    table = {"all": population, **columns}
-    width = 11
+def print_profile(base_label: str, base: dict, candidates: dict[str, dict],
+                  context: dict[str, dict] | None = None) -> None:
+    """Context columns (shown only), the base, then candidates checked against it."""
+    context = context or {}
+    table = {**context, base_label: base, **candidates}
+    names = list(table)
+    full = next(iter(table.values()))
+    width = 12
 
     def row(label: str, values: list) -> None:
         print(f"  {label:<24}" + "".join(f"{str(v):>{width}}" for v in values))
 
+    rule = "  " + "-" * (24 + width * len(names))
     print("\nDATASET PROFILE  (deterministic - no model has seen these notes)")
     print("=" * (26 + width * len(names)))
     row("", names)
     row("rows", [table[k]["rows"] for k in names])
-    for metric in ("chars", "words", "turns"):
+    for metric in ("chars", "words"):
         for stat in ("min", "median", "mean", "max"):
             row(f"{metric} {stat}", [table[k][metric].get(stat, "-") for k in names])
-    print("  " + "-" * (24 + width * len(names)))
-    print("  rows containing (regex proxy)")
+    print(rule)
+    print("  rows with a REFERENCE label (from the dataset's own rubrics)")
+    for name in REFERENCE_CATEGORIES:
+        row(f"  {name}", [f"{table[k]['reference_prevalence'][name]:.0%}" for k in names])
+    row("  medications/row median", [table[k]["medications_per_row"].get("median", "-") for k in names])
+    row("  medications/row max", [table[k]["medications_per_row"].get("max", "-") for k in names])
+    print("  rows matching a regex proxy (weaker - English-only patterns)")
     for name in ENTITY_PROXIES:
         row(f"  {name}", [f"{table[k]['entity_prevalence'][name]:.0%}" for k in names])
-    print("  mean mentions per row")
-    for name in ENTITY_PROXIES:
-        row(f"  {name}", [table[k]["entity_mean_per_row"][name] for k in names])
-    print("  " + "-" * (24 + width * len(names)))
-    lang = population["language_check"]
-    integ = population["integrity"]
-    print(f"  language   {lang['rows_ascii_letters_only']}/{population['rows']} rows ASCII-only, "
-          f"{lang['rows_with_devanagari']} with Devanagari, "
-          f"{lang['rows_possibly_code_mixed']} possibly code-mixed")
+    print(rule)
+    print("  script")
+    for group in ("latin", "devanagari", "other-script"):
+        row(f"  {group}", [table[k]["language_check"]["script_groups"][group] for k in names])
+    lang = full["language_check"]
+    print(f"  devanagari split ({names[0]}): ~{lang['devanagari_likely_hindi']} Hindi, "
+          f"~{lang['devanagari_likely_marathi']} Marathi (marker words)")
     if lang["code_mixed_row_idx"]:
-        print(f"             code-mixed candidates (row_idx): {lang['code_mixed_row_idx']}")
-    print(f"  integrity  {integ['md5_mismatches']} md5 mismatches, "
+        print(f"  romanised code-mixed candidates ({names[0]}, row_idx): {lang['code_mixed_row_idx']}")
+    integ = full["integrity"]
+    print(f"  integrity ({names[0]}): {integ['md5_mismatches']} md5 mismatches, "
           f"{integ['duplicate_texts']} duplicate texts")
-
-    print("  " + "-" * (24 + width * len(names)))
-    for label, summary in columns.items():
-        flags = representativeness(population, summary)
+    if candidates:
+        print(rule)
+    for label, summary in candidates.items():
+        flags = representativeness(base, summary)
         if not flags:
-            print(f"  {label:<10} representative on every check")
+            print(f"  {label:<12} representative of '{base_label}' on every check")
             continue
-        print(f"  {label:<10} DRIFTS from the full split on {len(flags)} check(s):")
+        print(f"  {label:<12} DRIFTS from '{base_label}' on {len(flags)} check(s):")
         for flag in flags:
-            print(f"             - {flag}")
+            print(f"               - {flag}")
     print()
 
 
@@ -539,21 +619,74 @@ def snap_to_source(evidence: str, source_text: str) -> str | None:
 # Subcommands
 # ---------------------------------------------------------------------------
 
-def _profile_and_select(args, rows: list[dict]):
-    """Profile the whole split, then choose. Prints both side by side."""
-    seed = None if args.head else args.seed
+def _profile_and_select(args, rows: list[dict]) -> dict:
+    """Profile the whole split, filter to the pool, draw from the pool.
+
+    The sample is checked for drift against the pool it was drawn from; the
+    full split is printed alongside for context.
+    """
     profiles = [_profile_row(r) for r in rows]
-    population = summarise(profiles)
+    full = summarise(profiles)
 
-    head_idx = select_indices(len(rows), args.n, None)
-    chosen_idx = select_indices(len(rows), args.n, seed)
-    chosen_label = f"head {args.n}" if seed is None else f"seed {seed}"
+    keep = [i for i, p in enumerate(profiles) if args.script == "any" or p["script"] == args.script]
+    pool_rows = [rows[i] for i in keep]
+    pool_profiles = [profiles[i] for i in keep]
+    pool = summarise(pool_profiles)
 
-    columns = {f"head {args.n}": summarise([profiles[i] for i in head_idx])}
-    if seed is not None:
-        columns[chosen_label] = summarise([profiles[i] for i in chosen_idx])
-    print_profile(population, columns)
-    return profiles, population, columns[chosen_label], chosen_idx, seed
+    n = len(pool_rows) if args.n == "all" else args.n
+    whole_pool = n == len(pool_rows)
+    seed = None if (args.head or whole_pool) else args.seed
+
+    head_idx = select_indices(len(pool_rows), n, None)
+    chosen_idx = select_indices(len(pool_rows), n, seed)
+
+    if whole_pool:
+        # Nothing is being sampled, so there is nothing to drift.
+        chosen_label, candidates = "pool", {}
+    else:
+        chosen_label = f"head {n}" if seed is None else f"seed {seed}"
+        candidates = {f"head {n}": summarise([pool_profiles[i] for i in head_idx])}
+        if seed is not None:
+            candidates[chosen_label] = summarise([pool_profiles[i] for i in chosen_idx])
+
+    if args.script == "any":
+        print_profile(f"all {len(rows)}", full, candidates)
+    else:
+        print_profile(f"{args.script} pool", pool, candidates, context={f"all {len(rows)}": full})
+
+    return {
+        "seed": seed,
+        "whole_pool": whole_pool,
+        "full": full,
+        "pool": pool,
+        "sample": pool if whole_pool else candidates[chosen_label],
+        "pool_rows": pool_rows,
+        "pool_profiles": pool_profiles,
+        "chosen_idx": chosen_idx,
+        "filter": {
+            "script": args.script,
+            "rows_before": len(rows),
+            "rows_after": len(pool_rows),
+            "excluded_row_idx": sorted(
+                set(r["_row_idx"] for r in rows) - set(r["_row_idx"] for r in pool_rows)
+            ),
+        },
+    }
+
+
+def _language_statement(full: dict, script: str, pool_size: int) -> str:
+    lang = full["language_check"]
+    groups = lang["script_groups"]
+    return (
+        f"The dataset card declares language:en, but the per-row script check does not "
+        f"bear that out: {groups['latin']}/{full['rows']} rows are Latin script, "
+        f"{groups['devanagari']} contain Devanagari (~{lang['devanagari_likely_hindi']} "
+        f"Hindi, ~{lang['devanagari_likely_marathi']} Marathi by marker words) and "
+        f"{groups['other-script']} another script. "
+        + ("No language filter was applied."
+           if script == "any" else
+           f"Script filter '{script}' applied: {pool_size} rows eligible.")
+    )
 
 
 def _check_row_count(provenance: dict, rows: list[dict]) -> None:
@@ -570,8 +703,11 @@ def cmd_profile(args) -> int:
     _check_row_count(provenance, rows)
     print(f"{len(rows)} rows from {provenance['dataset']} via {provenance['via']}")
     _profile_and_select(args, rows)
+    command = f"{SCRIPT} template --script {args.script} --n {args.n}"
+    if args.n != "all" and not args.head:
+        command += f" --seed {args.seed}"
     print("nothing written. To generate the template:")
-    print(f"  {TEMPLATE_COMMAND}")
+    print(f"  {command}")
     return 0
 
 
@@ -583,11 +719,13 @@ def cmd_template(args) -> int:
     rows, provenance = load_rows(args)
     _check_row_count(provenance, rows)
     print(f"{len(rows)} rows from {provenance['dataset']} via {provenance['via']}")
-    profiles, population, sample, chosen_idx, seed = _profile_and_select(args, rows)
+    picked = _profile_and_select(args, rows)
+    seed, sample, chosen_idx = picked["seed"], picked["sample"], picked["chosen_idx"]
+    pool_rows, profiles = picked["pool_rows"], picked["pool_profiles"]
 
     cases, row_map = [], {}
     for position, index in enumerate(chosen_idx, start=1):
-        row = rows[index]
+        row = pool_rows[index]
         case_id = f"case_{position:03d}"
         text = row[TEXT_FIELD]
         cases.append(GoldCase.blank_case(case_id, text))
@@ -597,24 +735,50 @@ def cmd_template(args) -> int:
             "text_md5": profiles[index]["md5"],
             "chars": profiles[index]["chars"],
             "words": profiles[index]["words"],
+            "script": profiles[index]["script"],
         }
 
-    flags = representativeness(population, sample)
+    flags = representativeness(picked["pool"], sample)
+    provenance["language"] = _language_statement(
+        picked["full"], args.script, picked["filter"]["rows_after"])
+    exposed = sorted(set(INSPECTED_ROW_IDX) & {pool_rows[i]["_row_idx"] for i in chosen_idx})
+    if picked["whole_pool"]:
+        method = "entire pool - no sampling"
+    elif seed is None:
+        method = "head"
+    else:
+        method = "seeded random sample without replacement"
     provenance.update({
+        "filter": picked["filter"],
+        "exposure": {
+            "row_idx_read_by_assistant_before_selection": exposed,
+            "extent": "first ~420 characters of text, plus the full rubric of row 0",
+            "when": "2026-09-16, during format inspection, before the pool was chosen",
+            "prompt_impact": (
+                "none intended: FIELD_RULES examples come from rubric boilerplate "
+                "identical across all rows. The 'unit often omitted' note in the "
+                "dose rule was informed by row 0."
+            ),
+        },
+        "field_rules": dict(FIELD_RULES),
         "selection": {
-            "method": "head" if seed is None else "seeded random sample without replacement",
+            "method": method,
             "seed": seed,
             "n": len(cases),
             "rng": "python random.Random(seed).sample(range(rows), n), sorted",
             "python": platform.python_version(),
-            "row_idx": [rows[i]["_row_idx"] for i in chosen_idx],
+            "drawn_from": f"{picked['filter']['rows_after']}-row '{args.script}' pool",
+            "row_idx": [pool_rows[i]["_row_idx"] for i in chosen_idx],
         },
-        "language_check": population["language_check"],
+        "language_check": picked["full"]["language_check"],
         "profile": {
-            "population": population,
+            "full_split": picked["full"],
+            "pool": picked["pool"],
             "sample": sample,
             "representativeness_flags": flags,
-            "note": "entity figures are regex proxies, computed before any model ran",
+            "note": ("reference_prevalence comes from the dataset's own rubric categories; "
+                     "entity_prevalence is a weaker English-only regex proxy. Both computed "
+                     "before any model ran."),
         },
         "row_map": row_map,
         "fields": list(CRITICAL_FIELDS),
@@ -628,6 +792,9 @@ def cmd_template(args) -> int:
     print(f"  selection: {provenance['selection']['method']}"
           + (f", seed {seed}" if seed is not None else ""))
     print(f"  row_idx:   {provenance['selection']['row_idx']}")
+    if exposed:
+        print(f"  exposure:  rows {exposed} were read during format inspection "
+              "- recorded in provenance.exposure")
     if flags:
         print("\n  the sample drifts from the population on: " + "; ".join(flags))
         print("  Report that in the write-up. Do not re-roll the seed until the numbers")
@@ -652,13 +819,16 @@ def label_one_field(name: str, source_text: str, existing: GoldField) -> GoldFie
         current += f" / {existing.value!r}]" if existing.value else "]"
 
     while True:
-        choice = _prompt(f"  {name:<11}{current}\n    status (f)ound (n)ot-stated (u)nsure (s)kip (q)uit > ").lower()
+        choice = _prompt(f"  {name:<11}{current}\n    status (f)ound (n)ot-stated (u)nsure (s)kip (q)uit (?)rule > ").lower()
+        if choice == "?":
+            print(f"    {name}: {FIELD_RULES[name]}")
+            continue
         if choice == "q":
             raise KeyboardInterrupt
         if choice == "s":
             return None
         if choice not in STATUS_KEYS:
-            print("    -> answer f, n, u, s or q")
+            print("    -> answer f, n, u, s, q or ?")
             continue
 
         status = STATUS_KEYS[choice]
@@ -704,6 +874,10 @@ def cmd_label(args) -> int:
 
     print(f"{len(queue)} case(s) to label in {_rel(path)}")
     print("ctrl-c or 'q' quits; the file is saved after every case.\n")
+    print("FIELD RULES - the same text the extraction model is given")
+    print(render_field_rules())
+    print("\nType ? at any status prompt to see that field's rule again.")
+    print("Record in the case note WHY you picked the medication you did.\n")
 
     try:
         for position, case in enumerate(queue, start=1):
@@ -803,7 +977,7 @@ def cmd_validate(args) -> int:
         goldset.provenance["sealed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
         save_goldset(goldset, SEALED_PATH)
         print(f"sealed to {_rel(SEALED_PATH)}")
-    print_seal_instructions(sealed=args.seal)
+    print_seal_instructions(sealed=args.seal, cases=len(goldset.cases))
     return 0
 
 
@@ -832,8 +1006,9 @@ def print_label_instructions(template: Path) -> None:
     print("  (validate prints the git tag gold-v1 commands once every label passes)")
 
 
-def print_seal_instructions(sealed: bool = False) -> None:
+def print_seal_instructions(sealed: bool = False, cases: int | None = None) -> None:
     is_repo = (ROOT / ".git").exists()
+    label = f"{cases} hand-labelled Eka Care cases" if cases else "hand-labelled Eka Care cases"
     print("\n" + "=" * 78)
     print("FREEZING gold-v1")
     print("=" * 78)
@@ -847,11 +1022,11 @@ def print_seal_instructions(sealed: bool = False) -> None:
     if not is_repo:
         print("   git init")
         print("   git add -A")
-        print("   git commit -m \"gold-v1: 30 hand-labelled Eka Care cases\"")
+        print(f"   git commit -m \"gold-v1: {label}\"")
     else:
         print("   git add data/gold_labels/gold_v1.json")
-        print("   git commit -m \"gold-v1: 30 hand-labelled Eka Care cases\"")
-    print("   git tag -a gold-v1 -m \"frozen gold labels, 30 cases, 4 critical fields\"")
+        print(f"   git commit -m \"gold-v1: {label}\"")
+    print(f"   git tag -a gold-v1 -m \"frozen gold labels, {label}, 4 critical fields\"")
     print("\n3. from here on, treat gold_v1.json as read-only. If a label turns out")
     print("   to be wrong, fix it in a gold-v2 tag rather than editing gold-v1 -")
     print("   a recall number that moved because the labels moved is not a result.")
@@ -863,11 +1038,15 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     def add_source_args(p):
-        p.add_argument("--n", type=int, default=30, help="cases to select (default 30)")
+        p.add_argument("--n", type=lambda v: v if v == "all" else int(v), default=DEFAULT_N,
+                       help=f"cases to select, or 'all' for the whole pool (default {DEFAULT_N})")
         p.add_argument("--seed", type=int, default=DEFAULT_SEED,
                        help=f"seeded random sample over the whole split (default {DEFAULT_SEED})")
         p.add_argument("--head", action="store_true",
                        help="take the first N rows instead of a seeded sample")
+        p.add_argument("--script", choices=["any", "latin"], default=DEFAULT_SCRIPT,
+                       help="restrict the pool before sampling; 'latin' drops Devanagari "
+                            f"and other non-Latin-script rows (default {DEFAULT_SCRIPT})")
         p.add_argument("--via", choices=["api", "datasets"], default="api")
         p.add_argument("--from-local-notes", metavar="DIR", help="use local .txt files instead")
 

@@ -24,6 +24,56 @@ BLANK = ""
 
 CRITICAL_FIELDS = ("medication", "dose", "frequency", "allergy")
 
+# What each field means. The single source of truth: extract.py puts this text
+# in the Gemini system prompt, and evals/label_gold_v1.py shows the same text
+# to the human labeller. If the two ever read different definitions, recall
+# would measure the difference between the definitions, not the model.
+FIELD_RULES = {
+    "medication": (
+        "The single most clinically significant medication prescribed or "
+        "continued at this visit. Brand names count ('Dolo 650', 'Telma'). If "
+        "two are equally significant and there is no principled way to choose, "
+        "use status unsure."
+    ),
+    "dose": (
+        "The STRENGTH of that same medication exactly as dictated: '500', "
+        "'500 mg', '0.5 mg'. Dictation often omits the unit - leave it omitted, "
+        "do not infer it. A strength inside a product name counts ('Dolo 650' -> "
+        "value '650'). A quantity per administration ('1 tablet', 'half') is "
+        "NOT a dose; if only a quantity is given, dose is not_stated."
+    ),
+    "frequency": (
+        "How often that same medication is taken, as dictated: 'twice daily', "
+        "'TDS', '1-0-1', 'three times a day'. Timing relative to food ('after "
+        "food') is not a frequency."
+    ),
+    "allergy": (
+        "A drug or other substance the patient is allergic to. A denial "
+        "('no known allergies') is not_stated, not an allergy."
+    ),
+}
+
+SHARED_FIELD_RULE = (
+    "dose and frequency always describe the medication reported in `medication`. "
+    "If that medication has no dictated strength, dose is not_stated even when "
+    "another medication in the note has one."
+)
+
+
+def render_field_rules(indent: str = "  ") -> str:
+    """The rules as plain text, for a prompt or a terminal."""
+    import textwrap
+
+    width = 78 - len(indent)
+    lines = []
+    for name, rule in FIELD_RULES.items():
+        wrapped = textwrap.wrap(rule, width - 13)
+        lines.append(f"{indent}{name:<11}- {wrapped[0]}")
+        lines.extend(f"{indent}{'':<13}{w}" for w in wrapped[1:])
+    lines.append("")
+    lines.extend(indent + w for w in textwrap.wrap(SHARED_FIELD_RULE, width))
+    return "\n".join(lines)
+
 
 class Status(str, Enum):
     """Why a field looks the way it does."""

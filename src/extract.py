@@ -32,7 +32,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from guardrails import BLANKED, PASS, apply_gates  # noqa: E402
-from schema import ClinicalExtraction  # noqa: E402
+from schema import ClinicalExtraction, render_field_rules  # noqa: E402
 
 MODEL = "gemini-2.5-flash"
 
@@ -45,14 +45,11 @@ PRICE_OUT_PER_MTOK = 2.50
 # inside 3 seconds, so the extraction itself needs to land well under that.
 LATENCY_BUDGET_MS = 3000
 
-SYSTEM_INSTRUCTION = """\
+SYSTEM_INSTRUCTION = f"""\
 You extract four fields from a dictated clinical note for a polyclinic physician.
 
 FIELDS
-  medication - the drug the patient is being prescribed or is currently taking
-  dose       - the amount per administration of that medication
-  frequency  - how often it is taken
-  allergy    - a drug or substance allergy the patient has
+{render_field_rules()}
 
 EVIDENCE IS THE PRODUCT
 For every field you mark `found` or `unsure`, `evidence` must be a span copied
@@ -79,10 +76,7 @@ STATUS
                above. Leave value and evidence as empty strings.
   unsure     - stated but genuinely ambiguous. Supply your best verbatim span.
                Prefer `unsure` over a confident guess; an unsure field costs
-               the physician one glance, a wrong field costs a patient.
-
-If several medications are mentioned, report the single most clinically
-significant one being prescribed or continued at this visit.\
+               the physician one glance, a wrong field costs a patient.\
 """
 
 MOCK_RESPONSE = {

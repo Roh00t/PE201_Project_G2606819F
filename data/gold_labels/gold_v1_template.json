@@ -6,50 +6,207 @@
     "config": "default",
     "split": "test",
     "rows_in_split": 156,
-    "language": "English. The dataset card declares language:en for its single config and single test split, so no language filter was applied; the per-row script check below is what was actually measured.",
-    "pulled_at": "2026-09-16T08:44:40+00:00",
+    "language": "The dataset card declares language:en, but the per-row script check does not bear that out: 67/156 rows are Latin script, 88 contain Devanagari (~44 Hindi, ~44 Marathi by marker words) and 1 another script. Script filter 'latin' applied: 67 rows eligible.",
+    "pulled_at": "2026-09-16T08:54:34+00:00",
     "via": "datasets-server rows API",
     "revision_enforced": false,
-    "selection": {
-      "method": "seeded random sample without replacement",
-      "seed": 42,
-      "n": 30,
-      "rng": "python random.Random(seed).sample(range(rows), n), sorted",
-      "python": "3.14.5",
-      "row_idx": [
-        1,
-        6,
-        7,
-        8,
+    "filter": {
+      "script": "latin",
+      "rows_before": 156,
+      "rows_after": 67,
+      "excluded_row_idx": [
+        9,
+        13,
+        14,
+        15,
+        18,
+        21,
         22,
         23,
+        24,
+        25,
         26,
-        28,
+        27,
+        29,
+        30,
+        32,
+        34,
         35,
-        39,
-        40,
+        37,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
         50,
+        51,
+        52,
+        53,
         55,
         56,
         57,
+        58,
         59,
+        60,
+        61,
         62,
-        70,
-        71,
+        66,
+        68,
+        69,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        86,
         87,
+        88,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
         107,
         108,
+        111,
+        112,
+        113,
         114,
+        115,
+        116,
+        119,
+        120,
         122,
+        123,
+        124,
+        126,
+        128,
         129,
+        130,
+        132,
         134,
+        135,
         139,
+        140,
         142,
-        146,
+        143,
+        144,
+        148,
+        153,
         154
       ]
     },
+    "exposure": {
+      "row_idx_read_by_assistant_before_selection": [
+        0,
+        2,
+        3
+      ],
+      "extent": "first ~420 characters of text, plus the full rubric of row 0",
+      "when": "2026-09-16, during format inspection, before the pool was chosen",
+      "prompt_impact": "none intended: FIELD_RULES examples come from rubric boilerplate identical across all rows. The 'unit often omitted' note in the dose rule was informed by row 0."
+    },
+    "field_rules": {
+      "medication": "The single most clinically significant medication prescribed or continued at this visit. Brand names count ('Dolo 650', 'Telma'). If two are equally significant and there is no principled way to choose, use status unsure.",
+      "dose": "The STRENGTH of that same medication exactly as dictated: '500', '500 mg', '0.5 mg'. Dictation often omits the unit - leave it omitted, do not infer it. A strength inside a product name counts ('Dolo 650' -> value '650'). A quantity per administration ('1 tablet', 'half') is NOT a dose; if only a quantity is given, dose is not_stated.",
+      "frequency": "How often that same medication is taken, as dictated: 'twice daily', 'TDS', '1-0-1', 'three times a day'. Timing relative to food ('after food') is not a frequency.",
+      "allergy": "A drug or other substance the patient is allergic to. A denial ('no known allergies') is not_stated, not an allergy."
+    },
+    "selection": {
+      "method": "entire pool - no sampling",
+      "seed": null,
+      "n": 67,
+      "rng": "python random.Random(seed).sample(range(rows), n), sorted",
+      "python": "3.14.5",
+      "drawn_from": "67-row 'latin' pool",
+      "row_idx": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        16,
+        17,
+        19,
+        20,
+        28,
+        31,
+        33,
+        36,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        54,
+        63,
+        64,
+        65,
+        67,
+        70,
+        71,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        89,
+        90,
+        91,
+        92,
+        99,
+        109,
+        110,
+        117,
+        118,
+        121,
+        125,
+        127,
+        131,
+        133,
+        136,
+        137,
+        138,
+        141,
+        145,
+        146,
+        147,
+        149,
+        150,
+        151,
+        152,
+        155
+      ]
+    },
     "language_check": {
+      "script_groups": {
+        "latin": 67,
+        "devanagari": 88,
+        "other-script": 1
+      },
+      "devanagari_likely_marathi": 44,
+      "devanagari_likely_hindi": 44,
       "rows_with_devanagari": 88,
       "rows_possibly_code_mixed": 5,
       "code_mixed_row_idx": [
@@ -60,10 +217,10 @@
         126
       ],
       "rows_ascii_letters_only": 67,
-      "method": "Devanagari codepoints, non-ASCII letters, and >= 3 romanised-Hindi marker tokens per row. A heuristic, not a classifier."
+      "method": "Devanagari codepoints, non-ASCII letters, >= 3 romanised-Hindi marker tokens per row, and Marathi-vs-Hindi marker words. A heuristic, not a language-ID model."
     },
     "profile": {
-      "population": {
+      "full_split": {
         "rows": 156,
         "chars": {
           "min": 54,
@@ -89,6 +246,21 @@
           "max": 2,
           "mean": 0.0
         },
+        "reference_prevalence": {
+          "medication": 0.564,
+          "dose": 0.256,
+          "frequency": 0.526,
+          "allergy": 0.038,
+          "current_med": 0.154
+        },
+        "medications_per_row": {
+          "min": 0,
+          "p25": 0,
+          "median": 1,
+          "p75": 4,
+          "max": 12,
+          "mean": 2.0
+        },
         "entity_prevalence": {
           "dose": 0.141,
           "frequency": 0.359,
@@ -106,6 +278,13 @@
           "allergy_negated": 0.01
         },
         "language_check": {
+          "script_groups": {
+            "latin": 67,
+            "devanagari": 88,
+            "other-script": 1
+          },
+          "devanagari_likely_marathi": 44,
+          "devanagari_likely_hindi": 44,
           "rows_with_devanagari": 88,
           "rows_possibly_code_mixed": 5,
           "code_mixed_row_idx": [
@@ -116,30 +295,30 @@
             126
           ],
           "rows_ascii_letters_only": 67,
-          "method": "Devanagari codepoints, non-ASCII letters, and >= 3 romanised-Hindi marker tokens per row. A heuristic, not a classifier."
+          "method": "Devanagari codepoints, non-ASCII letters, >= 3 romanised-Hindi marker tokens per row, and Marathi-vs-Hindi marker words. A heuristic, not a language-ID model."
         },
         "integrity": {
           "md5_mismatches": 0,
           "duplicate_texts": 0
         }
       },
-      "sample": {
-        "rows": 30,
+      "pool": {
+        "rows": 67,
         "chars": {
-          "min": 115,
-          "p25": 323,
-          "median": 641,
-          "p75": 1020,
-          "max": 2323,
-          "mean": 731.6
+          "min": 84,
+          "p25": 279,
+          "median": 358,
+          "p75": 494,
+          "max": 2119,
+          "mean": 438.0
         },
         "words": {
-          "min": 17,
-          "p25": 57,
-          "median": 123,
-          "p75": 194,
-          "max": 484,
-          "mean": 137.0
+          "min": 12,
+          "p25": 45,
+          "median": 58,
+          "p75": 83,
+          "max": 360,
+          "mean": 72.4
         },
         "turns": {
           "min": 0,
@@ -149,28 +328,130 @@
           "max": 2,
           "mean": 0.1
         },
+        "reference_prevalence": {
+          "medication": 0.806,
+          "dose": 0.403,
+          "frequency": 0.791,
+          "allergy": 0.03,
+          "current_med": 0.075
+        },
+        "medications_per_row": {
+          "min": 0,
+          "p25": 1,
+          "median": 3,
+          "p75": 5,
+          "max": 12,
+          "mean": 3.0
+        },
         "entity_prevalence": {
-          "dose": 0.1,
-          "frequency": 0.267,
-          "dosage_form": 0.267,
-          "drug_suffix": 0.0,
-          "allergy_any": 0.033,
-          "allergy_negated": 0.0
+          "dose": 0.239,
+          "frequency": 0.672,
+          "dosage_form": 0.701,
+          "drug_suffix": 0.075,
+          "allergy_any": 0.015,
+          "allergy_negated": 0.015
         },
         "entity_mean_per_row": {
-          "dose": 0.17,
-          "frequency": 0.7,
-          "dosage_form": 1.33,
-          "drug_suffix": 0.0,
-          "allergy_any": 0.03,
-          "allergy_negated": 0.0
+          "dose": 0.39,
+          "frequency": 2.07,
+          "dosage_form": 2.88,
+          "drug_suffix": 0.07,
+          "allergy_any": 0.01,
+          "allergy_negated": 0.01
         },
         "language_check": {
-          "rows_with_devanagari": 20,
-          "rows_possibly_code_mixed": 0,
-          "code_mixed_row_idx": [],
-          "rows_ascii_letters_only": 10,
-          "method": "Devanagari codepoints, non-ASCII letters, and >= 3 romanised-Hindi marker tokens per row. A heuristic, not a classifier."
+          "script_groups": {
+            "latin": 67,
+            "devanagari": 0,
+            "other-script": 0
+          },
+          "devanagari_likely_marathi": 0,
+          "devanagari_likely_hindi": 0,
+          "rows_with_devanagari": 0,
+          "rows_possibly_code_mixed": 1,
+          "code_mixed_row_idx": [
+            3
+          ],
+          "rows_ascii_letters_only": 67,
+          "method": "Devanagari codepoints, non-ASCII letters, >= 3 romanised-Hindi marker tokens per row, and Marathi-vs-Hindi marker words. A heuristic, not a language-ID model."
+        },
+        "integrity": {
+          "md5_mismatches": 0,
+          "duplicate_texts": 0
+        }
+      },
+      "sample": {
+        "rows": 67,
+        "chars": {
+          "min": 84,
+          "p25": 279,
+          "median": 358,
+          "p75": 494,
+          "max": 2119,
+          "mean": 438.0
+        },
+        "words": {
+          "min": 12,
+          "p25": 45,
+          "median": 58,
+          "p75": 83,
+          "max": 360,
+          "mean": 72.4
+        },
+        "turns": {
+          "min": 0,
+          "p25": 0,
+          "median": 0,
+          "p75": 0,
+          "max": 2,
+          "mean": 0.1
+        },
+        "reference_prevalence": {
+          "medication": 0.806,
+          "dose": 0.403,
+          "frequency": 0.791,
+          "allergy": 0.03,
+          "current_med": 0.075
+        },
+        "medications_per_row": {
+          "min": 0,
+          "p25": 1,
+          "median": 3,
+          "p75": 5,
+          "max": 12,
+          "mean": 3.0
+        },
+        "entity_prevalence": {
+          "dose": 0.239,
+          "frequency": 0.672,
+          "dosage_form": 0.701,
+          "drug_suffix": 0.075,
+          "allergy_any": 0.015,
+          "allergy_negated": 0.015
+        },
+        "entity_mean_per_row": {
+          "dose": 0.39,
+          "frequency": 2.07,
+          "dosage_form": 2.88,
+          "drug_suffix": 0.07,
+          "allergy_any": 0.01,
+          "allergy_negated": 0.01
+        },
+        "language_check": {
+          "script_groups": {
+            "latin": 67,
+            "devanagari": 0,
+            "other-script": 0
+          },
+          "devanagari_likely_marathi": 0,
+          "devanagari_likely_hindi": 0,
+          "rows_with_devanagari": 0,
+          "rows_possibly_code_mixed": 1,
+          "code_mixed_row_idx": [
+            3
+          ],
+          "rows_ascii_letters_only": 67,
+          "method": "Devanagari codepoints, non-ASCII letters, >= 3 romanised-Hindi marker tokens per row, and Marathi-vs-Hindi marker words. A heuristic, not a language-ID model."
         },
         "integrity": {
           "md5_mismatches": 0,
@@ -178,218 +459,544 @@
         }
       },
       "representativeness_flags": [],
-      "note": "entity figures are regex proxies, computed before any model ran"
+      "note": "reference_prevalence comes from the dataset's own rubric categories; entity_prevalence is a weaker English-only regex proxy. Both computed before any model ran."
     },
     "row_map": {
       "case_001": {
+        "row_idx": 0,
+        "source_id": "EA0153A1-EDFB-4623-BFCB-CC04F4439832",
+        "text_md5": "c13626cac9161cb3a9dc7bb0475d5062",
+        "chars": 151,
+        "words": 26,
+        "script": "latin"
+      },
+      "case_002": {
         "row_idx": 1,
         "source_id": "2AE1B7AB-AE78-447F-AA1E-13EF3D5AF749",
         "text_md5": "f1b7812537574a6c8cef0e4df1c4bb50",
         "chars": 197,
-        "words": 28
+        "words": 28,
+        "script": "latin"
       },
-      "case_002": {
+      "case_003": {
+        "row_idx": 2,
+        "source_id": "ce-dbe88634-6805-4029-80d1-6723ebdc5014",
+        "text_md5": "2e8a7480a614f201b1a5c3728d572d4b",
+        "chars": 696,
+        "words": 110,
+        "script": "latin"
+      },
+      "case_004": {
+        "row_idx": 3,
+        "source_id": "ce-f96204d9-5cc6-4ea7-93d8-56e5c6a63331",
+        "text_md5": "d2a42a4436d484502b69f4cdb779234a",
+        "chars": 759,
+        "words": 130,
+        "script": "latin"
+      },
+      "case_005": {
+        "row_idx": 4,
+        "source_id": "ce-46fd328b-08ec-4f26-bfdc-fe8c2ae82aec",
+        "text_md5": "9249ee39f1384b661169e222381ce35d",
+        "chars": 445,
+        "words": 67,
+        "script": "latin"
+      },
+      "case_006": {
+        "row_idx": 5,
+        "source_id": "ce-f7d1e4ee-3039-4134-9092-9ad0113276d9",
+        "text_md5": "d83fef745a6fa6d0dd07b697b3d5e10d",
+        "chars": 716,
+        "words": 110,
+        "script": "latin"
+      },
+      "case_007": {
         "row_idx": 6,
         "source_id": "69B036FA-842D-4FD2-8047-C16DB40F3BAE",
         "text_md5": "e6579ed4abcb1ce2711dca2fb4ebf114",
         "chars": 283,
-        "words": 57
+        "words": 57,
+        "script": "latin"
       },
-      "case_003": {
+      "case_008": {
         "row_idx": 7,
         "source_id": "B9CBF76B-AE54-4B3B-BEED-BFC5C272D86C",
         "text_md5": "412fdd0819056cd5a7867c3b6675b9a5",
         "chars": 316,
-        "words": 51
+        "words": 51,
+        "script": "latin"
       },
-      "case_004": {
+      "case_009": {
         "row_idx": 8,
         "source_id": "AD9C9E23-9FA0-4161-A881-73055862276F",
         "text_md5": "1f2f2ddba897088aea67238217eaa05c",
         "chars": 115,
-        "words": 17
+        "words": 17,
+        "script": "latin"
       },
-      "case_005": {
-        "row_idx": 22,
-        "source_id": "11c4d88c-4045-4aba-b32a-af785c90de94",
-        "text_md5": "39cc7af3de51ca32599afe12dc872d88",
-        "chars": 608,
-        "words": 125
+      "case_010": {
+        "row_idx": 10,
+        "source_id": "D3A836BC-417A-4F50-B6A7-C754CF71BAD4",
+        "text_md5": "fbd399c3ca896afe4e3c2fd501d9dc70",
+        "chars": 322,
+        "words": 51,
+        "script": "latin"
       },
-      "case_006": {
-        "row_idx": 23,
-        "source_id": "12c8040f-3399-43f7-b960-fa70e6d036bd",
-        "text_md5": "00343900f913e126e99ce44517cec5d9",
-        "chars": 674,
-        "words": 117
+      "case_011": {
+        "row_idx": 11,
+        "source_id": "B2315026-6C51-4E63-B240-40A1D41F4F39",
+        "text_md5": "9be8b3bafab45ceb50ce946a7e5e7449",
+        "chars": 268,
+        "words": 45,
+        "script": "latin"
       },
-      "case_007": {
-        "row_idx": 26,
-        "source_id": "ce-30297a50-6827-42d5-8bf5-5ae0489e8c66",
-        "text_md5": "30414fca795b5a6c1ed5bd1ac9deea9a",
-        "chars": 1623,
-        "words": 269
+      "case_012": {
+        "row_idx": 12,
+        "source_id": "3F793001-D663-4E46-8A0A-AB27989538A2",
+        "text_md5": "029a82eb754cbb75b3d306a2a0002b98",
+        "chars": 166,
+        "words": 28,
+        "script": "latin"
       },
-      "case_008": {
+      "case_013": {
+        "row_idx": 16,
+        "source_id": "1542E947-D6BD-4CCD-8F7D-59DFF50E5B5E",
+        "text_md5": "16cb12e4cd531a293114c777a99f4d90",
+        "chars": 381,
+        "words": 58,
+        "script": "latin"
+      },
+      "case_014": {
+        "row_idx": 17,
+        "source_id": "F6F1EBA8-53C6-452A-AC02-25230744ED5E",
+        "text_md5": "b3ea57916f76cd0053f24d91a40358c3",
+        "chars": 299,
+        "words": 52,
+        "script": "latin"
+      },
+      "case_015": {
+        "row_idx": 19,
+        "source_id": "7EE482D8-B2E5-451A-A684-513F72C03ED8",
+        "text_md5": "6ba4b6f1c0bb040dcc0421efd3df6f3f",
+        "chars": 165,
+        "words": 30,
+        "script": "latin"
+      },
+      "case_016": {
+        "row_idx": 20,
+        "source_id": "0A4E4D9D-7AE3-4DE4-819F-6EDE4798A77B",
+        "text_md5": "ee7b3724352f52df30884cd06e07ccc8",
+        "chars": 294,
+        "words": 50,
+        "script": "latin"
+      },
+      "case_017": {
         "row_idx": 28,
         "source_id": "dcab1493-74ce-4153-b14f-f3330a0e7297",
         "text_md5": "74714f25e84630d9151a846f0e6dcfad",
         "chars": 358,
-        "words": 64
+        "words": 64,
+        "script": "latin"
       },
-      "case_009": {
-        "row_idx": 35,
-        "source_id": "c8e18c67-c128-45de-9f95-ace75f4d00a4",
-        "text_md5": "fe4ebd6eb67db072638aeb32c85fae2c",
-        "chars": 469,
-        "words": 88
+      "case_018": {
+        "row_idx": 31,
+        "source_id": "e152894d-b281-4258-b0fc-df99d807d6c8",
+        "text_md5": "4fffa7891572d8c323395f3198fbce55",
+        "chars": 231,
+        "words": 37,
+        "script": "latin"
       },
-      "case_010": {
+      "case_019": {
+        "row_idx": 33,
+        "source_id": "5fc815d2-4981-437f-ae0a-f13014b29b15",
+        "text_md5": "12edddd1bf426c4b615668fd8708cbf4",
+        "chars": 449,
+        "words": 71,
+        "script": "latin"
+      },
+      "case_020": {
+        "row_idx": 36,
+        "source_id": "2f952b7c-c14a-45d7-a98a-c4616c056279",
+        "text_md5": "9bff207c9e84c1504286106ffd319165",
+        "chars": 279,
+        "words": 46,
+        "script": "latin"
+      },
+      "case_021": {
+        "row_idx": 38,
+        "source_id": "f1c1205e-f0e8-4bba-b1cb-dc75b94ed14c",
+        "text_md5": "15598ea56a85a68eb313f24c49b2a5d7",
+        "chars": 446,
+        "words": 73,
+        "script": "latin"
+      },
+      "case_022": {
         "row_idx": 39,
         "source_id": "fb349c53-b43d-4f2e-a1a2-544e6c7adee0",
         "text_md5": "03a70825e00c28ac4c8a762a18da77d2",
         "chars": 412,
-        "words": 67
+        "words": 67,
+        "script": "latin"
       },
-      "case_011": {
+      "case_023": {
         "row_idx": 40,
         "source_id": "a62280f3-437e-4d36-bf48-22840a41ece9",
         "text_md5": "8e133dca607862e0282aa1bfed7ea2db",
         "chars": 308,
-        "words": 52
+        "words": 52,
+        "script": "latin"
       },
-      "case_012": {
-        "row_idx": 50,
-        "source_id": "6E54AC80-EC83-4E3D-9BD3-8798D26F9351",
-        "text_md5": "6e9927d03793be70b4dfeaa365cc21b5",
-        "chars": 604,
-        "words": 144
+      "case_024": {
+        "row_idx": 41,
+        "source_id": "4c4a50ae-a778-4722-afc8-b12e83b74557",
+        "text_md5": "da5244aacfb1432f2354cb016819e10c",
+        "chars": 244,
+        "words": 38,
+        "script": "latin"
       },
-      "case_013": {
-        "row_idx": 55,
-        "source_id": "ce-50d47ab5-368c-4014-ac49-299a3ac56011",
-        "text_md5": "bb658a53f94f6ea68d338b3d48e4f93e",
-        "chars": 1100,
-        "words": 192
+      "case_025": {
+        "row_idx": 42,
+        "source_id": "BF18CD46-3F57-438D-A8E3-DE825D713319",
+        "text_md5": "6b7511f60a491cfa57802f4115cd77f0",
+        "chars": 786,
+        "words": 130,
+        "script": "latin"
       },
-      "case_014": {
-        "row_idx": 56,
-        "source_id": "ce-664a6125-e17c-4681-aea3-5ef255b2e522",
-        "text_md5": "2bcdcf0788f062fd776f51277d71fd9c",
-        "chars": 1938,
-        "words": 368
+      "case_026": {
+        "row_idx": 43,
+        "source_id": "29F1997D-F85B-4604-82C7-CD9E518DD900",
+        "text_md5": "9ea3970a28c188d327546e7a8344b12b",
+        "chars": 318,
+        "words": 40,
+        "script": "latin"
       },
-      "case_015": {
-        "row_idx": 57,
-        "source_id": "8feb9640-2ff2-44bf-ab1f-a993f47d7502",
-        "text_md5": "b11a344ddabad47764ecf09ecbafde9c",
-        "chars": 753,
-        "words": 127
+      "case_027": {
+        "row_idx": 54,
+        "source_id": "61440eb9-0b65-46c0-bcd9-db385ac2b507_1739718353594",
+        "text_md5": "b60749b01f47f658f4be892eb4cece43",
+        "chars": 1094,
+        "words": 183,
+        "script": "latin"
       },
-      "case_016": {
-        "row_idx": 59,
-        "source_id": "aef29569-4d0e-4fec-a3cb-63fa6714f0e6",
-        "text_md5": "d6b3b480d54b8a812ba865fcab741d09",
-        "chars": 1128,
-        "words": 205
+      "case_028": {
+        "row_idx": 63,
+        "source_id": "53629EFD-804E-4F4C-8345-2C0BD2D00D9F",
+        "text_md5": "6dee156c2a3affb93d62b850766a2dcc",
+        "chars": 84,
+        "words": 12,
+        "script": "latin"
       },
-      "case_017": {
-        "row_idx": 62,
-        "source_id": "4fb61a55-1c3a-436b-ac1b-35aad382ca97",
-        "text_md5": "9b38f10a4627d18719bba07c027a7dd9",
-        "chars": 683,
-        "words": 122
+      "case_029": {
+        "row_idx": 64,
+        "source_id": "72BCEF25-F2C6-4212-BD03-97421E127A2B",
+        "text_md5": "47cbc0389909fbd24ddfcbb7e8fbf8d6",
+        "chars": 327,
+        "words": 52,
+        "script": "latin"
       },
-      "case_018": {
+      "case_030": {
+        "row_idx": 65,
+        "source_id": "5CAA67D6-1B98-4B49-9AA5-AF52151DA320",
+        "text_md5": "472280b5eaa6366d50a5260242950b0a",
+        "chars": 419,
+        "words": 70,
+        "script": "latin"
+      },
+      "case_031": {
+        "row_idx": 67,
+        "source_id": "8DB51AE9-EAC1-45FE-9D09-5CCA22FDA5E1",
+        "text_md5": "6ea43479054e4aebbdf9283b4f49823a",
+        "chars": 1208,
+        "words": 207,
+        "script": "latin"
+      },
+      "case_032": {
         "row_idx": 70,
         "source_id": "B8A20CA8-E522-40CB-A854-886D7E19CF6F",
         "text_md5": "b823b80f86d80e0a019dbea9e000ddc1",
         "chars": 196,
-        "words": 35
+        "words": 35,
+        "script": "latin"
       },
-      "case_019": {
+      "case_033": {
         "row_idx": 71,
         "source_id": "1fa3a4a3-5a3b-424c-8e8b-ec8c13b9ec45_1743883291825",
         "text_md5": "4199ee2f5be6c5452aabafdb82b981df",
         "chars": 140,
-        "words": 22
+        "words": 22,
+        "script": "latin"
       },
-      "case_020": {
-        "row_idx": 87,
-        "source_id": "ce-b93f1d91-4a51-4533-bd2e-b586a8ce2a64",
-        "text_md5": "37145ccb749d3e3a58c16e62b784f7d2",
+      "case_034": {
+        "row_idx": 78,
+        "source_id": "B21BF70F-6FDA-4433-8111-9C2CE54AC1DF",
+        "text_md5": "5b881a1bd86ef80bf133d48fb62b7ea6",
+        "chars": 476,
+        "words": 84,
+        "script": "latin"
+      },
+      "case_035": {
+        "row_idx": 79,
+        "source_id": "24254458-31BB-4DB6-87E9-A6A77EF70C0D",
+        "text_md5": "9362e07a7b113109639f2fdead6b7fe5",
+        "chars": 502,
+        "words": 75,
+        "script": "latin"
+      },
+      "case_036": {
+        "row_idx": 80,
+        "source_id": "9DEED551-7945-440B-AB24-4078C1CC3008",
+        "text_md5": "a0049df7ae07a35cfc1f2ec2008ce8f8",
+        "chars": 103,
+        "words": 18,
+        "script": "latin"
+      },
+      "case_037": {
+        "row_idx": 81,
+        "source_id": "C58CA1B7-73F6-4EC1-891A-349746ABB980",
+        "text_md5": "95b4aa2399f0f7821c7396a412aa20af",
+        "chars": 537,
+        "words": 83,
+        "script": "latin"
+      },
+      "case_038": {
+        "row_idx": 82,
+        "source_id": "49AF6300-8DAC-4FDC-98EA-07CBA927FBC0",
+        "text_md5": "b1640388cef3a18c2325be20861a55ee",
+        "chars": 814,
+        "words": 142,
+        "script": "latin"
+      },
+      "case_039": {
+        "row_idx": 83,
+        "source_id": "9C659078-0015-4BBF-8E95-CFFB09042A59",
+        "text_md5": "d87a8ec03ea866c6d1bc26d20e5bb8c0",
+        "chars": 2119,
+        "words": 360,
+        "script": "latin"
+      },
+      "case_040": {
+        "row_idx": 84,
+        "source_id": "5FF4C90B-54FC-4294-B120-DD7DD6922874",
+        "text_md5": "9bf23f1c70671db347d86814cc44674b",
+        "chars": 627,
+        "words": 119,
+        "script": "latin"
+      },
+      "case_041": {
+        "row_idx": 85,
+        "source_id": "B7DFBAC1-5383-4147-9E94-1DAFFBD79A84",
+        "text_md5": "117ac2353eb80d52ea1b129f1ed403f6",
+        "chars": 532,
+        "words": 84,
+        "script": "latin"
+      },
+      "case_042": {
+        "row_idx": 89,
+        "source_id": "C1A1F955-364B-46D6-8F87-D6524F9A1C1A",
+        "text_md5": "1abd0ee9064c9661e934f6c2b5c4812f",
+        "chars": 367,
+        "words": 57,
+        "script": "latin"
+      },
+      "case_043": {
+        "row_idx": 90,
+        "source_id": "4935D2B9-27CD-42D8-8D30-3DFA63FAE1AE",
+        "text_md5": "2c82030d7403281105f8c9b5e974a587",
+        "chars": 331,
+        "words": 56,
+        "script": "latin"
+      },
+      "case_044": {
+        "row_idx": 91,
+        "source_id": "B20B88F6-22F0-47F2-8176-15461FAABA09",
+        "text_md5": "d2527366e922b7e93d95732a6fd7b567",
+        "chars": 1528,
+        "words": 242,
+        "script": "latin"
+      },
+      "case_045": {
+        "row_idx": 92,
+        "source_id": "A640AF9D-D126-4928-8013-4E0E2EB0D96F",
+        "text_md5": "bcd0bded48c99f9c6c4f7b37acb90440",
+        "chars": 379,
+        "words": 71,
+        "script": "latin"
+      },
+      "case_046": {
+        "row_idx": 99,
+        "source_id": "cd2e84c7-ae06-4c98-ac0c-c6ff83b58b18",
+        "text_md5": "9f2fd6fd00e9d9857575b88dea2a7403",
+        "chars": 552,
+        "words": 86,
+        "script": "latin"
+      },
+      "case_047": {
+        "row_idx": 109,
+        "source_id": "59008a98-674b-43a8-944b-ddfb8ad0587e",
+        "text_md5": "fa66d5fc3ccbfa6cde62349411f79b0a",
+        "chars": 494,
+        "words": 77,
+        "script": "latin"
+      },
+      "case_048": {
+        "row_idx": 110,
+        "source_id": "4bfcbd06-de3f-4311-abb6-516116c182e3",
+        "text_md5": "61442c205292bb1362dd67037c1dfb45",
+        "chars": 380,
+        "words": 62,
+        "script": "latin"
+      },
+      "case_049": {
+        "row_idx": 117,
+        "source_id": "82b771b0-c5fd-4421-9f89-0ec58fb421a9",
+        "text_md5": "dcccdf4ec68fb3dcc04f12817ac37a2f",
+        "chars": 454,
+        "words": 74,
+        "script": "latin"
+      },
+      "case_050": {
+        "row_idx": 118,
+        "source_id": "c77944b0-0f82-48b5-b16f-e8aa99ab753c",
+        "text_md5": "8ab6cefaf0ba2b3361017064e8453321",
+        "chars": 317,
+        "words": 54,
+        "script": "latin"
+      },
+      "case_051": {
+        "row_idx": 121,
+        "source_id": "131b6426-9f0e-4d93-bcca-8f6258e0317b",
+        "text_md5": "cffd7686bb5333b3595e007cbc7a850d",
         "chars": 497,
-        "words": 98
+        "words": 80,
+        "script": "latin"
       },
-      "case_021": {
-        "row_idx": 107,
-        "source_id": "ce-da9cd6fe-693c-4ec7-819f-c9315836482a",
-        "text_md5": "8b525efde46292d0d7f115016919cb73",
-        "chars": 1305,
-        "words": 238
+      "case_052": {
+        "row_idx": 125,
+        "source_id": "5207E5C5-F721-461E-B107-967ABD5D736C",
+        "text_md5": "684dfa2499debc414570e09db729e567",
+        "chars": 286,
+        "words": 49,
+        "script": "latin"
       },
-      "case_022": {
-        "row_idx": 108,
-        "source_id": "648e58e5-b3aa-47e0-bdab-1c4a8b9ba9dc",
-        "text_md5": "26065b28027f93988bb51dfe494856cd",
-        "chars": 833,
-        "words": 175
+      "case_053": {
+        "row_idx": 127,
+        "source_id": "A8A95796-3E92-4D51-9E21-B44EC26E761A",
+        "text_md5": "34c4ec6ef8b861a0c1e8f128b7f3fa50",
+        "chars": 358,
+        "words": 56,
+        "script": "latin"
       },
-      "case_023": {
-        "row_idx": 114,
-        "source_id": "01aa04e0-44df-43b7-94a9-2e4971f2d0e1",
-        "text_md5": "0c3c1a697392030070601a584fc15015",
-        "chars": 723,
-        "words": 133
+      "case_054": {
+        "row_idx": 131,
+        "source_id": "4cb2320d-e013-493d-9a3c-ffd10da014f1",
+        "text_md5": "fc87f89017aed2864590f0ef919845bd",
+        "chars": 486,
+        "words": 83,
+        "script": "latin"
       },
-      "case_024": {
-        "row_idx": 122,
-        "source_id": "e6bbb5ef-a0a8-4176-95ee-bd65a0c2d207",
-        "text_md5": "5e65f347b78a51a36ecb3ce825125c80",
-        "chars": 705,
-        "words": 124
+      "case_055": {
+        "row_idx": 133,
+        "source_id": "b6d1c5fb-26b6-4716-8672-b49fa0f3a146",
+        "text_md5": "8b1103a3e796bb22704976933717b16c",
+        "chars": 402,
+        "words": 69,
+        "script": "latin"
       },
-      "case_025": {
-        "row_idx": 129,
-        "source_id": "44fdd0fc-4976-4f40-bf25-7fff2785b421",
-        "text_md5": "c317157d88c8b81ba366b0dbe1b9b7bc",
-        "chars": 2323,
-        "words": 484
+      "case_056": {
+        "row_idx": 136,
+        "source_id": "1d91bfbf-c349-4681-a624-f0fb5c6731dc",
+        "text_md5": "5c897171fd16d175d63ce2f31addc05e",
+        "chars": 475,
+        "words": 76,
+        "script": "latin"
       },
-      "case_026": {
-        "row_idx": 134,
-        "source_id": "9a384984-7e33-4162-9901-2ad8e4fbf15e",
-        "text_md5": "d7efed5fcec88bcd15dd007e6279b4af",
-        "chars": 1015,
-        "words": 173
+      "case_057": {
+        "row_idx": 137,
+        "source_id": "af0a843b-e850-4137-801f-c822937f998c",
+        "text_md5": "9a01fba45eac65cc1f35e90164343cbe",
+        "chars": 571,
+        "words": 89,
+        "script": "latin"
       },
-      "case_027": {
-        "row_idx": 139,
-        "source_id": "2df7046a-2c2f-43ae-a23c-a72f02d3c219_1745940225245",
-        "text_md5": "acc8ccd9007c6a675a46999aff03aa69",
-        "chars": 1033,
-        "words": 214
+      "case_058": {
+        "row_idx": 138,
+        "source_id": "e65b44dd-8b5e-40fc-b74e-908131853d75",
+        "text_md5": "b92e2a21bede46bd58d93e2e5c145167",
+        "chars": 409,
+        "words": 68,
+        "script": "latin"
       },
-      "case_028": {
-        "row_idx": 142,
-        "source_id": "45c06348-4c6c-4cf1-9d9b-066869a36a7a",
-        "text_md5": "0f12a9158678dcc3e897a80ea5121cc5",
-        "chars": 930,
-        "words": 199
+      "case_059": {
+        "row_idx": 141,
+        "source_id": "BCFCEC67-8CB7-4F6B-AD64-B92EFBC60770",
+        "text_md5": "4376e795360edf57c25e7f1146ce6004",
+        "chars": 332,
+        "words": 58,
+        "script": "latin"
       },
-      "case_029": {
+      "case_060": {
+        "row_idx": 145,
+        "source_id": "3C77F298-B816-4D10-A3E2-960A0DC868B9",
+        "text_md5": "e8791ce97cbaf6830a485951d4aeb360",
+        "chars": 219,
+        "words": 36,
+        "script": "latin"
+      },
+      "case_061": {
         "row_idx": 146,
         "source_id": "E4461FA2-AED5-4784-B520-2A5F2D855C0F",
         "text_md5": "d09b954708f405971079e5171c1bd513",
         "chars": 355,
-        "words": 64
+        "words": 64,
+        "script": "latin"
       },
-      "case_030": {
-        "row_idx": 154,
-        "source_id": "31A3CBD8-3384-4A32-899B-ABF1024B0812",
-        "text_md5": "2f1c5613a0d13eccdb026236d159dec9",
-        "chars": 325,
-        "words": 57
+      "case_062": {
+        "row_idx": 147,
+        "source_id": "a56256ca-b00e-4a31-aca1-bf11f316d04a_1738915688858",
+        "text_md5": "4e8cc9fe78360f3e8a94279ce8c3407a",
+        "chars": 491,
+        "words": 92,
+        "script": "latin"
+      },
+      "case_063": {
+        "row_idx": 149,
+        "source_id": "F77EE75D-E0C5-4356-9F01-002F145C5F78",
+        "text_md5": "76dc25f30176292f00f57d4a267fffa1",
+        "chars": 124,
+        "words": 20,
+        "script": "latin"
+      },
+      "case_064": {
+        "row_idx": 150,
+        "source_id": "92155A28-FE16-4A9B-885F-B9C05D821F82",
+        "text_md5": "bbe72ed0cc2811a1d0570551595dfc08",
+        "chars": 208,
+        "words": 34,
+        "script": "latin"
+      },
+      "case_065": {
+        "row_idx": 151,
+        "source_id": "B329D743-70E1-4FEC-B74E-D43541861421",
+        "text_md5": "b4ae6f9db9537b7d6f6947a00ca39b55",
+        "chars": 88,
+        "words": 14,
+        "script": "latin"
+      },
+      "case_066": {
+        "row_idx": 152,
+        "source_id": "D114774B-3A57-48AB-B85E-4523ABD77FDD",
+        "text_md5": "bcf22f60ab1375cd6545e94828621414",
+        "chars": 355,
+        "words": 58,
+        "script": "latin"
+      },
+      "case_067": {
+        "row_idx": 155,
+        "source_id": "FB418508-A6BA-435E-A0B5-3BE2CBB0CCFF",
+        "text_md5": "cc0929fef7851548d2d725ab47dab641",
+        "chars": 305,
+        "words": 51,
+        "script": "latin"
       }
     },
     "fields": [
@@ -402,7 +1009,7 @@
   "cases": [
     {
       "case_id": "case_001",
-      "source_text": "Complaint of pain abdomen. Vomiting, fever since 3 days.  On examination afebrile.  cvs normal, rs normal. Abdomen tenderness on the rif  Diagnosis looked like Acute appendicitis. Advices Tab MRD  ",
+      "source_text": "Tablet paracetamol 500 three times a day. After food  Tablet chymoral forte three times a day after food. Tablet pan d before food, three times a day  ",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -431,7 +1038,7 @@
     },
     {
       "case_id": "case_002",
-      "source_text": "So, yeah, doctor, I have a problem in my chest. I'm not able to breathe properly and I have a very high fever also from the last two days. Do you have any cough? yeah, little bit of cough I have.  Fever? yeah, fever from last two days I am facing fever also. No other complaints, any",
+      "source_text": "Complaint of pain abdomen. Vomiting, fever since 3 days.  On examination afebrile.  cvs normal, rs normal. Abdomen tenderness on the rif  Diagnosis looked like Acute appendicitis. Advices Tab MRD  ",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -460,7 +1067,7 @@
     },
     {
       "case_id": "case_003",
-      "source_text": "Symptoms are fever, cold, cough. diagnosis: viral fever, URTI . medicines.Dolo 650,  twice a day. After meals, 7 days. Augmentin.One dosage at a time, twice a day, after meal for 7 days. Test prescribed,  CBC, lipid profile, HbA1C. Follow-up visit after 7 days.advices: daily walk for 30 minutes, avoid oily and cold",
+      "source_text": "25 year old female. She had progressive difficulty in upsquatting and difficulty in climbing stairs since last four to five years and the complaints are progressively worsening.  examination showed significant proximal lower girdle weakness. There is no family history of similar disorder. Her total CPK level is normal.  MRI spine which was done in the past was normal. Genetic testing has not been done. EMG, NCV study has not been done. Diagnosis is  degenerative muscular dystrophy, possibly limb-girdle type.\nHer treatment will include capsule Vernace.  one in the afternoon, tablet Shelcal one in the morning for a duration of one month along with physiotherapy for a duration of one month.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -489,7 +1096,7 @@
     },
     {
       "case_id": "case_004",
-      "source_text": "Symptoms: cough, fever, cold. Diagnosis: viral fever. Tablet Augmentin, one doseTwice a day, after meal for 7 days.",
+      "source_text": "Kya ho raha hai doctor saab, teen din ho gaye. Hann. ek side so jaati hai, to aise ghumta ghumta hai. Okay. Patient has predominant complaints of giddiness. She feels in unsteadiness while walking.  She has been started on anti-parkinsonian treatment in the form of Syndopa half TDS, but still the clinical picture is not convincing for Parkinson's disease. but she has orofacial dyskinesias.  we need to consider or confirm whether she really has Parkinson's disease. So it is suggested that we should taper off her dose of Syndopa for the time being and once she is off Syndopa, we will see her after 15 days for features of Parkinson's disease. She looks little bit anxious also overall.  and anxiety looks to be an important part of her clinical syndrome.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -518,7 +1125,7 @@
     },
     {
       "case_id": "case_005",
-      "source_text": "\u0924\u094d\u092f\u093e\u0902\u091a\u0902 \u092c\u0940\u092a\u0940 \u0938\u093e\u0902\u0917 ? \u0967\u0967\u096b /\u096d\u0969, \u092a\u0932\u094d\u0938 \u096e\u096d, \u091f\u0947\u092e\u094d\u092a\u0930\u0947\u091a\u0930 \u096f\u096d.\u096e\u0915\u094d\u092f\u093e \u0924\u0915\u0932\u0940\u092b \u0939\u0948? \u092b\u0940\u0935\u0930 \u0932\u0917 \u0930\u0939\u093e \u0939\u0948 \u0938\u0930, \u0938\u0941\u092c\u0939 \u0938\u0947\u0964 \u0905\u092d\u0940 \u092f\u0947 , \u0916\u0942\u0928 \u0938\u0947 \u0906\u092f\u093e \u092f\u093e \u0926\u094b\u0928\u094b\u0902 \u0935\u094b\u092e\u093f\u091f\u093f\u0902\u0917? \u0905\u091a\u094d\u091b\u093e\u0964 \u0920\u0902\u0921\u093e \u0917\u0930\u092e \u0915\u0941\u091b \u0939\u0941\u0906 \u0939\u0948? \u092a\u0924\u093e \u0928\u0939\u0940\u0902 \u0915\u094d\u092f\u093e \u0939\u0948\u0964 \u0920\u0902\u0921\u093e \u092a\u093e\u0928\u0940 \u0906\u0907\u0938\u0915\u094d\u0930\u0940\u092e \u0935\u0917\u0948\u0930\u0939? \u0939\u093e\u0902\u0964\u0909\u0938\u0915\u0947 \u091c\u0940\u092d \u0935\u0940\u092c \u0938\u092c \u0925\u094b\u0921\u093c\u093e \u092f\u0947 \u0939\u094b \u0917\u092f\u093e \u0939\u0948 , \u0915\u093e\u0932\u093e \u0915\u093e\u0932\u093e \u091f\u093e\u0907\u092a\u0964  \u0938\u0930 \u0935\u094b \u092e\u0948\u0902  \u092c\u094b\u0932\u0924\u0940 \u0939\u0942\u0901 \u0915\u094d\u092f\u093e \u0939\u0941\u0906\u0964  \u092a\u0942\u0930\u093e \u092e\u0941\u0902\u0939 \u0915\u0921\u093c\u0935\u093e \u0932\u0917 \u0930\u0939\u093e \u0939\u0948 \u0915\u094d\u092f\u093e? \u0939\u092e\u094d\u092e \u0915\u0921\u093c\u0935\u093e \u0932\u0917 \u0930\u0939\u093e \u0939\u0948 \u0964\u092b\u0940\u0935\u0930 \u092c\u0939\u0941\u0924 \u0917\u0930\u092e \u0928\u0939\u0940\u0902 \u0930\u0939\u0924\u093e \u0932\u0947\u0915\u093f\u0928 \u0905\u0902\u0926\u0930 \u0938\u0947 \u092a\u0942\u0930\u093e \u0926\u0947\u0939 \u0926\u0941\u0916\u0928\u093e\u0964 \u092e\u093e\u0925\u093e \u092e\u0947\u0902 \u0938\u0930\u094d\u0926\u0940 \u0964 \u0916\u093e\u0902\u0938\u0940 \u0906\u0924\u0940 \u0939\u0948? \u0939\u093e\u0902 \u0916\u093e\u0902\u0938\u0940 \u0938\u0930\u094d\u0926\u0940 \u0939\u0948\u0964 \u0909\u0932\u094d\u091f\u0940 \u0909\u0932\u094d\u091f\u0940 \u091c\u0948\u0938\u093e \u0939\u094b\u0924\u093e \u0939\u0948\u0964 \u0938\u0930\u094d\u0926\u0940 \u0964\u092e\u0941\u0902\u0939 \u0915\u0921\u093c\u0935\u093e \u0932\u0917\u0924\u093e \u0939\u0948? \u0939\u093e\u0902\u0964 \u0915\u092b \u0939\u094b \u0917\u092f\u093e \u0925\u093e\u0914\u0930 \u0915\u0941\u091b \u0924\u0915\u0932\u0940\u092b?\n\u0936\u0930\u0940\u0930 \u092a\u0942\u0930\u093e \u092c\u0939\u0941\u0924 \u0926\u0941\u0916\u0924\u093e \u0939\u0948 \u0938\u0930\u0964 \u092a\u0948\u0930 ,\u0939\u093e\u0925 \u091d\u0928\u091d\u0928\u093e\u0928\u093e, \u0918\u0941\u091f\u0928\u094b\u0902 \u092e\u0947\u0902 \u0926\u0930\u094d\u0926, \u092f\u0947 \u0938\u092c\u0964",
+      "source_text": "Patient has diabetes mellitus since last four to five years. Her present complaints are tingling numbness in both feet throughout day and night since last few months.  Diagnosis is diabetes mellitus related painful peripheral neuropathy. Investigation suggested is NCV study. Treatment tablet Gabantin GRS 300 milligram.  at night.  tablet Symbal 20 milligram half at night for three days, followed by one at night to be continued for one month.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -547,7 +1154,7 @@
     },
     {
       "case_id": "case_006",
-      "source_text": "\u0924\u094b \u091a\u0947\u0939\u0931\u094d\u092f\u093e\u0935\u0930\u091a\u0947 \u0905\u0938\u0947 \u092a\u093e\u0902\u0922\u0930\u093e\u0908\u091a\u094d\u092f\u093e,\u0905\u0938\u0947 \u092a\u094b\u091a \u0928\u093f\u0918\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u0902 \u0915\u093e \u092c\u0930\u0902 \u0939\u094b\u0924\u0902\u092f? \u091f\u094d\u092f\u0942\u092c \u0932\u093e\u0935\u0932\u094d\u092f\u093e\u0928\u0902\u0924\u0930? \u091f\u094d\u092f\u0942\u092c \u0932\u093e\u0935\u0932\u094d\u092f\u093e\u0928\u0902\u0924\u0930, \u092a\u094b\u091a \u0928\u093f\u0918\u0924\u0947. \u0916\u0942\u092a \u091c\u093e\u0938\u094d\u0924 \u091f\u094d\u092f\u0942\u092c \u0932\u093e\u0935\u0932\u0940 \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0905\u0938\u0902 \u091d\u093e\u0932\u0902 \u0906\u0924\u093e \u091a\u0947\u0939\u0930\u093e \u0932\u093e\u0932 \u091d\u093e\u0932\u093e\u092f \u0925\u094b\u0921\u093e.\u092a\u093f\u0902\u092a\u0932\u094d\u0938 \u0906\u0939\u0947\u0924 \u0925\u094b\u0921\u0947\u0936\u0947. \u0916\u0942\u092a \u091c\u093e\u0938\u094d\u0924 \u092a\u094d\u0930\u092e\u093e\u0923\u093e\u0924 \u091f\u094d\u092f\u0942\u092c \u0928\u093e\u0939\u0940 \u0932\u093e\u0935\u093e\u092f\u091a\u0940. \u0939\u0940 \u091f\u094d\u092f\u0942\u092c \u091c\u0940 \u0932\u093e\u0935\u093e\u092f\u091a\u0940 \u0906\u0939\u0947 \u0924\u0940 \u092b\u0915\u094d\u0924 \u0930\u093e\u0924\u094d\u0930\u0940\u0932\u093e\u091a \u0932\u093e\u0935\u093e\u092f\u091a\u0940, \u0924\u094d\u092f\u093e \u0938\u094d\u092a\u0949\u091f \u0935\u0930\u0924\u0940\u091a \u0932\u093e\u0935\u093e\u092f\u091a\u0940. \u091c\u0938\u0902 \u091c\u0938\u0902 \u092a\u093f\u0902\u092a\u0932\u094d\u0938 \u0920\u0940\u0915 \u0935\u094d\u0939\u093e\u092f\u0932\u093e \u0932\u093e\u0917\u0932\u0947, \u091f\u094d\u092f\u0942\u092c \u092c\u0902\u0926 \u0915\u0930\u093e\u092f\u091a\u0940. \u0906\u0923\u093f \u0924\u0947 \u090f\u0915, \u092a\u0942\u0930\u094d\u0923 \u091a\u0947\u0939\u0931\u094d\u092f\u093e\u0932\u093e \u0932\u093e\u0935\u093e\u092f\u0932\u093e \u0926\u093f\u0932\u0940 \u0939\u094b\u0924\u0940 \u0928\u093e?\u0939\u0940 \u0928\u093e? \u0939\u094b . \u0939\u094b, \u0939\u0940 \u090f\u0935\u094d\u0939\u0930\u0940 \u0905\u0932\u094d\u091f\u0930\u0928\u0947\u091f \u0921\u0947\u091c \u0932\u093e\u0935\u0932\u0940 \u0928\u093e? \u0939\u094b.  \u0939\u0947 \u0938\u0941\u091f\u0932\u0902\u092f . \u0906\u0924\u093e \u091a\u0947\u0902\u091c \u0939\u094b\u0908\u0932 . \u092e\u092e\u094d\u092e\u0940 \u0924\u0942 \u0939\u0947, \u0926\u093e\u092c\u0942\u0928 \u0935\u0917\u0948\u0930\u0947 \u0915\u0938\u0902 \u0920\u0947\u0935\u0932\u0902\u092f?\u0939\u0947 \u0921\u094d\u0930\u093e\u092f \u091d\u093e\u0932\u0947\u0932\u0902 \u0906\u0939\u0947. \u0906\u0924\u093e \u091d\u094b\u092a \u0939\u094b\u0924\u0947 \u0915\u093e ?  \u0939\u094b \u0939\u094b\u0924\u0947. \u0905\u091a\u094d\u091b\u093e. \u092c\u0940\u092a\u0940 \u092d\u0940 \u0915\u092e\u0940 \u091d\u093e\u0932\u093e \u0906\u0939\u0947 \u0924\u0941\u091d\u093e , \u092e\u0917 \u0939\u093f\u091a\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0915\u0940 \u091a\u0915\u094d\u0915\u0930 \u092f\u0947\u0924\u0947.\u092c\u093e\u0915\u0940 \u0915\u093f\u0924\u0928\u093e \u0938\u092d\u0940?\n\u0928\u0939\u0940\u0902 .",
+      "source_text": "75 year old lady hypertension and diabetes as risk factor presented with acute onset left sided weakness on 17th April 2025.  was admitted in <PII> hospital. MRI brain showed right MCA territory ischemic stroke. Started on dual antiplatelet treatment, is improving. Present complaint is abdominal pain, loss of appetite and nausea vomiting and sleep disturbances at night.  The present prescription should include capsule Ecosprin AV 75 + 20 at night. Then tablet Met XL 25 milligram twice daily.  Tablet Cilacar T 40 + 10 once in the night. Tablet Vilda M 50 + 500 twice daily.  Tablet Rexipra LS once at night and capsule Pan D once in the afternoon. All this treatment to be continued for a duration of one month.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -576,7 +1183,7 @@
     },
     {
       "case_id": "case_007",
-      "source_text": "\u0916\u093e\u0932\u0940 \u090f\u0915\u091a \u0928\u0938 \u0906\u0939\u0947. \u0905\u0938\u0902 \u0907\u0925\u0902.  \u0917\u0941\u0921\u0918\u094d\u092f\u093e\u092a\u093e\u0938\u0942\u0928 \u0916\u093e\u0932\u0940? \u0939\u093e \u0907\u0925\u0902 \u0915\u0941\u0920\u0947\u0939\u0940 \u0939\u094b\u0924\u0947, \u0906\u0924\u093e \u0907\u0925\u0902 \u0939\u094b\u0908\u0932, \u092e\u093e\u0917\u0928\u0902 \u0907\u0925\u0902 \u0939\u094b\u0908\u0932. \u0917\u0941\u0921\u0918\u094d\u092f\u093e\u092a\u093e\u0938\u0942\u0928 \u0916\u093e\u0932\u0940 \u0915\u0941\u0920\u0947\u0939\u0940 \u0915\u0933 \u092f\u0947\u090a \u0936\u0915\u0924\u0947? \u0939\u093e. \u0939\u0947 \u0939\u0947 \u0939\u0947 \u0918\u091f\u094d\u091f \u0939\u094b\u0924\u0902\u092f.  \u0920\u0940\u0915 \u0906\u0939\u0947. \u092a\u093e\u092f \u0938\u0941\u091c\u0924\u094b\u092f \u0915\u093e? \u0939\u094b \u0938\u0941\u091c\u0924\u094b\u092f, \u0938\u0942\u091c \u0906\u0939\u0947. \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u092e\u0940 \u092a\u093e\u092f\u093e\u091a\u094d\u092f\u093e \u0936\u093f\u0930\u093e \u091c\u094d\u092f\u093e \u092b\u0941\u0917\u0932\u0947\u0932\u094d\u092f\u093e \u0906\u0939\u0947\u0924 \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u0935\u094d\u0939\u0947\u0930\u093f\u0915\u094b\u091c\u091a\u0902 \u0938\u094d\u091f\u0949\u0915\u093f\u0902\u0917 \u0918\u093e\u0932\u093e\u092f\u0932\u093e \u0938\u093e\u0902\u0917\u093f\u0924\u0932\u0947\u0932\u0902 \u0906\u0939\u0947. \u0924\u0941\u092e\u094d\u0939\u0940 \u0935\u093e\u092a\u0930\u0924\u093e\u092f \u0915\u093e? \u0935\u093e\u092a\u0930\u0924\u0947 \u0935\u093e\u092a\u0930\u0924\u0947. \u0915\u0927\u0940 \u0935\u093e\u092a\u0930\u0924\u093e\u092f? \u0935\u093e\u092a\u0930\u0924\u0947 \u0924\u0947 \u0917\u0947\u0932\u0902 \u0924\u0930 \u0928\u093e\u0939\u0940 \u0928\u093e. \u0915\u0927\u0940 \u0915\u093e\u0922\u0932\u0947?  \u0906\u0923\u093f \u092e\u0939\u093f\u0928\u093e\u091d\u093e\u0932\u0902 \u0924\u0947 \u0939\u093e\u0930\u0935\u0932\u0902\u092f. \u0906\u0923\u0916\u0940 \u0915\u093e\u092f \u0906\u0939\u0947 \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u0935\u094d\u0939\u0947\u0930\u093f\u0915\u094b\u091c \u0935\u094d\u0939\u0947\u0928\u094d\u0938 \u0906\u0939\u0947\u0924. \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u091c\u094d\u092f\u093e \u0935\u094d\u0939\u0947\u0930\u093f\u0915\u094b\u091c \u0935\u094d\u0939\u0947\u0928\u094d\u0938 \u0906\u0939\u0947\u0924 \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u092a\u093e\u092f\u093e\u091a\u094d\u092f\u093e \u0936\u093f\u0930\u093e \u092b\u0941\u0917\u0924\u093e\u0924. \u092a\u093e\u092f\u093e\u091a\u094d\u092f\u093e \u0936\u093f\u0930\u093e \u092b\u0941\u0917\u0932\u094d\u092f\u093e \u0915\u0940 \u0924\u0947 \u0926\u0941\u0916\u093e\u092f\u0932\u093e \u091a\u093e\u0932\u0942 \u0939\u094b\u0924\u0947. \u0906\u0923\u093f \u0924\u0947 \u0911\u092a\u0930\u0947\u0936\u0928 \u0915\u0947\u0932\u0947\u0932\u0902 \u0906\u0939\u0947 \u0928\u093e \u0924\u093f\u0925\u0942\u0928 \u0915\u0933 \u092f\u0947\u0924\u0947. \u092e\u0917 \u0924\u0947 \u0911\u092a\u0930\u0947\u0936\u0928\u091a\u094d\u092f\u093e \u0921\u0949\u0915\u094d\u091f\u0930\u0928\u093e \u0915\u0933\u0940\u0938\u093e\u0920\u0940 \u090f\u0915\u0926\u093e \u0926\u093e\u0916\u0935\u093e\u092f\u0932\u093e \u092a\u093e\u0939\u093f\u091c\u0947. \u0906\u0930\u094d\u091f\u0947\u0930\u093f\u092f\u0932 \u0925\u094d\u0930\u094b\u092e\u094d\u092c\u094b\u0938\u093f\u0938 \u091d\u093e\u0932\u0902 \u0939\u094b\u0924\u0902 \u0926\u094b\u0928 \u0939\u091c\u093e\u0930\u0932\u093e.  \u0939\u094b \u092a\u0923 \u0928\u093e\u0939\u0940 \u0939\u0948 \u0906\u0924\u093e \u0915\u093e\u0939\u093f\u091a. \u092e\u094d\u0939\u0923\u091c\u0947 \u092e\u093e\u0917\u0902 \u0906\u092a\u0923 \u0930\u093f\u092a\u094b\u0930\u094d\u091f \u0915\u0947\u0932\u0947 \u0939\u094b\u0924\u0947 \u0924\u0947 \u0915\u094d\u0932\u093f\u0905\u0930 \u091d\u093e\u0932\u0947\u0924. \u092a\u094d\u0930\u0924\u094d\u092f\u0947\u0915 \u0935\u0930\u094d\u0937\u0940 \u0915\u0930\u0924\u094b\u092f.  \u0939\u0947 \u092a\u0930\u094d\u0935\u093e \u0915\u0947\u0932\u0902 \u0906\u0939\u0947. \u0939\u094b \u0924\u0947 \u0915\u094d\u0932\u093f\u0905\u0930\u091a \u0906\u0939\u0947. \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u0924 \u0915\u093e\u0939\u0940 \u0906\u0930\u094d\u091f\u0947\u0930\u093f\u092f\u0932 \u0925\u094d\u0930\u094b\u092e\u094d\u092c\u094b\u0932\u093f\u0938\u093f\u0938\u091a\u0940 \u0906\u0924\u093e \u0915\u0941\u0920\u0947\u0939\u0940 \u091a\u093f\u0928\u094d\u0939 \u0928\u093e\u0939\u0940\u092f\u0947. \u0907\u0935\u094d\u0939\u0928 \u0925\u093e\u092f\u0930\u0949\u0908\u0921 \u0928\u0949\u0930\u094d\u092e\u0932 \u0906\u0939\u0947. \u091f\u0940\u090f\u0938\u090f\u091a \u0932\u0947\u0935\u094d\u0939\u0932 4.8 \u0906\u0939\u0947. \u0924\u094d\u092f\u093e \u092a\u0923 \u0928\u0949\u0930\u094d\u092e\u0932 \u0906\u0939\u0947. \u0915\u093e\u0939\u0940 \u092a\u094d\u0930\u0949\u092c\u094d\u0932\u0947\u092e \u0928\u093e\u0939\u0940.  \u092b\u0915\u094d\u0924 \u0905\u0902\u0917\u093e\u0924\u0932\u0902 \u0930\u0915\u094d\u0924 \u092b\u093e\u0930\u091a \u0915\u092e\u0940 \u0906\u0939\u0947 7.8 ,  \u0924\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0924\u094b \u0925\u0915\u0935\u093e \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u092f\u0947\u0924 \u0906\u0939\u0947.  \u091a\u093e\u0932\u0924\u093e\u0928\u093e \u0925\u0915\u0935\u093e \u0924\u0941\u092e\u094d\u0939\u0940 \u092e\u094d\u0939\u0923\u0924 \u0939\u094b\u0924\u093e \u0924\u094b \u0915\u0927\u0940\u092a\u093e\u0938\u0942\u0928 \u092f\u093e\u092f\u0932\u093e \u0932\u093e\u0917\u0932\u093e\u092f? \u0925\u0915\u0935\u093e \u0928\u093e\u0939\u0940 \u0939\u0947 \u0926\u0941\u0916\u0924\u0902\u092f \u0938\u0917\u0933\u0902 \u0915\u0933 \u092f\u0947\u0924\u0947\u092f. \u0925\u0915\u0935\u093e \u0924\u0930 \u092f\u0947\u0924\u094b\u091a \u0906\u0923\u093f \u0915\u092e\u0930\u0947\u092a\u093e\u0938\u0928\u0902 \u0907\u0925\u0928\u0902 \u0905\u0938\u0902 \u0938\u0917\u0933\u0902 \u090f\u0915 \u092a\u093e\u092f \u0938\u0917\u0933\u093e \u0926\u0941\u0916\u0924\u094b. \u0915\u092e\u0930\u0947\u092a\u093e\u0938\u0942\u0928 \u092a\u093e\u092f \u0926\u0941\u0916\u093e\u092f\u0932\u093e \u0932\u093e\u0917\u0932\u093e\u092f? \u0939\u093e.  \u0909\u091c\u0935\u093e \u090f\u0915\u091a \u0926\u0941\u0916\u0924\u094b\u092f \u0915\u093e \u0926\u094b\u0928\u094d\u0939\u0940 \u0926\u0941\u0916\u0924\u093e\u0924? \u091c\u093e\u0938\u094d\u0924 \u0909\u091c\u0935\u093e \u0926\u0941\u0916\u0924\u094b\u092f.  \u092e\u0941\u0902\u0917\u094d\u092f\u093e \u092f\u0947\u0924\u093e\u0924? \u092a\u093e\u092f\u093e\u0932\u093e \u091a\u093e\u0932\u0924\u093e\u0928\u093e \u0905\u0938\u0902 \u091d\u093f\u0923\u091d\u093f\u0923 \u091d\u093f\u0923\u091d\u093f\u0923 \u0939\u094b\u0924\u0902 \u0906\u0923\u093f \u091c\u0921\u092a\u0923\u093e. \u092e\u0941\u0902\u0917\u094d\u092f\u093e \u092f\u0947\u0924\u093e\u0924? \u0920\u0940\u0915 \u0906\u0939\u0947 \u0920\u0940\u0915 \u0906\u0939\u0947. \u090f\u0915\u0926\u092e \u091c\u0921\u092a\u0923\u093e \u092f\u0947\u0924\u094b. \u0928\u094d\u092f\u0942\u0930\u094b\u092a\u0945\u0925\u093f\u0915 \u092a\u0947\u0928 \u0906\u0939\u0947 \u0924\u0947. \u0924\u0947 \u092e\u093e\u0928\u0947\u091a\u094d\u092f\u093e, \u0915\u092e\u0930\u0947\u091a\u094d\u092f\u093e \u092e\u0923\u0915\u094d\u092f\u093e\u092a\u093e\u0938\u0942\u0928 \u0916\u093e\u0932\u0940 \u091c\u0940 \u0936\u0940\u0930 \u092f\u0947\u0924\u0947 \u0928\u093e, \u0924\u094d\u092f\u093e \u0936\u093f\u0930\u0947\u0932\u093e \u0938\u0942\u091c \u0906\u0932\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0939\u0947 \u0926\u0941\u0916\u0923\u0902 \u0939\u094b\u0924\u0902.  \u092f\u0947\u0908\u0932 \u0915\u093e \u092e\u0940 \u092e\u0940 \u0926\u0947\u0924\u094b \u0917\u094b\u0933\u0947 \u0915\u093e\u092f \u092a\u094d\u0930\u0949\u092c\u094d\u0932\u0947\u092e \u0928\u093e\u0939\u0940. \u0905\u091a\u094d\u091b\u093e.",
+      "source_text": "So, yeah, doctor, I have a problem in my chest. I'm not able to breathe properly and I have a very high fever also from the last two days. Do you have any cough? yeah, little bit of cough I have.  Fever? yeah, fever from last two days I am facing fever also. No other complaints, any",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -605,7 +1212,7 @@
     },
     {
       "case_id": "case_008",
-      "source_text": "Complain of cough, dyspnea. Treatment injection Dexa.Tablet CP CV twice a day for two days. Tablet Wysolone three times a day for two days. Tablet Costus Advance three times a day for two days.Tablet Deriphyllin Retard 300 milligram twice a day for two days. Tablet Levopoint M once at night for 10 days.Capsule Ompec DM twice a day before food for two days.",
+      "source_text": "Symptoms are fever, cold, cough. diagnosis: viral fever, URTI . medicines.Dolo 650,  twice a day. After meals, 7 days. Augmentin.One dosage at a time, twice a day, after meal for 7 days. Test prescribed,  CBC, lipid profile, HbA1C. Follow-up visit after 7 days.advices: daily walk for 30 minutes, avoid oily and cold",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -634,7 +1241,7 @@
     },
     {
       "case_id": "case_009",
-      "source_text": "\u092c\u0941\u0916\u093e\u0930 \u0906 \u0930\u0939\u093e \u0939\u0948\u0964 \u0915\u0932 \u0938\u0947 \u0938\u0930\u094d\u0926\u0940 \u0925\u093e\u0964 \u0905\u092d\u0940 \u092c\u0941\u0916\u093e\u0930 \u092d\u0940 \u0939\u0948\u0964 \u0914\u0930 \u0935\u0940\u0915\u0928\u0947\u0938 \u092d\u0940 \u092c\u0939\u0941\u0924\u0964 \u0914\u0930 \u0916\u093e\u0901\u0938\u0940 \u0924\u094b \u0910\u0938\u0947 \u0926\u0941\u0916\u0924\u093e \u0939\u0948, \u091b\u0940\u0902\u0915 \u0939\u0941\u0908 \u0924\u094b\u0964 \u0920\u0940\u0915 \u0939\u0948\u0964\u0917\u0932\u093e \u0926\u0930\u094d\u0926 \u0939\u0948?\n\u0938\u0942\u0916 \u0930\u0939\u093e \u0939\u0948\u0964 \n\u0916\u093e\u0902\u0938\u0940 \u092c\u0932 \u0915\u092b \u0906 \u0930\u0939\u093e \u0939\u0948 \u0915\u0941\u091b?\n\u0938\u0942\u0916\u093e \u0916\u093e\u0901\u0938\u0940?\n\u0938\u0942\u0916\u093e\u0964Yeh kitni hai ? bahut ?\ntemperature 102.5.\ntreatment injection diclo1 ml. Tablet Cefodem 200 twice a day for two days. Tablet Azee 250 twice a day for two days.Tablet Gooday three times a day for two days. Tablet Mefenamic 500 twice a day for two days. Tablet Levocetat night for 2 days",
+      "source_text": "Symptoms: cough, fever, cold. Diagnosis: viral fever. Tablet Augmentin, one doseTwice a day, after meal for 7 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -663,7 +1270,7 @@
     },
     {
       "case_id": "case_010",
-      "source_text": "Complain of epigastric pain since morning. On examination, tenderness epigastric region.Treatment  Injection Pan IV Injection, Injection Spasmonorm.  Capsule Omez twice a day before food for two days. Five capsules.Tablet Ondem 4mg twice a day before food for two days. Tablet Para dicyclomine three times a day for two days. Tablet Mefenamic 500twice a day for two days.\nSyrup Antolix O 10 ml three times a day.",
+      "source_text": "symptoms are fever, cold, cough. diagnosis: viral fever and urti. medicine prescribed augmentin twice a day after meal, dolo 650 twice a day after meal for 7 daystest prescribed: cbc, hba1c, lipid profile. Advices areEat healthy, walk for 30 minutes daily. Avoid, avoid oily food and cold food and follow up  after 7 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -692,7 +1299,7 @@
     },
     {
       "case_id": "case_011",
-      "source_text": "<PII> to kuch nahi hai. X-ray of LS spine showing reversal of lumbar lordosis.diagnosis reversal of lumbar lordosis.  treatment injection Vitanova 6 lakhs unit first doseTablet Xykaa MR twice a day for 5 days.\nTablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before food for five days.",
+      "source_text": "After meal for 7 days. Augmentin twice a day, after meal for 7 days. Test prescribed CBC, HbA1C.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -721,7 +1328,7 @@
     },
     {
       "case_id": "case_012",
-      "source_text": "\u092f\u0947 \u0935\u094b \u092d\u0940 \u092e\u093f\u0938 \u0939\u094b  \u0917\u092f\u0940\u0964 \n\u0915\u0932 \u092b\u094d\u0932\u093e\u0908\u091f \u092e\u093f\u0938 \u0915\u0930 \u0926\u0940 \u0907\u0938\u0915\u0940, \u0924\u094b \u0905\u092c \u092e\u0947\u0930\u0947\u0915\u094b \u091a\u093f\u0902\u0924\u093e \u0939\u094b \u0930\u0939\u0940 \u0939\u0948 \u092d\u0908, \u0907\u0938\u0915\u094b \u0924\u094b \u0964 \n \u0926\u094b \u0924\u0940\u0928 \u0926\u093f\u0928 \u0924\u094b \u0906\u0930\u093e\u092e \u0915\u0930\u0928\u093e \u092a\u095c\u0947\u0917\u093e \u0907\u0938\u0915\u094b , \u0932\u094b\u0917\u094b\u0902 \u0915\u093e \u0926\u094b-\u0926\u094b \u0939\u092b\u094d\u0924\u0947 , \u0920\u0940\u0915 \u0928\u0939\u0940\u0902 \u0939\u094b \u0930\u0939\u093e \u0939\u0948\u0964 \n\u0920\u0940\u0915 \u0939\u0948? \u0924\u094b \u0910\u0938\u093e \u0928\u0939\u0940\u0902 \u0939\u0948 \u0915\u093f \u092e\u0924\u0932\u092c\u0917\u0932\u0947 \u092e\u0947\u0902 \u0916\u0930\u093e\u0936 \u092d\u0940 \u0939\u094b \u0930\u0939\u0940 \u0939\u0948?\n\u0916\u0930\u093e\u0936 \u092d\u0940 \u0939\u0948\u0964\n\u0915\u094d\u092f\u093e \u0939\u0948, \u0907\u0938 \u092c\u093e\u0930 \u091c\u094b \u092b\u0948\u0932\u093e \u0939\u0948 \u0928\u093e \u0935\u093e\u0907\u0930\u0938, \u0932\u094b\u0917\u094b\u0902 \u0915\u093e \u0926\u094b-\u0926\u094b \u0939\u092b\u094d\u0924\u0947 \u0932\u0947 \u0930\u0939\u093e \u0939\u0948\u0964\n\u0914\u0930 \u092c\u0941\u0916\u093e\u0930 \u092d\u0940 \u0915\u092e \u0938\u0947 \u0915\u092e \u091b\u0947-\u0938\u093e\u0924 \u0926\u093f\u0928 \u0932\u0947 ,\u0932\u0947 \u0930\u0939\u093e \u0939\u0948\u0964\n\u0938\u0930 \u0924\u094b \u0906\u092a \u092d\u0940 \u092e\u093e\u0928 \u0915\u0947 \u091a\u0932\u094b, \u0925\u094b\u0921\u093c\u093e \u0924\u094b \u0930\u0939\u0947\u0917\u093e \u0935\u094b, \u0910\u0938\u093e \u0928\u0939\u0940\u0902 \u0939\u094b \u0938\u0915\u0924\u093e \u0915\u093f \u092c\u093f\u0932\u094d\u0915\u0941\u0932 \u090f\u0915\u0926\u092e \u0938\u0947 \u0920\u0940\u0915 \u0939\u094b \u091c\u093e\u090f\u0964\n\u0920\u0940\u0915 \u0939\u0948\u0964\n\u0914\u0930 \u0907\u0938\u0915\u0940 \u0938\u092c\u0938\u0947 \u092c\u0921\u093c\u0940 \u0926\u093f\u0915\u094d\u0915\u0924 \u092f\u0947 \u0939\u0948 \u0938\u0930 , \u092f\u0947 \u0926\u0935\u093e\u0908 \u0928\u0939\u0940\u0902 \u0932\u0947\u0924\u0940\u0964\u0915\u094d\u092f\u094b\u0902? \u0932\u0947\u0924\u0940 \u0939\u0940 \u0928\u0939\u0940\u0902, \u0921\u0930 \u091c\u093e\u0924\u0940 \u0939\u0948\u0964 \u0907\u0924\u0928\u0940 \u092c\u095c\u0940 \u092c\u095c\u0940 \u0917\u094b\u0932\u093f\u092f\u093e\u0902 \u0939\u0948\u0964 \u0930\u094b\u0924\u0940 \u0939\u0948\u0964  \u0926\u0938,\u0926\u0938 \u091a\u094c\u0926\u093e \u0926\u093f\u0928 \u0915\u0947 \u092c\u093e\u0926 \u0964",
+      "source_text": "Augmentin, twice a day after meal for 3 days. Test prescribed CBC, HBA1C.Advices: avoid processed food, eat healthy, avoid cold and oily food. Follow up after 7 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -750,7 +1357,7 @@
     },
     {
       "case_id": "case_013",
-      "source_text": "\u0915\u0947\u0935\u094d\u0939\u093e\u092a\u093e\u0938\u0942\u0928 \u0924\u094d\u0930\u093e\u0938 \u0906\u0939\u0947? \u0906\u0924\u093e \u0915\u092e\u0940\u0924 \u0915\u092e\u0940 \u0906\u0924\u093e \u090f\u0915 \u0926\u094b\u0928 \u092e\u0939\u093f\u0928\u0947 \u091d\u093e\u0932\u0947. \u090f\u0915 \u0926\u094b\u0928 \u092e\u0939\u093f\u0928\u0947. \u091f\u0947\u0902\u0925\u091a\u0940  \u090f\u0915\u094d\u091d\u093e\u092e \u0939\u094b\u0924\u0940 \u0924\u094d\u092f\u093e\u091a\u0940. \u0924\u0947\u0935\u094d\u0939\u093e\u092a\u093e\u0938\u0942\u0928 \u0924\u094d\u0930\u093e\u0938 \u0906\u0939\u0947. \u0921\u094b\u0915\u0902 \u0926\u0941\u0916\u0924\u0902\u092f? \u0939\u094b. \u090f\u0915\u093e \u0938\u093e\u0908\u0921\u0932\u093e \u0915\u0940 \u092a\u0942\u0930\u094d\u0923? \u092a\u0942\u0930\u094d\u0923. \u0915\u0927\u0940 \u092f\u093e \u0938\u093e\u0908\u0921\u0932\u093e \u0926\u0941\u0916\u0924\u0902\u092f, \u0915\u0927\u0940 \u092f\u093e \u0938\u093e\u0908\u0921\u0932\u093e.  \u092e\u0933\u092e\u0933 \u0909\u0932\u091f\u0940 \u0939\u094b\u0924\u0940 ? \u092e\u0933\u092e\u0933 \u0928\u093e \u092a\u0923 \u091a\u0915\u094d\u0915\u0930 \u0938\u093e\u0930\u0916\u0902 \u0939\u094b\u0924\u0902\u092f \u090f\u0915\u0926\u092e. \u091a\u093f\u0921\u091a\u093f\u0921 \u0935\u093e\u091f\u0924\u0947\u092f \u0915\u093e? \u0906\u0935\u093e\u091c \u0928\u093e\u0939\u0940 \u0906\u0935\u0921\u0924, \u0915\u093e\u0939\u0940 \u0928\u093e\u0939\u0940 \u0906\u0935\u0921\u0924. \u092a\u0939\u093f\u0932\u0947 \u0926\u094b\u0928 \u092e\u0939\u093f\u0928\u0947 \u0905\u0917\u094b\u0926\u0930 \u092a\u0923 \u0905\u0927\u0942\u0928 \u092e\u0927\u0942\u0928 \u0926\u0941\u0916\u093e\u092f\u091a\u0902 \u0915\u093e \u0915\u0927\u0940? \u0905\u0927\u0942\u0928 \u092e\u0927\u0942\u0928 \u0926\u0941\u0916\u093e\u092f\u091a\u0902 \u092a\u0923 \u0906\u0924\u093e \u092e\u0917 \u092a\u0947\u092a\u0930 \u091a\u093e\u0932\u0942 \u091d\u093e\u0932\u0947 \u0924\u0947\u0935\u094d\u0939\u093e\u092a\u093e\u0938\u0942\u0928 \u091c\u093e\u0938\u094d\u0924 \u0926\u0941\u0916\u093e\u092f\u0932\u093e \u0932\u093e\u0917\u0932\u0902.  \u0935\u0947\u0933\u0947\u0935\u0930 \u091c\u0947\u0935\u0923 \u0935\u0917\u0948\u0930\u0947 \u0915\u0930\u0924\u094b \u0915\u093e? \u0928\u093e\u0939\u0940. \u0906\u0924\u093e \u0924\u0947 \u0915\u093e\u092f \u0924\u094d\u092f\u093e\u0902\u091a\u094d\u092f\u093e \u090f\u0915\u094d\u091d\u093e\u092e \u0905\u0938\u0932\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u091f\u094d\u092f\u0941\u0936\u0928, \u0936\u093e\u0933\u093e ... \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u0939\u093f \u0906\u0939\u0947 \u0924\u094d\u0930\u093e\u0938 \u0915\u093e \u0921\u094b\u0915\u0902 \u0926\u0941\u0916\u0923\u0902? \u092e\u0932\u093e \u0906\u0939\u0947 \u0924\u094d\u0930\u093e\u0938, \u092e\u093e\u091d\u094d\u092f\u093e \u092d\u093e\u0935\u093e\u0932\u093e \u092e\u093e\u092f\u0917\u094d\u0930\u0947\u0928\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0906\u0939\u0947, \u092e\u093e\u092f\u0917\u094d\u0930\u0947\u0928 \u0906\u0939\u0947 \u0924\u094d\u092f\u093e\u0932\u093e.  \u0924\u094d\u092f\u093e\u0932\u093e \u0939\u0940 \u092e\u0917 \u092e\u093e\u092f\u0917\u094d\u0930\u0947\u0928\u091a\u093e\u091a \u0924\u094d\u0930\u093e\u0938 \u0906\u0939\u0947?  \u0939\u094b \u0924\u0947 \u092e\u0932\u093e \u0915\u0933\u0932\u0902 \u0906\u0939\u0947. \u092e\u093e\u092f\u0917\u094d\u0930\u0947\u0928\u091a\u093e\u091a \u0924\u094d\u0930\u093e\u0938\u093e\u092e\u0927\u094d\u092f\u0947 \u0905\u0938\u0902 \u0930\u093e\u0939\u0924\u0902 \u0905\u0928\u0941\u0935\u093e\u0902\u0936\u093f\u0915 \u0930\u093e\u0939\u0924\u0902 \u0906\u0908\u0932\u093e \u0935\u0917\u0948\u0930\u0947 \u0905\u0938\u0947\u0932 \u0924\u0930 \u091c\u093e\u0938\u094d\u0924\u0940 50% \u091a\u093e\u0928\u094d\u0938\u0947\u0938 \u0905\u0938\u0924\u093e\u0924. \u092e\u0932\u093e \u0906\u0939\u0947 \u092a\u0923 \u092e\u0932\u093e \u0924\u0947\u0935\u0922\u093e \u0928\u093e\u0939\u0940, \u0906\u0939\u0947 \u092a\u0923 \u0906\u0939\u0947. \u092f\u093e\u0932\u093e \u0906\u0924\u093e \u092f\u093e \u0926\u094b\u0928 \u092e\u0939\u093f\u0928\u094d\u092f\u093e\u092a\u093e\u0938\u0942\u0928 \u0935\u093e\u0922\u0932\u0947\u0932\u0902 \u0906\u0939\u0947. \u0939\u094b. \u0924\u094d\u092f\u093e\u091a\u0902 \u0935\u0947\u091f \u092a\u0923 \u0932\u0949\u0938 \u092e\u094d\u0939\u0923\u091c\u0947 10 kg \u0935\u091c\u0928 \u0915\u092e\u0940 \u091d\u093e\u0932\u0902 \u0924\u094d\u092f\u093e\u091a\u0902. \u0926\u094b\u0928 \u092e\u0939\u093f\u0928\u094d\u092f\u093e\u0924\u091a \u0924\u094d\u092f\u093e\u091a\u0902.  \u0924\u0930 \u0924\u094b \u0926\u0941\u0938\u0931\u094d\u092f\u093e \u092a\u094d\u0930\u0915\u093e\u0930\u091a\u093e \u092e\u094b\u092c\u093e\u0907\u0932 \u0928\u0947, \u0924\u094d\u092f\u093e\u091a\u093e \u0935\u0947\u0921 \u0928\u093e\u0939\u0940 \u0924\u094d\u092f\u093e\u0932\u093e.  \u0921\u094b\u0933\u0947 \u092a\u0923 \u092e\u094b\u0920\u0947 \u0924\u094d\u092f\u093e\u091a\u0947.  \u0915\u093e\u0932 \u0924\u094b \u090f\u0915\u0926\u092e\u091a \u0905\u0938\u0902 \u0905\u0938\u0947, \u0915\u092e\u0940 \u0915\u092e\u0940 \u0921\u094b\u0933\u0947 \u0915\u0930\u0924 \u0939\u094b\u0924\u093e.  \u0924\u094d\u092f\u093e\u0932\u093e \u0932\u093e\u0908\u091f\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0939\u094b\u0924\u0902?",
+      "source_text": "Patient name is <PII>Age 27 female, she's a case of ankle pain and stiffness. History of ankle fracture three months ago. She's having difficulty in stair climbing. Examination finding tenderness grade one, swelling grade one. She's having tight calf and hamstring muscles.Full ankle range of motion, painful inversion.Diagnosis : known case of lateral malleolus fracture left side",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -779,7 +1386,7 @@
     },
     {
       "case_id": "case_014",
-      "source_text": "\u0915\u0938\u093e \u0906\u0939\u0947 \u0938\u0927\u094d\u092f\u093e \u0924\u094d\u0930\u093e\u0938?\n\u0906\u0924\u093e \u092a\u0930\u0924 \u0906\u0939\u0947 \u0928\u093e \u0906\u0920-\u0926\u0939\u093e \u0926\u093f\u0935\u0938 \u091d\u093e\u0932\u0947, \u0916\u093e\u0932\u0940 \u0935\u093e\u0915\u0932\u094d\u092f\u093e\u0935\u0930\u0924\u0940 \u091a\u0915\u094d\u0915\u0930 \u092f\u0947\u0924\u0947 \u091c\u0936\u0940 \u092e\u093e\u0917\u091a\u094d\u092f\u093e \u0935\u0947\u0933\u0947\u0938 \u0906\u0932\u0940 \u0939\u094b\u0924\u0940. \u0939\u093e.  \u0924\u0930 \u0924\u0938\u0902\u091a \u0906\u0924\u093e \u0925\u094b\u0921\u0902 \u0925\u094b\u0921\u0902 \u0939\u094b\u090a\u0928 \u0930\u093e\u0939\u093f\u0932\u0902. \u091d\u094b\u092a\u0932\u093e \u0915\u0940 \u092b\u093f\u0930\u0924\u0940. \u0916\u093e\u0932\u0940 \u0935\u093e\u0915\u0932\u0902 \u0915\u0940. \u091a\u0915\u094d\u0915\u0930 \u092f\u0947\u0924\u0947?  \u0939\u093e \u091a\u0915\u094d\u0915\u0930 \u092f\u0947\u0924\u0947. \u0915\u093f\u0924\u0940 \u0935\u0947\u0933\u093e\u0938\u093e\u0920\u0940 \u092f\u0947\u0924\u0947 \u092e\u0917 \u091a\u0915\u094d\u0915\u0930? \u091a\u0915\u094d\u0915\u0930 \u0915\u093f\u0924\u0940 \u0935\u0947\u0933\u093e\u0938\u093e\u0920\u0940 \u0930\u093e\u0939\u0924\u0947?  \u0924\u0930\u0940 \u092a\u093e\u091a, \u092a\u093e\u091a \u0906\u0920 \u092e\u093f\u0928\u093f\u091f\u0902 \u0905\u0938\u093e \u0916\u093e\u0932\u0940 \u0935\u093e\u0915\u0932\u093e \u0915\u093e \u092a\u0942\u0930\u094d\u0923 \u092b\u093f\u0930\u0924\u0947. \u092e\u093e\u0928 \u0926\u0941\u0916\u0924 \u0906\u0939\u0947 \u0915\u093e? \u0939\u094b \u092e\u093e\u0928 \u0935\u0917\u0948\u0930\u0947 \u0926\u0941\u0916\u0924\u0947 \u0906\u0923\u093f \u0939\u0947 \u0921\u094b\u0915\u0902 \u092d\u093e\u0930\u0940 \u092d\u093e\u0930\u0940 \u0928\u093e\u0939\u0940 \u0915\u093e \u0905\u0938\u0902 \u090f\u0915\u0926\u092e \u091c\u0921 \u091d\u093e\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u0902. \u0939\u0947 \u0907\u0915\u0921\u0947 \u0924\u093f\u0915\u0921\u0947 \u0928\u093e\u0939\u0940 \u0915\u093e \u0905\u0938\u0902. \u0921\u094b\u0915\u0902 \u092a\u0923 \u092d\u093e\u0930\u0940 \u0935\u093e\u091f\u0924\u0902\u092f? \u0939\u094b \u0921\u094b\u0915\u0902. \u0930\u094b\u091c\u091a \u0935\u093e\u091f\u0924\u0902\u092f \u0915\u093e \u0938\u0927\u094d\u092f\u093e?  \u0939\u094b \u0938\u0927\u094d\u092f\u093e \u0938\u0927\u094d\u092f\u093e \u0935\u093e\u091f\u0924 \u0906\u0939\u0947 \u0906\u0924\u093e \u090f\u0935\u0922\u094d\u092f\u093e\u0924. \u0906\u0924\u093e \u0939\u0947 \u0926\u0941\u0916\u0924 \u0906\u0939\u0947 \u0928\u093e, \u092e\u094d\u0939\u0923\u091c\u0947 \u091a\u0915\u094d\u0915\u0930 \u092f\u0947\u0924\u093e\u0924 \u0924\u0947 \u0924\u0930\u0940 \u0906\u0920-\u0926\u0939\u093e \u0926\u093f\u0935\u0938 \u091d\u093e\u0932\u0947 \u0925\u094b\u0921\u0940 \u0925\u094b\u0921\u0940 \u0925\u094b\u0921\u0940 \u0905\u0936\u0940\u091a \u092a\u0939\u093f\u0932\u0947 \u091a\u093e\u0932\u0942 \u091d\u093e\u0932\u0940 \u092a\u0923 \u0932\u0935\u0915\u0930 \u0906\u0932\u0940 \u0928\u093e\u0939\u0940 \u092e\u0917 \u090f\u0915\u0926\u092e\u091a \u092a\u0921\u0924 \u0939\u094b\u0924\u0940. \u092e\u0917 \u0924\u0947\u0935\u094d\u0939\u093e \u0906\u0932\u0940 \u0939\u094b\u0924\u0940 \u092e\u094d\u0939\u0923\u0942\u0928 \u092e\u094d\u0939\u091f\u0932\u0902 \u0906\u0924\u093e \u0932\u0935\u0915\u0930\u091a \u092a\u0921\u093e. \u0906\u0923\u093f \u092c\u0940\u092a\u0940\u091a\u094d\u092f\u093e \u0917\u094b\u0933\u0940 \u091a\u093e\u0932\u0942 \u0906\u0939\u0947 \u0915\u0940 \u0924\u0940 \u092c\u0902\u0926 \u0906\u0939\u0947? \u092c\u0940\u092a\u0940\u091a\u0940 \u0917\u094b\u0933\u0940 \u0924\u0930 \u0924\u0940 \u092c\u0902\u0926 \u0915\u0947\u0932\u0940 \u0939\u094b\u0924\u0940 \u092e\u093e\u091d\u093e \u092c\u0940\u092a\u0940 \u0932\u094b \u0939\u094b\u0924 \u0939\u094b\u0924\u093e \u092a\u0939\u093f\u0932\u0947 \u0932\u094b\u091a \u0939\u094b\u0924\u094b. \u092e\u0917 \u0924\u0947\u0935\u094d\u0939\u093e \u0935\u093e\u0922\u0932\u093e \u0905\u0938\u0947\u0932. \u0906\u0924\u093e \u092a\u0930\u0924 \u092e\u093e\u091d\u093e \u092c\u0940\u092a\u0940 \u0935\u093e\u0922\u0932\u093e. \u092e\u093e\u091d\u0940 \u0924\u0940 \u092b\u093e\u0908\u0932 \u0906\u0939\u0947 \u0928\u093e. \u0915\u093e\u0932 \u092e\u094d\u0939\u0923\u091c\u0947 \u092e\u0932\u093e..  \u0939\u093e \u0939\u093e\u0925 \u0906\u0939\u0947 \u0928\u093e , \u0916\u0942\u092a \u091d\u0941\u0928\u091d\u0941\u0928 \u0906\u0932\u0940 \u0939\u094b\u0924\u0940 \u092a\u0941\u0930\u094d\u0935\u0940 \u0935\u0948\u0917\u0948\u0930\u0947\u091a\u0902. \u0928\u090a \u0938\u0921\u0947\u0928\u090a \u0932\u093e \u0924\u0930 \u092e\u0917 \u092e\u0940 \u0939\u094d\u092f\u093e\u0902\u091a\u0947 \u092b\u0945\u092e\u093f\u0932\u0940 \u0921\u0949\u0915\u094d\u091f\u0930 \u0906\u0939\u0947, \u092e\u0947\u0921\u093f\u0915\u0932 \u0915\u0949\u0932\u0947\u091c \u0915\u0921\u0947, \u0924\u093f\u0925\u0947 \u0917\u0947\u0932\u0940  \u0939\u094b\u0924\u0940 \u0924\u0930 \u092c\u0940\u092a\u0940 150 \u0939\u094b\u0924\u093e. \u0928\u0902\u0924\u0930 \u092e\u0917 \u0935\u093e\u0922\u0932\u093e \u0939\u094b\u0924\u093e \u0925\u094b\u0921\u093e\u0938\u093e \u0935\u093e\u0922\u0932\u093e \u092e\u094d\u0939\u0923\u0947. \u0908\u0938\u0940\u091c\u0940 \u0935\u0917\u0948\u0930\u0947 \u0915\u0947\u0932\u0902 \u092a\u0923 \u0928\u0949\u0930\u094d\u092e\u0932 \u0939\u094b\u0924\u0902 \u0906\u0923\u093f \u0907\u0925\u0947 \u091b\u093e\u0924\u0940\u0924 \u0918\u0930\u0940 \u092e\u094d\u0939\u0923\u091c\u0947 \u0905\u0938\u0902 \u0925\u094b\u0921\u0902 \u0915\u093e\u092e \u091a\u093e\u0932\u0942 \u0906\u0939\u0947 \u092a\u0947\u0902\u091f\u093f\u0902\u0917\u091a\u0902 \u0935\u0917\u0948\u0930\u0947 \u0925\u094b\u0921\u0902 ... \u0930\u0942\u092e \u0935\u0917\u0948\u0930\u0947 \u0915\u0947\u0932\u0947.  \u0924\u0930 \u092e\u0932\u093e \u090f\u0915\u091f\u0940\u0932\u093e\u091a \u0932\u0915\u094d\u0937 \u0926\u094d\u092f\u093e\u092f\u091a\u0902 \u0939\u094b\u0924\u0902 \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e \u090f\u0915 \u0926\u0930\u094d\u0936\u0928\u0928\u0940 \u091d\u093e\u0932\u0902 \u0915\u093e\u092f \u092e\u093e\u0939\u093f\u0924 \u092a\u0923. \u092a\u0923 \u092c\u0940\u092a\u0940 \u0935\u093e\u0922\u0932\u0902. \u0906\u0924\u093e \u0915\u093e\u0932\u091a \u092e\u0940 \u0917\u094b\u0933\u0940 \u0918\u0947\u0924\u0932\u0940, \u0924\u094d\u092f\u093e\u0902\u0928\u0940 \u0926\u093f\u0932\u0940 \u092c\u0940\u092a\u0940\u091a\u0940 \u0917\u094b\u0933\u0940.  \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u0924\u0941\u092e\u091a\u0940 \u0932\u0915\u094d\u0937\u093e\u0924 \u0905\u0938\u0947\u0932 \u090f\u0916\u093e\u0926\u0940 \u092a\u0923, \u0932\u0915\u094d\u0937\u093e\u0924 \u0928\u093e\u0939\u0940 \u0930\u093e\u0939\u093f\u0932\u0902. \u092e\u0917 \u092c\u0902\u0926 \u0915\u0947\u0932\u0940 \u0939\u094b\u0924\u0940 \u0924\u0940 \u0928\u0902\u0924\u0930. \u0907\u0924\u0915\u0947 \u0926\u093f\u0935\u0938 \u0928\u0902\u0924\u0930 \u0939\u094b\u0924\u0902 \u0939\u0948, \u091d\u094b\u092a \u0935\u0948\u0917\u0948\u0930\u0947 \u092f\u0947\u0924\u0947 \u0915\u093e ? \u0939\u094b \u0939\u094b \u0939\u094b \u0939\u094b. \u0924\u0947\u0935\u094d\u0939\u093e\u0902 \u092a\u093e\u0938\u0942\u0928 \u090f\u0915  \u092e\u0939\u093f\u0928\u093e \u0915\u093e\u092e \u091a\u093e\u0932\u0942 \u0906\u0939\u0947 \u0918\u0930\u0940. \u0905\u091a\u094d\u091b\u093e. \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u092e\u0941\u0933\u0947. \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0906\u0939\u0947. \u092e\u0932\u093e \u0938\u0930\u094d\u0935\u0940\u0915\u0932 \u0938\u094d\u092a\u0949\u0928\u094d\u0921\u093f\u0932\u093e\u092f\u091f\u093f\u0938\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0935\u093e\u0922\u0932\u093e \u0905\u0938\u0947\u0932 . \u0906\u0923\u093f \u0924\u0940 \u091c\u0930\u093e \u091c\u093e\u0938\u094d\u0924\u091a \u0915\u093e\u092e \u0915\u0930\u0924\u0947. \u0905\u091a\u094d\u091b\u093e. \u092e\u094d\u0939\u0923\u091c\u0947 \u0913\u0935\u094d\u0939\u0930. \u0935\u0947\u0933\u0947\u0935\u0930 \u091c\u0947\u0935\u0923 \u0935\u0917\u0948\u0930\u0947 \u0939\u094b\u0924\u0947 \u0915\u0940 \u0928\u093e\u0939\u0940? \u0928\u093e\u0939\u0940. \u0928\u093e\u0939\u0940 \u0924\u0947 \u0939\u094b\u0924 \u0928\u093e\u0939\u0940\u092f\u0947 \u0924\u0947\u0935\u0922\u0902. \u0906\u0923\u093f \u0939\u0947 \u091b\u093e\u0924\u0940 \u092a\u0923 \u0905\u0936\u0940.... \u092a\u093e\u092f \u0926\u0941\u0916\u093e\u092f\u0932\u093e \u0932\u093e\u0917\u0932\u0947. \u0915\u093e\u0932 \u090f\u0915\u0926\u092e \u092e\u0927\u0942\u0928 \u0925\u094b\u0921\u0938\u0902 \u0905\u0938\u0902 \u0935\u093e\u091f\u0932\u0902 \u092e\u0932\u093e \u0916\u0942\u092a \u092e\u0941\u0902\u0917\u094d\u092f\u093e \u092f\u0947\u0924 \u0906\u0939\u0947\u0924 \u0915\u093e\u0939\u0940 \u092e\u094d\u0939\u0923\u0942\u0928 \u092e\u0940 \u0932\u0917\u0947\u091a \u0924\u0940 \u0918\u0947\u0924\u0932\u0940. \u0915\u093e\u0932\u0939\u0940 \u0935\u093e\u0922\u0932\u0902\u091a \u0939\u094b\u0924\u0902 \u0924\u0941\u091d\u0902. \u092c\u0940\u092a\u0940 140/ 80 \u0906\u0939\u0947 \u0906\u0924\u093e. \u0915\u093e\u0930\u0923 \u0939\u0947 \u092e\u0941\u0902\u0917\u0940 \u091d\u093e\u0932\u0940 \u0939\u0947.",
+      "source_text": "OK, so patient Has come with a complaint of backache. I plan to prescribe HSCRP.   TFT vitamin B12 FBS PPBS. LFT KFT lipid profile CBC.  Also 25 hydroxy vitamin D. The vitals were captured, body height is 175 centimetres, blood pressure is 110 by 80.  I want a follow-up to be done on December 12th.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -808,7 +1415,7 @@
     },
     {
       "case_id": "case_015",
-      "source_text": "\u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u0915\u093e\u092f \u0924\u094d\u0930\u093e\u0938 \u0939\u094b\u0924\u094b \u092e\u094d\u0939\u0923\u091c\u0947? \u092e\u0942\u0933\u0935\u094d\u092f\u093e\u0927\u0940\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0939\u094b\u0924\u094b. \u092e\u0942\u0933\u0935\u094d\u092f\u093e\u0927\u0940\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0939\u094b\u0924\u094b. \u092e\u0942\u0933\u0935\u094d\u092f\u093e\u0927\u0940\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0915\u093f\u0924\u0940 \u0926\u093f\u0935\u0938\u093e\u092a\u093e\u0938\u0942\u0928 \u0906\u0939\u0947? \u092e\u0932\u093e \u0906\u0924\u093e \u0926\u094b\u0928 \u092e\u0939\u093f\u0928\u0947 \u091d\u093e\u0932\u0947. \u0906\u0923\u093f \u0924\u094d\u092f\u093e\u091a\u0940 \u0914\u0937\u0927\u0940 \u091a\u093e\u0932\u0942 \u0906\u0939\u0947. \u0906\u0924\u093e \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u091a\u0915\u094d\u0915\u0930 \u0906\u0939\u0947. \u092e\u094d\u0939\u0923\u091c\u0947 \u092c\u0930\u0902\u091a \u0915\u092e\u0940 \u0906\u0939\u0947 \u092e\u094d\u0939\u0923\u0923\u094d\u092f\u093e\u0924 \u0935\u0917\u0948\u0930\u0947. \u0914\u0937\u0927 \u092a\u0923 \u0924\u0940 \u0938\u093e\u0930\u0916\u0940 \u0938\u093e\u0930\u0916\u0940 \u0909\u092e\u0933\u0947\u0932 \u0915\u093e\u0930\u0923 \u0915\u0940 \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u092c\u094012 \u0915\u092e\u0940 \u091d\u093e\u0932\u0947\u0932\u0902 \u0906\u0939\u0947 \u0906\u0923\u093f \u092c\u094012 \u0924\u0941\u092e\u091a\u0902 \u092b\u0915\u094d\u0924 157.40 \u0906\u0939\u0947. \u0915\u093f\u0924\u0940 \u0905\u0938\u093e\u092f\u0932\u093e \u092a\u093e\u0939\u093f\u091c\u0947? 400 \u091a\u094d\u092f\u093e \u0935\u0930 \u0905\u0938\u093e\u092f\u0932\u093e \u092a\u093e\u0939\u093f\u091c\u0947.\u0920\u0940\u0915 \u0906\u0939\u0947. \u0906\u092a\u0932\u094d\u092f\u093e\u0932\u093e \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u0915\u0945\u092a\u094d\u0938\u0942\u0932 \u0917\u094b\u0933\u094d\u092f\u093e \u0907\u0902\u091c\u0947\u0915\u094d\u0936\u0928\u091a\u093e \u092e\u094b\u0920\u093e \u0915\u094b\u0930\u094d\u0938 \u0915\u0930\u093e\u092f\u091a\u093e \u0906\u0939\u0947. \u0920\u0940\u0915 \u0906\u0939\u0947. \u0938\u094b\u092c\u0924 \u0924\u0941\u092e\u091a\u0902 \u092c\u094d\u0932\u0921 \u0925\u094b\u0921\u0902 \u0915\u092e\u0940\u091a \u0906\u0939\u0947 . \u0920\u0940\u0915 \u0906\u0939\u0947, \u0924\u0930 \u0906\u092a\u0923 \u091c\u0947 \u0915\u0945\u092a\u094d\u0938\u0942\u0932 \u0917\u094b\u0933\u094d\u092f\u093e \u0907\u0902\u091c\u0947\u0915\u094d\u0936\u0928 \u0926\u0947\u090a \u0924\u094d\u092f\u093e, \u0926\u0930 \u0906\u0920\u0935\u0921\u094d\u092f\u093e\u0932\u093e \u090f\u0915 \u0905\u0938\u0947 \u0906\u0920 \u0906\u0920\u0935\u0921\u094d\u092f\u093e\u091a\u0947 \u0907\u0902\u091c\u0947\u0915\u094d\u0936\u0928 \u0906\u0939\u0947 , \u092e\u0917  \u0926\u0930 \u092e\u0939\u093f\u0928\u094d\u092f\u093e\u0932\u093e \u090f\u0915 \u0906\u0939\u0947 \u0905\u0938\u0947 \u092c\u093e\u0930\u093e \u092e\u0939\u093f\u0928\u094d\u092f\u093e\u091a\u0947 \u092c\u093e\u0930\u093e \u0906\u0939\u0947\u0924.\u0920\u0940\u0915 \u0906\u0939\u0947? \u0906\u0924\u093e \u0924\u0942 \u0915\u094b\u0930\u094d\u0938 \u091a\u093e\u0932\u0942 \u0915\u0930 \u0924\u0941\u091d\u093e. \u092e\u0939\u093f\u0928\u094d\u092f\u093e \u092e\u0939\u093f\u0928\u094d\u092f\u093e\u0924\u0941\u0928 \u090f\u0915\u0926\u093e \u092f\u0947\u090a\u0928 \u0926\u093e\u0916\u0935\u093e\u092f\u091a\u0902. \u0939\u094b \u0938\u0930.Use template B12 advance",
+      "source_text": "Give this patient tablet Dolostat plus R one OD for 10 days. Tab bac Gabamax gold one HS at night for 10 days. Tablet Pan DIn the morning, empty stomach for 10 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -837,7 +1444,7 @@
     },
     {
       "case_id": "case_016",
-      "source_text": "\u0915\u0938\u093e \u0906\u0939\u0947 \u0906\u0924\u093e \u0917\u0941\u0921\u0918\u094d\u092f\u093e\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0915\u0938\u093e \u0906\u0939\u0947? \u0917\u0941\u0921\u0918\u094d\u092f\u093e\u091a\u093e \u0924\u0947\u091a \u0924\u093f\u091a\u0947 \u0939\u0947 \u0928\u093e, \u092d\u0940\u0924\u0940 \u0935\u093e\u0922\u0932\u0940 \u0906\u0939\u0947 \u0924\u093f\u091a\u0940 \u0915\u093e\u0932 \u092a\u093e\u0938\u0941\u0928 . \u092a\u0902\u0927\u0930\u093e \u0926\u093f\u0935\u0938 \u091d\u093e\u0932\u0947 .  \u0915\u093e\u0932 \u0921\u0949\u0915\u094d\u091f\u0930\u0915\u0921\u0947 \u0917\u0947\u0932\u0947\u0915\u093e\u092f \u091d\u093e\u0932\u0902 \u0915\u0933\u0924 \u0928\u093e\u0939\u0940 \u092c\u0940\u092a\u0940 \u0916\u0942\u092a \u0935\u093e\u0922\u0932\u0940 \u0939\u094b\u0924\u0940 \u0924\u0930. \u092c\u0940\u092a\u0940\u091a\u093e \u0917\u094b\u0933\u094d\u092f\u093e \u091a\u093e\u0932\u0942 \u0906\u0939\u0947 \u0915\u093e ?  \u0939\u094b . \u091a\u093e\u0932\u0942 \u0905\u0938\u0942\u0928,  \u092c\u0940\u092a\u0940 \u0916\u0942\u092a \u0935\u093e\u0922\u0932\u0940.\u0915\u093e\u0932 \u0915\u093e\u092f \u0938\u0930\u093e\u0928\u0915\u0921\u0947  \u0917\u0947\u0932\u0947 \u0939\u094b\u0924\u0947 \u0918\u0930\u093e\u0924\n\u0906\u0923\u093f \u092a\u093e\u092f\u093e\u0935\u0930 \u0916\u0942\u092a \u0938\u0942\u091c\u0928 \u0906\u0932\u0940 \u0939\u094b\u0924\u0940.\n\u0916\u0942\u092a\u091a \u0926\u0941\u0916\u0924 \u0939\u094b\u0924\u0902.\u092c\u0940\u092a\u0940\u091a\u093e \u0917\u094b\u0933\u094d\u092f\u093e \u0906\u0923\u0932\u094d\u092f\u093e \u0906\u0939\u0947  \u0928\u093e? \u0939\u094b. \u0939\u094b, \u092e\u0940 \u092c\u0940\u092a\u0940\u091a\u093e \u0917\u094b\u0933\u094d\u092f\u093e \u0906\u0923\u0932\u094d\u092f\u093e.\u092c\u0940\u092a\u0940 \u0928\u0949\u0930\u094d\u092e\u0932 \u0906\u0939\u0947 \u0906\u091c \u0967\u0969\u096b /\u096f\u0967 \u0906\u0923\u093f \u092a\u0932\u094d\u0938 \u0930\u0947\u091f \u096c\u096e.  \u092c\u0940\u092a\u0940 \u0924\u0930 \u0928\u0949\u0930\u094d\u092e\u0932 \u0906\u0939\u0947. \u0916\u0942\u092a\u091a \u0906\u0939\u0947 \u092c\u0940\u092a\u0940 . \u092c\u0940\u092a\u0940\u091a\u094d\u092f\u093e \u0917\u094b\u0933\u094d\u092f\u093e \u091a\u093e\u0932\u0942 \u0906\u0939\u0947 \u0915\u093e ? \u0939\u094b \u091a\u093e\u0932\u0942 \u0939\u0948 . \u0939\u094d\u092f\u093e \u0917\u094b\u0933\u0940 \u0918\u0947\u0924\u0932\u0902 \u0915\u093f \u0915\u092e\u0940 \u091d\u093e\u0932\u0902 \u0928\u093e \u0906\u0924\u093e? \u0939\u094b . \u092a\u0923 \u0905\u0902\u0917\u093e\u0935\u0930 \u0935\u0917\u0948\u0930\u0947 \u0938\u0945\u092e\u0940 \u0938\u0941\u091c\u0932\u0947\u0932\u093e \u0906\u0939\u0947 \u0924\u0941\u092e\u091a\u0902 . \u092c\u093e\u0915\u0940 \u0915\u093e\u092f ? \u092a\u093e\u092f \u0924\u0930 \u0916\u0942\u092a \u0938\u0941\u091c\u0932\u0947 . \u0935\u0930\u0924\u0940 \u0915\u0930\u093e.\u0906\u0924\u093e\u091a\u0940 \u091a\u093e\u0932\u0942 \u0906\u0939\u0947 ? \u092a\u093e\u0939\u093f\u0932\u094d\u092f\u093e\u091a\u0940 \u091a\u093e\u0932\u0942 \u0906\u0939\u0947 ?  \u0928\u093e\u0939\u0940, \u0906\u0924\u093e \u0939\u0947 \u0926\u094b\u0928 \u0924\u0940\u0928 \u092e\u0939\u093f\u0928\u0947 \u092e\u093e\u0917\u0902 \u0926\u093e\u0916\u0935\u0924\u094b \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e. \u092f\u093e \u0917\u094b\u0933\u094d\u092f\u093e \u0918\u0947\u0924\u0932\u093e \u0915\u093f \u0938\u0942\u091c \u0928\u093e\u0939\u0940 , \u092c\u0931\u094d\u092f\u093e\u091a\u0926\u093e \u092f\u093e \u0932\u094b\u0915\u093e\u0902\u0928\u093e, \u092f\u093e \u0917\u094b\u0933\u094d\u092f\u093e\u0902\u0928\u0940 \u092a\u0923 \u0939\u094b\u090a \u0936\u0915\u0924\u0902 \u092c\u0930\u0902. \u0939\u094b \u0915\u093e ? \u0916\u0942\u092a \u0926\u093f\u0935\u0938\u093e\u091a\u094d\u092f\u093e \u0906\u0939\u0947 \u0939\u093f  \u0917\u094b\u0933\u094d\u092f\u093e \u092f\u093e\u0902\u091a\u094d\u092f\u093e \u0938\u0917\u0933\u0902. \u092a\u0921\u0932\u0940 \u0915\u093f \u0939\u0947 \u091a\u0915\u094d\u0915\u0930 \u092f\u0947\u0924\u0947, \u0939\u094d\u092f\u093e \u0917\u094b\u0933\u094d\u092f\u093e \u0926\u093f\u0932\u094d\u092f\u093e \u0939\u094b\u0924\u094d\u092f\u093e,  \u092a\u0921\u0932\u094d\u092f\u093e \u0938\u0917\u0933\u094d\u092f\u093e\u0924\u094d\u092f\u093e\u0902\u091a\u094d\u092f\u093e \u0924\u094d\u092f\u093e\u0902\u091a\u094d\u092f\u093e \u0905\u091c\u0942\u0928 \u0917\u094b\u0933\u094d\u092f\u093e \u0924\u0930 \u0928\u093e\u0939\u0940 \u091a\u093e\u0932\u0942 \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u0935\u0947\u0917\u0933\u094d\u092f\u093e? \u0928\u093e\u0939\u0940 ,\u0928\u093e\u0939\u0940 \u092e\u0917 \u0915\u0938\u0902 \u0936\u094b\u0927\u093e\u092f\u091a\u0902? \u092e\u0940 \u0939\u0947 \u0938\u0917\u0933\u0902 \u0932\u093f\u0939\u093f\u0932\u0947\u0932\u0940 \u0939\u094b\u0924\u0940 \u0917\u094b\u0933\u094d\u092f\u093e, \u0924\u0947 \u0918\u0947\u0924\u0932\u0902 \u0939\u094b\u0924\u0902 \u092e\u093e\u0917\u0942\u0928 .\u0906\u0924\u093e \u092a\u0942\u0930\u094d\u0923 \u091a\u0947\u0939\u0930\u093e \u0906\u0939\u0947 , \u0921\u094b\u0933\u094d\u092f\u093e \u0935\u0933\u092f\u093e \u0916\u0942\u092a \u0938\u0941\u091c\u0932\u093e\u0906\u0939\u0947. \u0935\u091c\u0928 \u0915\u0930\u093e.\u0935\u091c\u0928 62 \u0915\u093f\u0932\u094b 500 \u0917\u094d\u0930\u093e\u092e \u0939\u0948",
+      "source_text": "This patient has fever since the last 4 days. He is also suffering from headache. Kindly prescribe him tablet Combiflam, 1 tablet TID after meal for 3 days. Tablet Pan D, 1 tablet in the morning, empty stomach for 3 days.And tablet Vomikind  MD 4 mg one tablet three times a day after food, OK.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -866,7 +1473,7 @@
     },
     {
       "case_id": "case_017",
-      "source_text": "\u0924\u0941\u092e\u091a\u0902 B12 235 \u0906\u0939\u0947 \u091c\u0947 \u0915\u0940 400 \u091a\u094d\u092f\u093e \u0935\u0930 \u092a\u093e\u0939\u093f\u091c\u0947. \u0924\u0941\u092e\u091a\u0902 \u0915\u0945\u0932\u094d\u0936\u093f\u092f\u092e \u0906\u0939\u0947 8.3 \u0924\u0947 \u092a\u0923 \u0915\u092e\u0940 \u0906\u0939\u0947. \u0924\u0941\u092e\u091a\u0902 \u0935\u093f\u091f\u093e\u092e\u093f\u0928 \u0921\u0940 \u092a\u0923 \u0915\u092e\u0940 \u0906\u0939\u0947. \u0935\u093f\u091f\u093e\u092e\u093f\u0928 \u0921\u0940 \u0924\u0941\u092e\u091a\u0902 19 \u091a \u0906\u0939\u0947. \u0924\u0947 30 \u091a\u094d\u092f\u093e \u0935\u0930 \u092a\u093e\u0939\u093f\u091c\u0947. \u0924\u0930 \u0906\u092a\u0923 \u092f\u093e\u091a\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u0915\u093e\u0939\u0940 \u091f\u094d\u0930\u0940\u091f\u092e\u0947\u0902\u091f \u091a\u093e\u0932\u0942 \u0915\u0930\u0942. \u092a\u0923 \u0915\u0945\u092a\u094d\u0938\u0942\u0932 \u0917\u094b\u0933\u094d\u092f\u093e \u0907\u0902\u091c\u0947\u0915\u094d\u0936\u0928 \u0938\u0917\u0933\u0947 \u0918\u094d\u092f\u093e\u0935\u0947 \u0932\u093e\u0917\u0924\u0940\u0932.\u0935\u094d\u0939\u093f\u091f\u0945\u092e\u093f\u0928 \u0921\u0940 \u0938\u093e\u0920\u0940, \u0915\u0945\u092a\u094d\u0938\u0942\u0932 \u0915\u094b\u0932\u0945\u0938\u0930\u094d\u091f\u0940\u0928 \u0921\u0940 \u0969 . \u0920\u0940\u0915 \u0906\u0939\u0947?  \u092a\u0923 \u092c\u0940 \u0967\u0968 \u092c\u0930\u0902\u091a \u0915\u092e\u0940 \u0905\u0938\u0932\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0906\u092a\u0932\u094d\u092f\u093e\u0932\u093e \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u0907\u0902\u091c\u0947\u0915\u094d\u0936\u0928 \u0918\u094d\u092f\u093e\u0935\u0902 \u0932\u093e\u0917\u0947\u0932.\u0906\u092a\u0923 \u092e\u093e\u0917\u091a\u094d\u092f\u093e \u0935\u0947\u0933\u0947\u0932\u093e \u0915\u0947\u0932\u093e \u0939\u094b\u0924\u093e \u0915\u094b\u0930\u094d\u0938 B12 \u091a\u093e. \u0939\u093e B12 \u0939\u093e \u0907\u0930\u094d\u0930\u093f\u0935\u094d\u0939\u0930\u094d\u0938\u093f\u092c\u0932 \u0921\u093f\u0938\u0940\u091c \u0906\u0939\u0947. \u0924\u0941\u092e\u094d\u0939\u0940 \u091c\u0930 B12 \u0932\u093e \u0905\u0938\u0902 \u0935\u093e\u091f\u0932\u0902 \u0915\u0940 \u0915\u093e \u0928\u093e\u0939\u0940 \u0906\u092a\u0923 \u0920\u0940\u0915 \u0915\u0947\u0932\u0902, \u0906\u0923\u093f \u0924\u094b \u092a\u0941\u0928\u094d\u0939\u093e \u0939\u094b\u0923\u093e\u0930 \u0928\u093e\u0939\u0940, \u0924\u0930 \u0924\u094b \u0938\u093e\u0930\u0916\u093e \u0938\u093e\u0930\u0916\u093e.\u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u0924\u094d\u092f\u093e\u0932\u093e \u092a\u094d\u0930\u0949\u092a\u0930\u094d\u0932\u0940 \u0915\u094b\u0930\u094d\u0938 \u0915\u0930\u0942\u0928 \u0924\u094d\u092f\u093e\u0932\u093e \u0920\u0940\u0915 \u0915\u0930\u0923\u093e\u0930 \u0928\u093e\u0939\u0940\u0924\u0930 \u091c\u0928\u094d\u092e\u092d\u0930\u093e\u091a\u0902, \u0972\u091c \u0907\u091f \u0907\u091c \u0924\u0938\u0902\u091a \u0930\u093e\u0939\u0940\u0932 \u0924\u094b.\u0935\u0947\u091f \u0915\u093f\u0924\u0940 \u0938\u0947\u0935\u094d\u0939\u0928 \u0939\u094b\u0924\u0902 ?  \u0928\u093e\u0939\u0940 . \u096f\u096e. \u096d",
+      "source_text": "Complain of cough, dyspnea. Treatment injection Dexa.Tablet CP CV twice a day for two days. Tablet Wysolone three times a day for two days. Tablet Costus Advance three times a day for two days.Tablet Deriphyllin Retard 300 milligram twice a day for two days. Tablet Levopoint M once at night for 10 days.Capsule Ompec DM twice a day before food for two days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -895,7 +1502,7 @@
     },
     {
       "case_id": "case_018",
-      "source_text": "So patient Mr. XYZ, has a complaint in the knee andrequires an MRI to be done. he has a anterior drawer grade 2 tenderness on the medialcompartment. and difficulty in walking and pain in the knee.",
+      "source_text": "complain of knee pain, leg painsTreatment injection Vitanova first dose, IV NS250 ml 2 units .Injection Cyanocal,\nInjection B Complex,\nTablet Acecloran MR\nTwice a day after food for 5 days.Tab Pregastar D once at night for 10 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -924,7 +1531,7 @@
     },
     {
       "case_id": "case_019",
-      "source_text": "2 D Echo report2D Echo Report\nPatient Name: <PII>\nConclusion:\nNormal LV systolic function.\nMild MR, mild TRNo clot, no pericardial effusion.",
+      "source_text": "<PII> came with reports, showing hemoglobin lowVitamin D was low. Cholesterol was high. SGOT SGPT raised. Vitamin B12 118 low.Treatment Injection Cynocal First doseinjection Nana Nova 6 lakhs units first dose . tablet Calcirix XT once in the morning forone month . tablet Zolfer XT once at night for 30 days . tablet Statpure F once at nightfor three months.  tablet liveril forte once in the morning for six weeksNotes: This is visit of 14th April.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -953,7 +1560,7 @@
     },
     {
       "case_id": "case_020",
-      "source_text": "\u0915\u094d\u092f\u093e \u0926\u093f\u0915\u094d\u0915\u0924 \u0939\u0948 \u092c\u093e\u092c\u0942? \u0926\u094b\u0928\u094b\u0902 \u0939\u093e\u0925 \u092e\u0947\u0902 \u0914\u0930 \u0926\u094b\u0928\u094b\u0902 \u092a\u0948\u0930 \u092e\u0947\u0902 \u091d\u0928\u091d\u0928\u093e\u0939\u091f \u0939\u0948 , \u0914\u0930 ? \u0914\u0930?\n\u0905\u092c \u0925\u094b\u0921\u093c\u093e \u0915\u092d\u0940 \u0915\u092d\u0940 \u0938\u093e\u0902\u0938 \u0932\u0947\u0928\u0947 \u092e\u0947\u0902 \u0926\u093f\u0915\u094d\u0915\u0924 \u0939\u094b\u0924\u0940 \u0939\u0948\u0964 \n\u0914\u0930?\n\u0914\u0930 \u0909\u092e\u0938\u0940 \u091f\u093e\u0907\u092a \u0915\u093e \u0939\u0948\u0964 \n\u0914\u0930 ? \u092c\u0941\u0916\u093e\u0930 \u0935\u0917\u0948\u0930\u0939? \u0936\u093e\u092e \u0915\u094b \u0939\u094b \u0917\u092f\u093e\u0964\u0964 \u0939\u0932\u094d\u0915\u093e \u092f\u093e \u091c\u094d\u092f\u093e\u0926\u093e? \u0928\u0939\u0940\u0902, \u0939\u0932\u094d\u0915\u093e\u0964 \u0916\u093e\u0902\u0938\u0940 \u0935\u0917\u0948\u0930\u0939? \u0928\u0939\u0940\u0902 \u0939\u0948\u0964 \u092a\u0939\u0932\u0947 \u0938\u0947 \u0915\u094b\u0908 \u0926\u093f\u0915\u094d\u0915\u0924?  \u092e\u093e\u0928\u0947 \u092a\u093e\u0908\u0932\u094d\u0938 \u0925\u093e\u0964 \u0911\u092a\u0930\u0947\u0936\u0928 \u092d\u0940 \u0939\u0941\u0906 \u0925\u093e \u0915\u094d\u092f\u093e \u0909\u0938\u0915\u093e? \u0928\u0939\u0940\u0902\u0964 \u0928\u0939\u0940\u0902 \u0939\u0941\u0906 \u0925\u093e\u0964 \u0915\u094b\u0908 \u0926\u0935\u093e \u092d\u0940 \u0916\u093e\u0924\u0947 \u0939\u0948\u0902 \u0930\u0947\u0917\u0941\u0932\u0930? \u0905\u092d\u0940 \u092c\u0940 \u0915\u0949\u092e\u094d\u092a\u094d\u0932\u0947\u0915\u094d\u0938 \u0915\u093e\u0964  \u092a\u0940\u0930\u093f\u092f\u0921 \u0907\u0930\u094d\u0930\u0947\u0917\u0941\u0932\u0930 \u0906\u0924\u093e \u0939\u0948?\n\u0928\u0939\u0940\u0902, \u092a\u093f\u091b\u0932\u0947 \u0926\u094b \u0924\u0940\u0928 \u092e\u0939\u0940\u0928\u0947 \u0938\u0947.... \n\u092c\u094d\u0932\u0940\u0921\u093f\u0902\u0917 \u091c\u094d\u092f\u093e\u0926\u093e \u092d\u0940 \u0939\u094b\u0924\u093e \u0939\u0948?\n\u091c\u0940\u0964\n\u092a\u0947\u091f \u0920\u0940\u0915 \u0939\u0948 \u0906\u092a\u0915\u093e?  \u0932\u0947\u091f\u093f\u090f \u092a\u0939\u0932\u0947\u0964  \u0932\u0947\u091f\u093f\u090f \u0964",
+      "source_text": "Complain of throat pain, cough, fever. On examinationPus on left tonsil. Treatment injection oxy plus dexa 1, 1 ml.Syrup Sensiclav ES 5ml twice a day. Syrup Mefkind DS 5ml three times a day. Syrup Cogof 5ml three times a day.Diagnosis septic tonsillitisNotes: visit of 14th April",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -982,7 +1589,7 @@
     },
     {
       "case_id": "case_021",
-      "source_text": "\u0939\u0947 \u0915\u094b\u092a\u0930\u093e \u0915\u0947\u0935\u094d\u0939\u093e \u0932\u093e\u0917\u0932\u093e \u0921\u094b\u0915\u094d\u092f\u093e\u0932\u093e?\n\u092a\u0930\u0935\u093e \u0938\u0902\u0927\u094d\u092f\u093e\u0915\u093e\u0933\u0940.\n\u0905\u091a\u094d\u091b\u093e. \u092c\u0947\u0936\u0941\u0926\u094d\u0927 \u0935\u0917\u0948\u0930\u0947 \u091d\u093e\u0932\u0947 \u0939\u094b\u0924\u0947?\n\u0915\u093e\u0939\u0940\u091a \u0928\u093e\u0939\u0940. \u092e\u0932\u093e \u092b\u0915\u094d\u0924 \u0932\u093e\u0917\u0932\u0902 \u0916\u0942\u092a \u091c\u094b\u0930\u094d\u092f\u093e\u0924 . \u0915\u093e\u0939\u0940 \u0935\u0947\u0933 \u0905\u0938\u0902 \u092e\u0932\u093e \u090f\u0915\u0926\u092e \u091d\u0923\u091d\u0923\u094d\u092f\u093e \u0906\u0932\u094d\u092f\u093e \u0938\u093e\u0930\u0916\u0902 \u091d\u093e\u0932\u0902 , \u0906\u0923\u093f \u0907\u0925\u0947 \u0925\u094b\u0921\u0902 \u0921\u0947\u0902\u0917\u0942\u0933 \u0932\u093e\u0917\u0932\u0902 , \u0925\u094b\u0921\u0902\u091a\u0902 \u0939\u0947 \u0906\u0939\u0947\u091a \u092e\u0932\u093e \u0907\u0925\u0947.\u0906\u0923\u093f,  \u0924\u094d\u092f\u093e\u0928\u0902\u0924\u0930 \u092e\u0932\u093e \u0916\u0942\u092a \u0926\u0941\u0916\u093e\u092f\u0932\u093e \u0932\u093e\u0917\u0932\u0902 \u0924\u0947. \u092e\u0917 \u092e\u0940 \u092c\u093e\u092e \u0935\u0917\u0948\u0930\u0947 \u0932\u093e\u0935\u0932\u0940 \u0906\u0923\u093f \u092e\u0917 \u0925\u094b\u0921\u094d\u092f\u093e \u0935\u0947\u0933\u093e\u0928\u0902\u0924\u0930 \u092e\u0917 \u091d\u094b\u092a\u0942\u0928 \u0917\u0947\u0932\u0940. \u091d\u094b\u092a\u0947 \u0938\u0915\u093e\u0933\u0940 \u0909\u0920\u0932\u0940 \u0924\u0930 \u092a\u093e\u0939\u093f\u0932\u0902 \u0924\u0930, \u0939\u0947 \u092e\u0932\u093e \u0921\u094b\u0933\u093e,  \u0938\u0941\u091c\u0932\u093e \u0939\u094b\u0924\u093e \u092a\u0941\u0930\u094d\u0923 .\u0915\u093e\u092f \u092e\u0933\u092e\u0933 \u0909\u0932\u091f\u0940 \u0935\u0917\u0948\u0930\u0947? \u0928\u093e\u0939\u0940 \u0928\u093e\u0939\u0940, \u0915\u093e\u0939\u0940\u091a \u0928\u093e\u0939\u0940. \u0906\u0923\u093f \u0915\u093e\u0932\u0939\u0940 \u0926\u0941\u0916\u0923\u0902 \u0939\u094b\u0924\u0902\u091a. \u091c\u0930\u093e \u091c\u0930\u093e \u0926\u0941\u0916\u0923\u0902 \u0939\u094b\u0924\u0902 \u092a\u0923 \u0906\u091c \u0938\u0915\u093e\u0933\u0940 \u092e\u093e\u0939\u093f\u0924 \u0928\u093e\u0939\u0940 \u0915\u093e\u092f \u091d\u093e\u0932\u0902. \u092e\u0940 \u092c\u093e\u0939\u0947\u0930 \u0917\u0947\u0932\u0947 \u092c\u093e\u0939\u0947\u0930\u0928\u0902 \u0906\u0932\u094d\u092f\u093e\u0928\u0902\u0924\u0930 \u092e\u0917 \u0907\u0924\u0915\u0902 \u0926\u0941\u0916\u0923\u0902 \u0938\u0941\u0930\u0942 \u091d\u093e\u0932\u0902. \u0939\u0947 \u092a\u0942\u0930\u094d\u0923 \u0906\u0923\u093f, \u0939\u0947 \u092a\u0942\u0930\u094d\u0923 \u0916\u093e\u0932\u0940\u092a\u0930\u094d\u092f\u0902\u0924, \u092a\u0942\u0930\u094d\u0923 \u0921\u094b\u0915\u0902 \u0926\u0941\u0916\u093e\u092f\u0932\u093e \u0932\u093e\u0917\u0932\u0902 \u092e\u093e\u091d\u0902.\u0906\u0923\u093f \u0939\u0947 \u0924\u0930 . \u0905\u091c\u0942\u0928 \u0906\u0924 \u0917\u0947\u0932\u0947 \u0939\u094b\u0924\u0947 \u0915\u093e? \u0905\u091c\u0942\u0928 \u0906\u0924 \u0917\u0947\u0932\u0947 \u0939\u094b\u0924\u0947. \u0939\u0947 \u092a\u0923 \u090f\u0915 \u0915\u093e\u0930\u0923 \u0932\u093e\u0935\u0942 \u0936\u0915\u0924\u094b. \u092e\u093e\u092f\u0917\u094d\u0930\u0947\u0928 \u0939\u094b\u0924\u0902 \u0928\u093e \u0924\u0941\u092e\u094d\u0939\u093e\u0932\u093e \u092a\u0939\u093f\u0932\u094d\u092f\u093e\u092a\u093e\u0938\u0942\u0928? \u0939\u093e\u0902 \u092e\u093e\u092f\u0917\u094d\u0930\u0947\u0928 \u0906\u0939\u0947 \u092a\u0923 \u0909\u0928\u094d\u0939\u093e\u0924 \u092e\u0940 \u0916\u0942\u092a \u0935\u0947\u0933 \u0928\u0935\u094d\u0939\u0924\u0940. \u0928\u093e\u0939\u0940 \u092a\u0923 \u0906\u0924\u093e \u0909\u0928\u094d\u0939\u093e\u0933\u094d\u092f\u093e\u0924 \u090a\u0928  \u0915\u0921\u0915 \u0906\u0939\u0947 \u0928\u093e ...\u092e\u094d\u0939\u0923\u0947 \u0905\u091c\u0942\u0928\u0939\u0940 \u0926\u0941\u0916\u0924\u091a \u0906\u0939\u0947 \u0915\u093e\u092f \u092e\u093e\u0939\u093f\u0924 \u0915\u093e.  \u0906\u0923\u093f \u0905\u0938\u0902 \u0935\u093e\u091f\u0924 \u0906\u0939\u0947 \u0915\u0940 \u092a\u0942\u0930\u094d\u0923 \u092c\u0949\u0921\u0940\u0935\u0930 \u0938\u094d\u0935\u0947\u0932\u093f\u0902\u0917 \u0906\u0932\u0940 \u0906\u0939\u0947 \u0915\u0940 \u0915\u093e\u092f \u0905\u0938\u0902 \u091c\u093e\u0923\u0935\u0924 \u0906\u0939\u0947 \u092e\u0932\u093e.  \u091a\u093f\u0921\u091a\u093f\u0921 \u0935\u093e\u091f\u0924\u0947 \u0915\u093e \u0906\u0935\u093e\u091c\u094d\u092f\u093e\u0935\u0930 ? \u0928\u093e\u0939\u0940 . \u0906\u0935\u093e\u091c \u0928\u093e\u0939\u0940.\u092e\u093e\u092f\u0917\u094d\u0930\u0947\u0928\u091a\u093e \u0924\u094d\u0930\u093e\u0938 \u0924\u0941\u092e\u091a\u093e \u092a\u0930\u0924 \u0935\u093e\u0922\u0932\u0947\u0932\u093e \u0906\u0939\u0947 \u0905\u0938\u093e.\u092c\u0940\u092a\u0940 \u0928\u0949\u0930\u094d\u092e\u0932 \u0906\u0939\u0947 \u0967\u0966\u0966 \u092c\u093e\u092f \u096d\u0966\u0915\u093e\u0939\u0940 \u0938\u0930\u094d\u0926\u0940, \u0916\u094b\u0915\u0932\u093e, \u0924\u093e\u092a , \u0935\u0917\u0948\u0930\u0947 \u091d\u093e\u0932\u093e?\n\u0932\u093e\u0938\u094d\u091f \u092e\u0902\u0925 \u092e\u0927\u094d\u092f\u0947 \u0939\u094b\u0924\u093e.\n\u0906\u0924\u093e? \u0906\u0924\u093e \u0938\u0927\u094d\u092f\u093e \u0928\u093e\u0939\u0940\u092f\u0947?\n\u0928\u093e\u0939\u0940 \u0906\u0924\u093e \u0938\u0927\u094d\u092f\u093e \u0924\u0930 \u0928\u093e\u0939\u0940\u092f\u0947.\u0935\u0947\u0933\u0947\u0935\u0930 \u091c\u0947\u0935\u0923 \u0915\u0930\u093e\u092f\u091a\u0902\u092f, \u092a\u093e\u0923\u0940 \u091c\u093e\u0938\u094d\u0924\u0940 \u092a\u094d\u092f\u093e\u092f\u091a\u0902\u092f \u0924\u0940\u0928 \u0924\u0947 \u091a\u093e\u0930 \u0932\u093f\u091f\u0930. \u0938\u0927\u094d\u092f\u093e \u0921\u093e\u092f\u0930\u0947\u0915\u094d\u091f\u0932\u0940 \u0909\u0928\u094d\u0939\u093e\u0924 \u0928\u0915\u093e \u091c\u093e\u090a \u0915\u093f\u0902\u0935\u093e \u092e\u0917 \u0938\u0928\u0917\u094d\u0932\u093e\u0938\u0947\u0938 \u0935\u0917\u0948\u0930\u0947 \u092f\u0941\u091c \u0915\u0930\u093e. \u0920\u0940\u0915 \u0906\u0939\u0947 ? \u0939\u094b.",
+      "source_text": "complain of epigastric pain, severe. nausea, backache .Treatment injection pan IV stat.  injection spasmonormstat. Capsule Omez twice a day before food for two days. Five capsules. Tablet Ondem MD twice a day before food for two days. Tablet Para Dicyclomine.three times a day for two days. Tablet Mefenamic 500 twice a day for two days. Syrup Antolix O 10 ml three times a day after food.Investigation: USG of abdomenUSG of abdomen report normal",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1011,7 +1618,7 @@
     },
     {
       "case_id": "case_022",
-      "source_text": "\u0938\u0930\u094d\u0926\u0940 \u0928\u093e\u0915 \u0938\u0947 \u092a\u093e\u0928\u0940?  \u0928\u093e\u0915 \u0938\u0947 \u092a\u093e\u0928\u0940 \u0928\u0939\u0940\u0902 \u0917\u093f\u0930 \u0930\u0939\u093e \u0939\u0948 \u0964 \u0915\u092b \u0928\u0939\u0940\u0902 \u0928\u093f\u0915\u0932 \u0930\u0939\u093e \u0939\u0948 \u0964 \u0938\u0942\u0916\u0940 \u0916\u093e\u0902\u0938\u0940 \u0906\u0924\u093e \u0939\u0948 \u0964 \u092c\u0941\u0916\u093e\u0930?  \u092c\u0941\u0916\u093e\u0930 \u092d\u0940 \u092a\u0924\u093e \u0928\u0939\u0940\u0902 \u091a\u0932\u0924\u093e \u0939\u0948 , \u0915\u093f \u092c\u0941\u0916\u093e\u0930 \u0906\u0924\u093e \u0939\u0948 \u0964\u0914\u0930 \u0917\u0932\u0947 \u092e\u0947\u0902 \u0939\u092e\u0947\u0936\u093e \u0916\u0930\u093e\u0936 \u0930\u0939\u0924\u093e \u0939\u0948, \u0938\u0941\u092c\u0939 \u0936\u093e\u092e\u0964  \u091c\u092c \u0924\u092c \u0910\u0938\u093e \u090f\u0915\u093e\u090f\u0915 \u0916\u093e\u0902\u0938\u0940 \u0906\u0928\u0947 \u0932\u0917\u0924\u093e \u0939\u0948, \u0939\u093e\u0932\u0924 \u0916\u0930\u093e\u092c \u0939\u094b \u091c\u093e\u0924\u093e \u0939\u0948\u0964 \u0914\u0930 \u0915\u0941\u091b \u0906\u0926\u0924? \u091c\u0948\u0938\u0947 \u0938\u093f\u0917\u0930\u0947\u091f , \u0924\u0902\u092c\u093e\u0915\u0942? \u0915\u0941\u091b \u0928\u0939\u0940\u0902 , \u0915\u0941\u091b \u092d\u0940 \u0928\u0939\u0940\u0902\u0964 \u092e\u0924\u0932\u092c \u092a\u093e\u0902\u091a, \u092a\u093e\u0902\u091a \u0938\u093e\u0932 \u0939\u094b \u0917\u090f \u092f\u0947 \u0938\u092c \u0939\u0941\u090f\u0964  \u0939\u093e\u0902 \u0964<PII> \u092e\u0947\u0902 \u0915\u092c \u0938\u0947?\n<PII> \u092e\u0947\u0902 \u0938\u0930 \u0905\u092d\u0940 \u090f\u0915 \u0938\u093e\u0932 \u0939\u0941\u0906\u0964 \u0906\u092f\u093e \u0924\u094b 2019 \u092e\u0947\u0902 \u0939\u0940\u0964 \u0924\u092c\u0940\u092f\u0924 \u0916\u0930\u093e\u092c \u0939\u094b \u0917\u092f\u093e \u0925\u093e, \u091a\u0932\u093e \u0917\u092f\u093e \u0925\u093e\u0964 \u0905\u092d\u0940 \u090f\u0915 \u0938\u093e\u0932 \u0939\u0941\u0906 \u0939\u0948\u0964\u0924\u094b \u0907\u0938, \u0915\u094d\u092f\u093e \u0907\u0932\u093e\u091c \u0915\u0930\u093e\u090f \u0907\u0938\u0915\u0947 \u0932\u093f\u090f?  \u0915\u0908 \u092c\u093e\u0930 \u0938\u0930 \u0926\u0935\u093e \u0932\u093f\u090f \u0938\u0939\u0940 \u0939\u094b \u091c\u093e\u0924\u093e , \u092b\u093f\u0930 \u091b\u094b\u0921\u093c \u0926\u0947\u0924\u0947 \u092b\u093f\u0930 \u0935\u0948\u0938\u093e \u0939\u094b \u091c\u093e\u0924\u093e \u092b\u093f\u0930 \u0964 \u0939\u093e\u0902 \u0939\u093e\u0902\u0964diagnosis is allergic bronchitis.  treatment tab CP CVtwice a day for two . Tab Costus Advance three times a day for two days.  Tab Wysolone10 mg three times a day for.  Tab Deriphyllin Retard 300 twice a day for two days.  Tab Levopoint Mat night for 10 days.",
+      "source_text": "Complain of epigastric pain since morning. On examination, tenderness epigastric region.Treatment  Injection Pan IV Injection, Injection Spasmonorm.  Capsule Omez twice a day before food for two days. Five capsules.Tablet Ondem 4mg twice a day before food for two days. Tablet Para dicyclomine three times a day for two days. Tablet Mefenamic 500twice a day for two days.\nSyrup Antolix O 10 ml three times a day.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1040,7 +1647,7 @@
     },
     {
       "case_id": "case_023",
-      "source_text": "\u0906\u0924\u093e \u0938\u093e\u0902\u0917 \u0915\u093e\u092f \u0915\u093e\u092f \u0939\u094b\u0924\u094b\u092f\u0902 ?  \u091b\u093e\u0924\u0940\u0924 \u0926\u0941\u0916\u0924\u0947? \u0939\u094b \u091b\u093e\u0924\u0940\u0924 \u0926\u0941\u0916\u0923\u0902 \u0915\u093e\u0932\u092a\u093e\u0938\u0942\u0928\u091a, \u092a\u0939\u093f\u0932\u0947 \u0925\u094b\u0921\u0902 \u092b\u093e\u0930 \u0915\u093e\u092f \u0939\u094b\u0924\u0902 \u092e\u0932\u093e \u0935\u093e\u091f\u0932\u0902 \u0915\u0940 \u0917\u093e\u092f \u0935\u0917\u0948\u0930\u0947 \u0918\u0938\u0930\u0932\u0940 \u0905\u0938\u0947\u0932, \u0924\u0930 \u0939\u094b\u090a \u0936\u0915\u0924\u0947 \u092e\u0917 . \u0924\u0947 \u0917\u094b\u0933\u094d\u092f\u093e \u0935\u0917\u0948\u0930\u0947 \u0918\u0947\u090a\u0928 \u092a\u093e\u0939\u093f\u0932\u094d\u092f\u093e \u091b\u094b\u091f\u094d\u092f\u093e \u0935\u093e\u0932\u094d\u092f\u093e \u0924\u094d\u092f\u093e \u092c\u093e\u0930\u0940\u0915 \u092c\u093e\u0930\u0940\u0915. \u0906\u0923\u093f \u0932\u093f\u0902\u092c\u0942 \u0938\u0930\u092c\u0924 \u0935\u0917\u0948\u0930\u0947 \u0906\u0923\u093f \u0924\u0947 \u0906\u092a\u0932\u0902 \u0907\u0928\u094b \u0935\u0917\u0948\u0930\u0947 \u0918\u0947\u090a\u0928 \u092a\u093e\u0939\u093f\u0932\u0902, \u092a\u0923 \u0915\u093e\u0939\u0940 \u0906\u0930\u093e\u092e \u0928\u093e\u0939\u0940 . \u0915\u093e\u0932\u092a\u093e\u0938\u0942\u0928 \u0905\u0915\u0921\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u0902 \u0906\u0923\u093f \u091c\u093e\u0938\u094d\u0924\u091a \u0924\u094d\u0930\u093e\u0938 \u0939\u094b\u0924\u094b\u092f.\u091c\u0947\u0935\u0923 \u0935\u0917\u0948\u0930\u0947 \u0915\u0930\u0942\u0928 \u0906\u0932\u094b \u0915\u0940 \u0907\u0925\u0942\u0928 \u091c\u0947 \u0907\u0925\u0947 . \u0906\u0923\u093f \u0939\u0947 \u0907\u0925\u0942\u0928 \u0906\u0939\u0947 \u0928\u093e \u0905\u0938\u0902 , \u092e\u094d\u0939\u0923\u091c\u0947 \u0930\u093e\u0908\u091f \u0938\u093e\u0908\u0921 \u0905\u0938\u0902 \u091c\u0947\u0935\u0923 \u0906\u0939\u0947 \u0928\u093e \u0905\u0938\u0902 \u0924\u094d\u0930\u093e\u0938.\u0939\u093e \u0938\u0917\u0933\u0947 \u092c\u093e\u0930\u0940\u0915 \u0924\u093e\u092a\u0932\u0947 \u092c\u0918\u0924\u094b\u0938 \u0928\u093e. \u0906\u0923\u093f \u0906\u092a\u0932\u094d\u092f\u093e\u0932\u093e \u0938\u093e\u092a\u0921\u0932\u0902\u0925\u0902\u0921\u0940 \u0935\u093e\u091c\u0924\u0947 \u0915\u093e? \u0928\u093e\u0939\u0940 \u0925\u0902\u0921\u0940 \u0935\u0917\u0948\u0930\u0947 \u0915\u093e\u0939\u0940\u091a \u0928\u093e\u0939\u0940.\u0926\u092e \u092d\u0930\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u093e \u0932\u093e\u0917\u0924\u094b \u0938\u0930 \u0906\u0923\u093f \u0936\u094d\u0935\u093e\u0938 \u0918\u0947\u0924\u0932\u093e \u0915\u0940 \u0924\u093f\u0925\u0902 \u0938\u093f\u0928\u094d\u0915\u093e \u092e\u093e\u0930\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u0902 \u0935\u093e\u091f\u0924\u0902.\u0906\u0923\u093f \u0938\u094d\u0935\u091a\u094d\u091b \u092a\u0923 \u0928\u093e\u0939\u0940 \u091c\u093e\u0938\u094d\u0924 \u0939\u094b\u090a\u0928 \u0930\u093e\u0939\u093f\u0932\u0947. \u0938\u0915\u093e\u0933\u0940 \u0938\u0902\u0921\u093e\u0938\u0932\u093e \u0917\u0947\u0932\u0902 \u0915\u0940 \u0924\u0947 \u092a\u0942\u0930\u094d\u0923\u092a\u0923\u0947 \u0938\u093e\u092b \u0928\u093e\u0939\u0940 \u0939\u094b\u090a\u0928 \u091d\u093e\u0932\u0947 , \u0906\u0923\u093f \u091c\u0947\u0935\u0923 \u092c\u0940 \u092c\u0930\u093e\u092c\u0930 \u0939\u094b\u090a\u0928 \u0928\u093e\u0939\u0940 \u0930\u093e\u0939\u093f\u0932\u0947.",
+      "source_text": "<PII> to kuch nahi hai. X-ray of LS spine showing reversal of lumbar lordosis.diagnosis reversal of lumbar lordosis.  treatment injection Vitanova 6 lakhs unit first doseTablet Xykaa MR twice a day for 5 days.\nTablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before food for five days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1069,7 +1676,7 @@
     },
     {
       "case_id": "case_024",
-      "source_text": "\u0916\u094b\u0915\u0932\u093e \u0915\u092e\u0940\u091a \u0928\u093e\u0939\u0940 \u0939\u094b\u0924 \u0906\u0939\u0947?  \u0916\u094b\u0915\u0932\u093e \u0924\u0930 \u0928\u093e\u0939\u0940\u091a \u0906\u0939\u0947 \u092e\u0932\u093e.  \u092e\u0917 \u0915\u093e\u092f \u0915\u092b \u0906\u0939\u0947?  \u0939\u093e. \u091b\u093e\u0924\u0940\u0924 \u0915\u092b \u0915\u092b? \u0928\u093e\u0939\u0940 \u092f\u093e, \u0907\u0925\u0947 \u0907\u0925\u0947. \u091b\u093e\u0924\u0940\u0924 \u092a\u0923 \u0928\u093e\u0939\u0940. \u0907\u0925\u0947\u091a \u0905\u0921\u0915\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u0902 \u0935\u093e\u091f\u0924\u0902\u092f. \u0939\u093e. \u0906\u0924\u093e.\u0905\u0938\u0902 \u0915\u0930\u093e\u0935\u0902 \u0932\u093e\u0917\u0924\u0902. \u0939\u094b \u0939\u094b \u0939\u094b. \u0918\u0936\u094d\u092f\u093e\u0924 \u0916\u0938\u0916\u0938 \u0906\u0939\u0947. \u0939\u092e\u094d\u092e. \u0918\u094d\u092f\u093e \u0932\u0902\u092c\u093e \u0936\u094d\u0935\u093e\u0938 .\u0918\u094d\u092f\u093e\u092a\u0932\u091f\u093e\u0938\u0930\u094d\u0926\u0940 \u0916\u094b\u0915\u0932\u093e \u0935\u0917\u0948\u0930\u0947 \u0915\u093e\u0939\u0940\u091a \u0928\u093e\u0939\u0940\u092f\u0947.\u091c\u0930 \u092a\u093e\u0924\u0933 \u091d\u093e\u0932\u093e \u0924\u0930 \u092e\u0917 \u0935\u093e\u091f\u0924\u0947 \u0928\u093e\u0939\u0940\u0924\u0930 ...\u0935\u0930\u0924\u0940 \u091d\u094b\u092a\u0942\u0928 \u091c\u093e , \u092c\u0940\u092a\u0940 \u092a\u093e\u0939\u0941\u0902 \u0906\u092e\u0940.\u092a\u094d\u0930\u0924\u094d\u092f\u0947\u0915 \u0917\u094b\u0933\u094d\u092f\u093e \u091a\u093e\u0932\u0942 \u0906\u0939\u0947? \u0928\u093e\u0939\u0940 \u0906\u0939\u0947.\u092a\u094b\u091f\u093e\u0924 \u0905\u0921\u0915\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u0902 \u0915\u093e\u0939\u0940\u0924\u0930\u0940 \u0906\u0939\u0947. \u0924\u0947  \u0917\u094b\u0933\u094d\u092f\u093e \u0924\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u092c\u0902\u0926 \u0915\u0930\u0924\u093e. \u0928\u093e\u0939\u0940 \u091a\u093e\u0932\u0942 \u0939\u094b\u0924\u0902 \u0924\u0947\u0935\u094d\u0939\u093e \u092a\u0923 \u092c\u093e\u0915\u0940 . \u0921\u0947\u0902\u091c\u0930 \u0915\u093e\u092e \u0939\u094b\u090a \u0936\u0915\u0924\u0902 \u0906\u0924\u093e \u092c\u0940\u092a\u0940 183 \u092c\u093e\u092f 118 \u0906\u0923\u093f \u092a\u0932\u094d\u0938 \u0930\u0947\u091f 139 \u0906\u0939\u0947. \u0924\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0906\u092a\u0932\u094d\u092f\u093e\u0932\u093e \u0908\u0938\u0940\u091c\u0940 \u092a\u0923 \u0915\u0930\u093e\u0935\u0902 \u0932\u093e\u0917\u0947\u0932. \u0928\u093e\u0939\u0940\u0924\u0930 \u0914\u0937\u0927 \u0926\u0947\u0924\u094b. \u0918\u0936\u093e\u0924\u0932\u0902 \u0905\u0921\u0915\u0932\u094d\u092f\u093e\u0938\u093e\u0930\u0916\u0902 \u092a\u0923 \u0926\u0947\u0924\u094b. \u0920\u0940\u0915 \u0906\u0939\u0947? \u0924\u0930\u0940 \u0915\u092e\u0940 \u0928\u093e\u0939\u0940 \u091d\u093e\u0932\u0902 \u0924\u0930 \u0938\u0917\u0933\u094d\u092f\u093e \u0924\u092a\u093e\u0938\u0923\u094d\u092f\u093e \u0915\u0930\u093e\u0935\u094d\u092f\u093e \u0932\u093e\u0917\u0924\u0940\u0932 \u0906\u092a\u0932\u094d\u092f\u093e\u0932\u093e. \u092c\u094d\u0932\u0921\u091a\u094d\u092f\u093e \u092a\u0923 \u0924\u092a\u093e\u0938\u0923\u094d\u092f\u093e \u0908\u0938\u0940\u091c\u0940 \u092a\u0923 \u0906\u0939\u0947.",
+      "source_text": "complaint of backache since two days, severe. treatmentInjection Dynapar AQ 1 ml stat. Tablet Aceclo MR twice a day for 3 days. TabletPara 650 once in the afternoon for three days. Tablet Shelong once in the morning after breakfast for 15 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1098,7 +1705,7 @@
     },
     {
       "case_id": "case_025",
-      "source_text": "<PII> \u0915\u093e \u0915\u0939 \u0930\u0939\u0947 \u0939\u0948\u0902 \u0928\u0949\u0930\u094d\u092e\u0932 \u0939\u0948 \u0964 \u0928\u0949\u0930\u094d\u092e\u0932 \u0939\u0948\u0964 \u0935\u094b 120/ 80 \u0915\u093f\u0938\u093e\u0928\u094b\u0902 \u0914\u0930 \u0916\u0947\u0924\u094b\u0902 \u0915\u0947 \u091c\u092e\u093e\u0928\u0947 \u092e\u0947\u0902 \u0911\u092a\u094d\u0936\u0928 \u0925\u093e\u0964 \u0939\u092e \u092f\u0947 \u0938\u092e\u091d\u0924\u0947 \u0939\u0948\u0902 \u091c\u092c \u0905\u092c \u0928\u092f\u093e \u0938\u094d\u091f\u094d\u0930\u0947\u0938 \u090f\u0928\u0935\u093e\u092f\u0930\u0928\u092e\u0947\u0902\u091f \u0939\u094b \u0917\u092f\u093e \u0939\u0948 \u0924\u094b, \u0939\u092e \u0932\u094b\u0917 \u0939\u092e\u093e\u0930\u0947 \u092c\u0940\u092a\u0940... \u092c\u0940\u092a\u0940 \u0915\u0940 \u091f\u0948\u092c\u0932\u0947\u091f \u0928\u0939\u0940\u0902 \u091a\u093e\u0932\u0942 \u0915\u0930\u0947\u0902? \u0917\u0932\u0924 \u0939\u0948\u0964\u0932\u094b\u0917 \u0915\u0939\u0924\u0947 \u0939\u0948\u0902 \u090f\u0915 \u092c\u093e\u0930 \u0936\u0941\u0930\u0942 \u0915\u0930\u094b \u091c\u093f\u0902\u0926\u0917\u0940 \u092d\u0930 \u0916\u093e\u0928\u0940 \u092a\u0921\u093c\u0947\u0917\u0940 \u0964  \u092c\u0940\u091a \u092e\u0947\u0902 \u0915\u092d\u0940 \u0930\u093f\u0935\u0930\u094d\u0938 \u0928\u0939\u0940\u0902 \u0939\u094b\u0924\u093e\u0964  \u092c\u0940\u091a \u092e\u0947\u0902 \u0915\u093f\u0938\u0940 \u0915\u093e \u092a\u0940\u091b\u0947 \u0915\u093e \u0906\u092a\u0928\u0947 \u0926\u0947\u0916\u093e \u0939\u0940 \u0928\u0939\u0940\u0902 \u0928\u093e \u0915\u094d\u092f\u094b\u0902 \u0910\u0938\u093e \u091a\u093e\u0939\u0924\u0947 \u0939\u0948\u0902 , \u0907\u0938\u0915\u0947 \u092c\u093e\u0930\u0947 \u092e\u0947\u0902 \u0915\u094d\u092f\u093e \u0915\u094d\u092f\u093e ?  \u0915\u0941\u091b \u0928\u0939\u0940\u0902 \u092a\u0924\u093e\u0964  \u092e\u0948\u0902 \u0921\u0949\u0915\u094d\u091f\u0930 \u0928\u0939\u0940\u0902 \u0939\u0942\u0902 , \u0906\u092a \u0921\u0949\u0915\u094d\u091f\u0930 \u0907\u0924\u0928\u0947  \u0915\u094d\u0935\u093e\u0932\u093f\u092b\u093e\u0907\u0921 \u0939\u094b \u0964   \u0907\u0938\u0940 \u0915\u0947 \u0932\u093f\u090f \u092e\u0948\u0902 \u092c\u0924\u093e \u0930\u0939\u093e \u0939\u0942\u0902 \u0906\u092a\u0915\u094b, \u092e\u093e\u0928 \u0932\u094b \u0907\u0924\u0928\u093e \u092c\u0940\u092a\u0940 \u091c\u093e\u0924\u093e \u0939\u0948 \u0964   \u0907\u0938 \u0909\u092e\u094d\u0930 \u092e\u0947\u0902 \u0906\u092a\u0915\u0947 \u0905\u092d\u0940 \u0905\u092a\u0928 \u0928\u0947 \u0932\u093e\u0907\u092b \u0906\u092a\u0928\u0947 \u0915\u0948\u0932\u0915\u0941\u0932\u0947\u091f \u0915\u093f\u092f\u093e \u0906\u092a\u0928\u0947 ? 90 \u092a\u094d\u0932\u0938 \u0939\u094b\u0928\u0940 \u091a\u093e\u0939\u093f\u090f  \u0964  \u0915\u0930\u0947\u0915\u094d\u091f ?\u0932\u0947\u0915\u093f\u0928 \u0935\u094b \u0915\u0948\u0938\u0940 \u0932\u093e\u0907\u092b \u0939\u094b\u0928\u0940 \u091a\u093e\u0939\u093f\u090f? \u0939\u0947\u0932\u094d\u0926\u0940  \u0964  \u0939\u0947\u0932\u094d\u0926\u0940? \u0939\u0947\u0932\u094d\u0926\u0940, \u0932\u0947\u0915\u093f\u0928 \u0907\u0924\u0928\u093e \u091c\u092c \u092c\u0940\u092a\u0940 \u091c\u093e\u0924\u093e \u0939\u0948 189 \u0909\u0938\u092e\u0947\u0902 \u0915\u094d\u092f\u093e \u0915\u094d\u092f\u093e \u0921\u0947\u0902\u091c\u0930 \u0939\u094b \u0938\u0915\u0924\u093e \u0939\u0948 \u0964   \u0938\u092c\u0938\u0947 \u092a\u0939\u0932\u0947 \u091c\u093e\u090f\u0917\u093e \u092f\u0939\u093e\u0902 \u0915\u093e \u092c\u094d\u0930\u0947\u0928 \u0935\u0939\u093e\u0902 \u0915\u0940 \u0928\u0938 \u0916\u0941\u0932 \u091c\u093e\u090f\u0917\u0940  \u0964  \u0935\u094b \u092b\u091f\u0947\u0917\u0940 \u0906\u0926\u092e\u0940 \u090f\u0915 \u090f\u0915 \u0928\u093e \u090f\u0915 \u0926\u093f\u0928 \u0915\u093f\u0938\u0940 \u0915\u094b \u092d\u0940 \u091c\u093e\u0928\u093e \u0939\u0948, \u0932\u0947\u0915\u093f\u0928 \u0935\u094b \u0906\u0927\u093e \u0905\u0927\u0942\u0930\u093e \u091c\u093e\u090f\u0917\u093e \u092f\u0939\u093e\u0902 \u092a\u0947 \u090f\u0915 \u0928\u0947 \u0925\u094b\u0921\u093c\u093e \u0938\u093e \u0938\u094d\u092a\u0949\u091f \u092e\u093e\u0930 \u0926\u093f\u092f\u093e \u0909\u0938\u0928\u0947 \u0924\u094b \u090f\u0915 \u0938\u093e\u0907\u0921 \u092a\u0942\u0930\u093e \u092a\u0948\u0930\u093e\u0932\u093e\u0907\u091c \u0939\u094b \u091c\u093e\u090f\u0917\u093e \u0964   \u092a\u0948\u0930\u093e\u0932\u093e\u0907\u091c \u0939\u094b\u0915\u0947  \u092b\u093f\u0930 \u091c\u093f\u0902\u0926\u0917\u0940 \u092d\u0930\u092f\u093e \u0924\u094b \u0939\u093e\u0930\u094d\u091f \u0905\u091f\u0948\u0915 \u0906\u090f\u0917\u093e\u0964 \u0915\u0930\u0947\u0915\u094d\u091f\u0964 \u0920\u0940\u0915 \u0939\u0948 ? \u0915\u093f\u0921\u0928\u0940 \u092b\u0947\u0932\u093f\u092f\u0930 \u0915\u0947 \u091a\u093e\u0902\u0938\u0947\u095b \u0939\u094b\u0902\u0917\u0947, \u0915\u094d\u092f\u094b\u0902\u0915\u093f \u0906\u092a\u0915\u093e \u091c\u094b \u092a\u094d\u0930\u0947\u0936\u0930 \u091c\u093e \u0930\u0939\u093e \u0939\u0948 \u0935\u094b \u0938\u093e\u0930\u0947 \u0911\u0930\u094d\u0917\u0928\u094d\u0938 \u092a\u0947 \u091c\u093e \u0930\u0939\u093e \u0939\u0948 \u0964 \u0915\u0930\u0947\u0915\u094d\u091f \u0964 \u0906\u0902\u0916\u094b\u0902 \u0915\u0947 \u090a\u092a\u0930 \u091c\u093e \u0930\u0939\u093e \u0939\u0948, \u092c\u094d\u0930\u0947\u0928 \u0915\u0947 \u090a\u092a\u0930 \u091c\u093e \u0930\u0939\u093e \u0939\u0948\u0964  \u0924\u094b \u0907\u0938\u0938\u0947 \u0905\u091a\u094d\u091b\u093e, \u092c\u0940\u092a\u0940 \u0915\u0940 \u091f\u0948\u092c\u0932\u0947\u091f \u0932\u0947\u0915\u0947 \u0939\u0947\u0932\u094d\u0926\u0940 \u0930\u0939\u094b\u0964\u0939\u093e\u0908 \u092c\u0940\u092a\u0940 \u0915\u093e \u0930\u093f\u091c\u0932\u094d\u091f \u092f\u0947 \u0939\u0948\u0964 \u092c\u0902\u0926 \u092d\u0940 \u0939\u094b\u0917\u0940 \u091c\u093f\u0902\u0926\u0917\u0940 \u092e\u0947\u0902 \u0915\u092d\u0940? \u0915\u092d\u0940 \u092e\u0947\u0930\u093e \u0924\u094b  , \u0928\u0939\u0940\u0902\u0964 \u090f\u0915 \u092c\u093e\u0930 \u0939\u094b \u0917\u092f\u093e \u0924\u094b\u0964 \u0907\u0924\u0928\u0947, \u0907\u0924\u0928\u0947 \u0935\u093e\u0932\u0947 \u0928\u0939\u0940\u0902\u0964 \u092f\u0947 \u0939\u0948 \u0935\u094b \u091c\u093f\u0902\u0926\u0917\u0940 \u092d\u0930 \u0916\u093e\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f\u0964 \u0921\u093e\u092f\u092c\u093f\u091f\u0940\u091c \u0916\u093e\u090a\u0902\u0917\u093e \u0924\u094b 161\u0964 \u0935\u0939\u0940 \u0924\u094b \u0915\u0902\u091f\u094d\u0930\u094b\u0932 \u0939\u0948\u0964 \u0935\u0939\u0940 \u0924\u094b \u0915\u0902\u091f\u094d\u0930\u094b\u0932 \u0915\u0930\u0928\u093e \u0939\u0948\u0964 \u0935\u094b \u0916\u093e \u0915\u0947 \u0905\u092a\u0928\u0947 \u0915\u094b , \u0905\u092a\u0928\u0940 \u092c\u0949\u0921\u0940 \u0915\u094b \u091c\u094b \u0911\u0930\u094d\u0917\u0928 \u0921\u0948\u092e\u0947\u091c \u0939\u094b \u0930\u0939\u0947 \u0939\u0948\u0902 \u0909\u0938\u0915\u094b \u0920\u0940\u0915 \u0915\u0930\u0928\u093e \u0939\u0948\u0964 \u092c\u0940\u092a\u0940 \u0907\u0924\u0928\u093e \u0939\u093e\u0908 \u0915\u094d\u092f\u094b\u0902 \u0926\u094c\u0921\u093c \u0930\u0939\u093e \u0939\u0948 \u0928\u0938\u094b\u0902 \u092e\u0947\u0902? \u0928\u0938\u094b\u0902 \u0915\u094b \u0915\u0902\u091f\u094d\u0930\u094b\u0932 \u0915\u0930\u0928\u0947 \u0915\u093e?  \u0909\u0938\u0915\u093e \u0930\u0940\u095b\u0928 \u0939\u0948 \u090f\u0915 \u0924\u094b \u0915\u094b\u0932\u0947\u0938\u094d\u091f\u094d\u0930\u0949\u0932\u0964 \u0935\u094b \u092c\u095d\u093e \u0939\u094b\u0917\u093e \u0906\u092a\u0915\u0940 \u0932\u093e\u0907\u092b\u0964\u0915\u094b\u0932\u0947\u0938\u094d\u091f\u094d\u0930\u0949\u0932 \u092c\u095d\u093e \u0939\u094b\u0917\u093e? \u0930\u093e\u0907\u091f\u0964 \u092f\u093e \u0924\u094b \u092e\u0926\u0930 \u092b\u093e\u0926\u0930 \u0915\u0947 \u0924\u0930\u092b \u0938\u0947 \u0906\u092f\u093e \u0939\u094b\u0917\u093e \u0964  \u0939\u093e\u0901, \u0909\u0928\u0915\u094b \u092d\u0940 \u0939\u0948\u0964 \u092a\u093e\u092a\u093e \u0915\u094b \u092d\u0940 \u0939\u0948\u0964 \u091c\u094b \u091c\u0947\u0928\u0947\u091f\u093f\u0915 \u0906\u092f\u093e \u0939\u0941\u0906 \u0939\u0948 \u0935\u094b \u0906\u092a\u0915\u094b, \u0930\u093f\u0935\u0930\u094d\u0938 \u0928\u0939\u0940\u0902 \u0939\u094b \u0938\u0915\u0924\u093e\u0964 \u0935\u094b \u0930\u093f\u0935\u0930\u094d\u0938 \u0928\u0939\u0940\u0902 \u0939\u094b \u0938\u0915\u0924\u093e\u0964 \u0909\u0938\u0915\u094b \u0938\u093f\u0930\u094d\u092b \u0906\u092a\u0915\u094b \u0915\u0902\u091f\u094d\u0930\u094b\u0932 \u0915\u0930\u0928\u093e \u0939\u0948\u0964 \u0924\u094b \u0935\u094b \u0906\u092a\u0915\u0947 \u0939\u093e\u0925 \u092e\u0947\u0902 \u0939\u0948\u0964\u091c\u094b \u0935\u093e\u0932\u0940 \u091a\u0940\u091c\u0947\u0902 \u0939\u0948\u0902 \u0935\u094b \u0906\u092a\u0915\u0947 \u0915\u0902\u091f\u094d\u0930\u094b\u0932 \u092e\u0947\u0902 \u0928\u0939\u0940\u0902, \u0932\u0947\u0915\u093f\u0928 \u091c\u094b \u0915\u0902\u091f\u094d\u0930\u094b\u0932 \u0915\u0930\u0928\u0947 \u0935\u093e\u0932\u0940 \u091a\u0940\u091c\u0947\u0902 \u0939\u0948\u0902 \u0935\u094b \u0915\u0902\u091f\u094d\u0930\u094b\u0932 \u0915\u0930\u0947\u0902\u0964 \u0935\u094b \u091f\u0947\u0932\u094d\u092e\u093e 40 \u092e\u0947\u0930\u0947 \u0915\u094b \u092c\u094b\u0932\u0940\u0964 \u0915\u094d\u092f\u093e \u0915\u094d\u092f\u093e \u0924\u0915\u0932\u0940\u092b \u0939\u0948? \u0939\u093e\u0901 \u0905\u092d\u0940 \u092e\u0948\u0902\u0928\u0947 \u0915\u0932 \u092a\u0930\u0938\u094b\u0902 \u0920\u0902\u0921\u093e \u092a\u093e\u0928\u0940 \u092a\u0940 \u0932\u093f\u092f\u093e, \u0924\u094b \u092e\u0947\u0930\u0947 \u0915\u094b \u0915\u092b \u0936\u0941\u0930\u0942 \u0939\u0941\u0906, \u0916\u093e\u0902\u0938\u0940 \u0936\u0941\u0930\u0942 \u0939\u0941\u0908\u0964 \u0935\u094b \u0927\u0940\u0930\u0947 \u0927\u0940\u0930\u0947 \u092c\u0932\u0917\u092e \u092f\u0939\u093e\u0901 \u092b\u0902\u0938\u0928\u0947 \u0932\u0917\u093e\u0964 \u091c\u094d\u092f\u093e\u0926\u093e \u0926\u093f\u0928\u094b\u0902 \u0938\u0947  \u0916\u093e\u0901\u0938\u0924\u093e \u0930\u0939\u0924\u093e \u0939\u0942\u0901\u0964  \u092c\u0902\u0926 \u0939\u0940 \u0928\u0939\u0940\u0902 \u0939\u094b\u0924\u093e \u0939\u0948 \u092e\u0947\u0930\u0947 \u0915\u094b \u0926\u094b \u0926\u093f\u0928\u094b\u0902 \u0938\u0947\u0964 \u0930\u0928\u093f\u0902\u0917 \u092e\u0947\u0902 \u0939\u094b\u0924\u093e \u0939\u0948\u0964\u0930\u0928\u093f\u0902\u0917 \u0928\u094b\u091c \u0938\u0947 \u092e\u0947\u0930\u093e \u0927\u0940\u0930\u0947 \u0927\u0940\u0930\u0947 \u092b\u0940\u0935\u0930 \u0906\u0928\u0947 \u0932\u0917\u093e \u0939\u0948 \u0964\u0938\u093e\u0930\u093e \u0926\u093f\u0928 \u092e\u0948\u0902 \u0916\u093e\u0938\u0924\u093e \u0930\u0939\u0924\u093e \u0939\u0942\u0901 \u092e\u0948\u0902 \u0938\u093e\u0930\u093e \u0926\u093f\u0928 \u0964  75 \u0907\u091f \u0930\u0940\u0921\u094d\u0938\u0964\u0932\u0947\u091f \u091c\u093e\u0907\u090f\u0964",
+      "source_text": "So this patient came in with the complaints of ear pain in the right ear since two days, previously taken tablet, Augmentin, 625 milligrams morning and night.For 5 days and some painkiller, or exact details of the previous prescription are not available. On examination, there was congestion of the right uh tympanic membrane and all other system examinations were within normal limits.The patient was prescribed tablet cefixime 200 milligrams morning and night for 5 days. Tablet diclomol SP morning and night for 3 days, tablet.Sompraz D one in the morning before food for 3 days along with advice to keep the ears completely dry for the next 5 days.The patient has been asked for a follow-up after one week and has been asked to avoid lifting heavy weights and avoidBlowing nose hard",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1127,7 +1734,7 @@
     },
     {
       "case_id": "case_026",
-      "source_text": "\u0924\u093e\u092a \u092c\u0930\u0924\u0947. \u0938\u0930\u094d\u0926\u0940 , \u0916\u094b\u0915\u0932\u093e,  \u0935\u093f\u0915\u0928\u0947\u0938 \u091c\u093e\u0938\u094d\u0924 \u0939\u094b\u0924\u0947. \u092e\u0917 \u092a\u0902\u0927\u0930\u093e \u0935\u0940\u0938 \u0926\u093f\u0935\u0938\u093e\u0902\u0928\u0940 \u0915\u0927\u0940 \u0915\u0927\u0940 \u0939\u094b\u0924\u091a \u0930\u093e\u0939\u0924\u094b.  \u0906\u0924\u093e \u0926\u094b\u0928-\u0924\u0940\u0928 \u0926\u093f\u0935\u0938 \u091d\u093e\u0932\u0947 \u092e\u0932\u093e \u0939\u0947 \u091d\u093e\u0932\u0902\u092f \u092a\u0942\u0930\u094d\u0923. \u0924\u0940\u0928 \u0926\u093f\u0935\u0938\u093e\u092a\u093e\u0938\u0942\u0928. \u0939\u093e. \u0918\u0938\u093e \u092a\u0923 \u0926\u0941\u0916\u0924\u094b? \u0939\u093e \u0918\u0938\u093e \u092a\u0923 \u0926\u0941\u0916\u0924\u094b \u0906\u0923\u093f \u090f\u0915\u0926\u092e \u0916\u094b\u0915\u0942\u0928 \u0916\u094b\u0915\u0942\u0928 \u0932\u092f \u0939\u0947 \u091d\u093e\u0932\u0902\u092f. \u0914\u0937\u0927 \u0918\u0947\u0924\u0932\u0902 \u0939\u094b\u0924\u0902 \u0915\u093e\u092f? \u0928\u093e\u0939\u0940 \u0906\u0924\u093e \u0916\u094b\u0915\u0932\u094d\u092f\u093e\u091a\u0902 \u0924\u0930 \u0914\u0937\u0927 \u0928\u093e\u0939\u0940 \u0918\u0947\u0924\u0932\u0902 \u092e\u0940. \u0924\u0947 \u0915\u094d\u0930\u094b\u0938\u093f\u0928 \u092e\u094d\u0939\u0923\u0942\u0928 \u092e\u0940 \u0924\u0940 \u0939\u0947 \u0918\u0947\u0924\u0932\u0940 \u0939\u094b\u0924\u0940 \u0917\u094b\u0933\u0940.  \u0938\u094d\u092e\u094b\u0915\u093f\u0902\u0917 ? \u0924\u0947 \u092e\u0927\u094d\u092f\u0947 \u092e\u0927\u094d\u092f\u0947 \u0939\u094b \u0915\u0930\u093e\u092f\u091a\u0947. \u0925\u0902\u0921 \u092a\u093e\u0923\u0940 \u092a\u094d\u092f\u093e\u092f\u0932\u093e? \u0925\u0902\u0921 \u092a\u093e\u0923\u0940 \u0906\u092e\u091a\u094d\u092f\u093e \u0924\u093f\u0925\u0947 \u0915\u0902\u092a\u0928\u0940\u092e\u0927\u094d\u092f\u0947 \u0924\u0947 \u0939\u094b\u0924\u0902\u091a \u0928\u093e. \u0924\u094d\u092f\u093e\u091a\u094d\u092f\u093e\u092e\u0941\u0933\u0947 \u0938\u093e\u0927\u0902 \u092a\u093e\u0923\u0940 \u092a\u0923 \u0924\u0947 \u092e\u093f\u0915\u094d\u0938 \u091d\u093e\u0932\u0902 \u0938\u0917\u0933\u0902. \u0924\u0947 \u0939\u0947 \u091d\u093e\u0932\u0902 \u0925\u094b\u0921\u093e\u0938\u093e \u092a\u094d\u0930\u0949\u092c\u094d\u0932\u0947\u092e \u091d\u093e\u0932\u093e. \u092f\u093e.  On examination, temperature 100 degree Fahrenheit. respiratory system.  crepitations found, wheezing found.  medication  Injection Dyclo 1 ml, Tablet Macflox 400 once a day for two days. Tablet Cefixime 200  twice for two days. Tablet Colday three times a day for two days. Tablet Mefenamic 500 twice a day for two days. Tablet Deriphyllin Retard 300 milligram   a day for two days.  tablet KZ  Once at night for two days.\nSyrup Costus AM\n5 ml three times a day.  Investigations, CBC, ESR, X-ray chest PA view.",
+      "source_text": "Write prescription for <PII>, 30 year old male, diagnosis stroke in young. He has hyperhomocysteinemia on evaluation. Vasculitis evaluation is normal. Now the prescription capsule Best CZD 0-1-0.For 15 days tablet Cogre P forte  1-0-1. Tablet Clopivas AP 75 by 75,0-1-0. Tablet Avas 40, 0-0-1. Capsule Homocheck 1-0-1.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1156,7 +1763,7 @@
     },
     {
       "case_id": "case_027",
-      "source_text": "\u0915\u0928\u094d\u0935\u0930\u094d\u0938\u0947\u0936\u0928 \u092e\u094b\u0921 \u092e\u0947\u0902 \u091c\u092c \u0906\u092a \u0938\u094d\u091f\u093e\u0930\u094d\u091f \u0915\u0930\u0947\u0902\u0917\u0947?\n\u091a\u0932\u094b \u092b\u093f\u0930 \u0938\u0947 \u0915\u0930\u0924\u0947 \u0939\u0948\u0902\u0964\n\u0939\u0947\u0932\u094b \u0938\u0930\n\u0928\u0939\u0940\u0902 \u0905\u092d\u0940 \u0938\u094d\u091f\u093e\u0930\u094d\u091f \u0939\u0941\u0906?\n\u0928\u0939\u0940\u0902 \u0939\u0941\u0906 \u0939\u0948\u0964\n\u0939\u094b \u0930\u0939\u093e \u0939\u0948, \u091a\u093e\u0932\u0942 \u0939\u0948 \u091a\u093e\u0932\u0942 \u0939\u0948, \u090a\u092a\u0930 \u091a\u093e\u0932\u0942 \u0939\u0948\u0964\n\u0939\u093e\u0902\n\u092c\u094b\u0932\u094b <PII> \u0915\u094d\u092f\u093e \u0939\u0941\u0906? \u0906\u092a\u0915\u094b \u0915\u094d\u092f\u093e \u0924\u0915\u0932\u0940\u092b \u0939\u0948?\n\u0938\u0930 \u092a\u093f\u091b\u0932\u0947 \u092a\u093e\u0902\u091a \u091b\u0947 \u0926\u093f\u0928 \u0938\u0947 \u092a\u0947\u091f \u092e\u0947\u0902 \u092c\u0939\u0941\u0924 \u0926\u0941\u0916 \u0930\u0939\u093e \u0939\u0948 \u0914\u0930 \u0915\u0949\u0928\u094d\u0938\u094d\u091f\u093f\u092a\u0947\u0936\u0928 \u092d\u0940 \u0939\u0948\u0964\n\u0939\u093e\u0902\n\u0938\u093e\u0925 \u0938\u093e\u0925 \u092e\u0947\u0902 \u0909\u092c\u0915\u093e \u091c\u0948\u0938\u093e, \u0917\u0948\u0938 \u091c\u0948\u0938\u093e \u0932\u0917 \u0930\u0939\u093e \u0939\u0948?\n\u0917\u0948\u0938 \u0939\u094b \u0930\u0939\u0940 \u0939\u0948 \u0938\u0930 \u0939\u093e\u0902 \u092c\u0939\u0941\u0924\u0964\n\u0909\u0932\u094d\u091f\u0940 \u0939\u094b \u0930\u0939\u0940 \u0939\u0948?\n\u0909\u0932\u094d\u091f\u0940  \u0928\u0939\u0940\u0902 \u0939\u094b \u0930\u0939\u0940 \u0938\u0930\u0964 \u0909\u0932\u094d\u091f\u0940 \u0928\u0939\u0940\u0902 \u0939\u094b \u0930\u0939\u0940\u0964 \u0939\u0947\u0921\u0947\u0915? \u0939\u0947\u0921\u0947\u0915 \u0939\u094b\u0924\u093e \u0939\u0948 \u0938\u0930 \u092a\u0930 \u0935\u094b \u0939\u0947\u0921\u0947\u0915 \u092b\u093f\u0930 \u0905\u0917\u0930 \u092e\u0948\u0902 \u0907\u0915\u094b \u0907\u0928\u094b \u092a\u0940\u0924\u093e \u0939\u0942\u0902 \u0924\u094b \u091c\u093e\u0915\u0947 \u0925\u094b\u0921\u093c\u093e \u0920\u0940\u0915 \u0939\u094b\u0924\u093e \u0939\u0948\u0964 \u092f\u093e \u092b\u093f\u0930 \u092e\u0947\u0930\u0947\u0915\u094b \u092f\u0942\u0928\u093f\u090f\u0902\u091c\u093e\u0907\u092e \u0916\u093e\u0928\u0940 \u092a\u0921\u093c\u0924\u0940 \u0939\u0948\u0964 \u092c\u0941\u0916\u093e\u0930 \u0906\u092f\u093e \u0925\u093e? \u092c\u0941\u0916\u093e\u0930 \u0928\u0939\u0940\u0902 \u0906\u092f\u093e \u0938\u0930\u0964 \u092c\u0941\u0916\u093e\u0930 \u0928\u0939\u0940\u0902 \u0906\u092f\u093e \u0925\u093e\u0964 \u0913\u0915\u0947\u0964 \u0914\u0930 \u0924\u0941\u092e\u094d\u0939\u093e\u0930\u093e \u092c\u0940\u092a\u0940 \u0906\u091c \u0928\u093e\u092a\u093e \u0939\u0948 \u0924\u094b 120/80 \u0939\u0948\u0964 \u092a\u0932\u094d\u0938 \u0924\u0941\u092e\u094d\u0939\u093e\u0930\u0947 74 \u0925\u0947\u0964 SpO2 99 \u0939\u0948\u0964 \u092c\u093e\u0915\u0940 \u0915\u094b\u0908 \u0924\u0941\u092e\u094d\u0939\u093e\u0930\u0940 \u092a\u093e\u0938\u094d\u091f \u0939\u093f\u0938\u094d\u091f\u094d\u0930\u0940 \u0939\u0948 \u0928\u0939\u0940\u0902\u0964 \u0924\u094b \u092e\u0948\u0902 \u0924\u0941\u092e\u0915\u094b \u092a\u094d\u0930\u093f\u0938\u094d\u0915\u094d\u0930\u093e\u0907\u092c \u0915\u0930\u0942\u0902\u0917\u093e  \u0928\u0947\u0915\u094d\u0938\u092a\u094d\u0930\u094b \u0906\u0930\u0921\u0940 \u0935\u094b \u0924\u0941\u092e \u0938\u0941\u092c\u0939 \u0936\u093e\u092e \u0916\u093e\u0928\u0947 \u0938\u0947 \u092a\u0939\u0932\u0947 \u0932\u0947 \u0932\u094b\u0964 \u0924\u0941\u092e\u0915\u094b \u092e\u0948\u0902 \u0932\u093f\u0916\u0942\u0902\u0917\u093e \u0938\u093e\u0907\u0915\u094d\u0932\u094b\u092a\u093e\u092e, \u0935\u094b \u090f\u0915 \u0917\u094b\u0932\u0940 \u0938\u0941\u092c\u0939 \u0936\u093e\u092e \u0916\u093e\u0928\u0947 \u0938\u0947 \u092a\u0939\u0932\u0947 \u0932\u0947 \u0932\u094b\u0964 \u0914\u0930 \u0938\u093e\u0925 \u0938\u093e\u0925 \u092e\u0948\u0902 \u0924\u0941\u092e\u0915\u094b \u0915\u094d\u0930\u0947\u092e\u093e\u092b\u093f\u0928 \u092a\u094d\u0932\u0938 \u0932\u093f\u0916\u0942\u0902\u0917\u093e \u091c\u094b \u0926\u094b \u091a\u092e\u091a\u0940 \u0930\u093e\u0924 \u0915\u094b \u0938\u094b\u0924\u0947 \u0938\u092e\u092f \u0932\u0947\u0928\u0940 \u0939\u0948\u0964 \u0938\u093e\u0925 \u092e\u0947\u0902 \u092e\u0948\u0902 \u0924\u0941\u092e\u0915\u094b \u090f\u0921\u0935\u093e\u0907\u0938 \u0926\u0942\u0902\u0917\u093e \u0915\u093f \u0932\u093e\u0907\u091f \u0916\u093e\u0928\u093e \u0916\u093e\u0913, \u092b\u093e\u0907\u092c\u0930 \u0935\u093e\u0932\u093e \u091c\u094d\u092f\u093e\u0926\u093e \u0916\u093e\u0913, \u092c\u093e\u0939\u0930 \u0915\u093e \u0916\u093e\u0928\u093e \u092e\u0924 \u0916\u093e\u0913\u0964 \u0913\u0915\u0947\u0964",
+      "source_text": "So, I want to create a  Plan for my patient. The patient name is <PII>. And the plan for the patient is for 3 months, weight loss due to obese.  So, weight loss program for obesity. And the treatment will include two massages per week, deep tissue massage  With sauna or steam. 3 times a week acupuncture session. For 20 minutes each The deep tissue massage would be for 1 hour, that is  60 minutes. Followed by steam and sauna or sauna , steam or sauna .  And Kansa would be. Again, 3 times a week. And  Diet consultation. Diet follow-up. Diet chart will be prepared.  And shared with the patient. And frequent follow-up. Also, Nadi Parika using Nadi Tarangini will be done.  Also Body composition will be checked. And  3 months later again body composition and Nadi Tarangini will be checked to .  Check the performance of the treatment. Also, hydrotherapy session would be once a week.  Which will include, include hydrojets. And Chromotherapy  in warm water. Then sitz bath jacuzzi  would be twice a week, With spinal spray. And this would,  this alltreatment would be for the next 3 months",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1185,7 +1792,7 @@
     },
     {
       "case_id": "case_028",
-      "source_text": "\u092f\u0947 \u092a\u0930\u094d\u091a\u093e \u0928\u092f\u093e \u0939\u094b\u0928\u093e \u091a\u093e\u0939\u093f\u090f \u0938\u0930 \u0928\u093e\u0964  \u0935\u0939\u0940 \u0938\u093e\u0924 \u0906\u0920 \u0907\u0902\u091c\u0947\u0915\u094d\u0936\u0928 \u0924\u094b \u0907\u0928\u0915\u094b \u0932\u0917 \u0939\u0940 \u0917\u090f \u0939\u0948\u0902, \u0914\u0930 \u0907\u0938 \u092c\u093e\u0930 \u0917\u0948\u092a \u092d\u0940 \u0928\u0939\u0940\u0902 \u0939\u0941\u0906 \u0939\u0948\u0964\u0938\u0930 \u0905\u092d\u0940 \u0924\u094b \u0926\u0930\u094d\u0926 \u0928\u0939\u0940\u0902 \u0930\u0939\u0924\u093e\u0964 \u0930\u093f\u092a\u094b\u0930\u094d\u091f, \u0930\u093f\u092a\u094b\u0930\u094d\u091f \u092c\u0924\u093e\u0907\u090f \u0930\u093f\u092a\u094b\u0930\u094d\u091f?  \u0930\u093f\u092a\u094b\u0930\u094d\u091f \u0924\u094b \u092b\u093f\u0930 \u0935\u094b \u0939\u0940 \u0939\u0948\u0964 \u0939\u092e\u0947\u0936\u093e \u0926\u0930\u094d\u0926 \u0928\u0939\u0940\u0902 \u0930\u0939\u0924\u093e? \u0928\u0939\u0940\u0902\u0964 \u0926\u0930\u094d\u0926 \u090f\u0915 \u0938\u093e\u0907\u0921 \u0939\u0940 \u0930\u0939\u0924\u093e \u0939\u0948? \u092c\u0938 \u090f\u0915 \u0939\u0940 \u0938\u093e\u0907\u0921 \u0939\u0948\u0964 \u0918\u0941\u091f\u0928\u0947 \u092e\u0947\u0902 \u0939\u0940 \u0930\u0939\u0924\u093e \u0939\u0948? \u0930\u093e\u0907\u091f , \u0930\u093e\u0907\u091f \u0918\u0941\u091f\u0928\u0947 \u092e\u0947\u0902 \u0926\u0930\u094d\u0926 \u0930\u0939\u0924\u093e \u0939\u0948\u0964 \u0914\u0930 \u0915\u092d\u0940 \u0915\u092d\u0940 \u092c\u094b\u0932\u0924\u0947 \u0915\u093f \u092e\u0924\u0932\u092c \u092a\u0942\u0930\u093e \u0939\u093e\u0925 \u0915\u093e \u0926\u0930\u094d\u0926\u0964 \u092e\u0924\u0932\u092c \u0938\u0947\u092e \u0938\u093e\u0907\u0921 \u092e\u0947\u0902 \u0928\u093e? \u0935\u094b \u092d\u0940 \u0930\u094b\u095b \u0928\u0939\u0940\u0902 \u0930\u0939\u0924\u093e? \u0928\u0939\u0940\u0902 \u0939\u093e\u0925 \u0924\u094b \u0939\u092e\u0947\u0936\u093e \u0926\u0930\u094d\u0926 \u0930\u0939\u0924\u093e \u0939\u0948\u0964 \u0938\u0947\u092e \u0938\u093e\u0907\u0921 \u092e\u0947\u0902 \u0964  \u091c\u092c \u0918\u0941\u092e\u093e\u0928\u0947 \u092e\u0947\u0902 \u0915\u092a\u0921\u093e \u0926\u0941\u0916\u0924\u093e ...\u0939\u093e\u0925 \u090a\u092a\u0930 \u0915\u0940\u091c\u093f\u090f \u090f\u0915 \u092c\u093e\u0930 , \u090a\u092a\u0930\u0964  \u0928\u0940\u091a\u0947\u0964  \u092a\u0940\u091b\u0947 \u0964  \u092c\u0938  \u0910\u0938\u0947 \u0915\u0930\u0928\u0947 \u092e\u0947\u0902  \u0964 \u0910\u0938\u0947 \u0915\u0930\u0928\u0947 \u092e\u0947\u0902 \u0926\u093f\u0915\u094d\u0915\u0924 \u0939\u0948\u0964  \u0939\u093e\u0925 \u0938\u093e\u092e\u0928\u0947 \u0915\u0940\u091c\u093f\u090f \u090f\u0915 \u092c\u093e\u0930 \u0964\u092f\u0947 \u0924\u094b \u0909\u0928\u0915\u093e \u092a\u0941\u0930\u093e\u0928\u093e \u0930\u093f\u092a\u094b\u0930\u094d\u091f \u0939\u0948 , \u0911\u0932 \u0911\u095e \u0907\u091f \u0928\u093e\u0964\u0935\u091c\u0928 \u0915\u093f\u0924\u0940? \u0905\u091a\u094d\u091b\u093e \u0907\u0928\u0915\u093e \u0935\u093f\u091f\u093e\u092e\u093f\u0928 \u0921\u0940 \u0915\u092e \u0925\u093e \u092c\u094012 \u092d\u0940 \u0915\u092e \u0925\u093e, \u092c\u094012 \u0938\u093f\u092e\u094d\u092a\u091f\u092e\u094d\u0938 \u0925\u093e\u0964 \u0935\u093f\u091f\u093e\u092e\u093f\u0928 \u0921\u0940 40 \u0925\u093e \u0964 75 \u0915\u0947 \u090a\u092a\u0930 \u0930\u0939\u0928\u093e \u091a\u093e\u0939\u093f\u090f \u0925\u093e\u0915\u0948\u0932\u094d\u0936\u093f\u092f\u092e \u0915\u093f\u0924\u0928\u093e \u0925\u093e?  \u092f\u0942\u0930\u093f\u0915 \u090f\u0938\u093f\u0921 \u092a\u093e\u0902\u091a \u0925\u093e, \u092f\u0942\u0930\u093f\u0915 \u090f\u0938\u093f\u0921 \u0920\u0940\u0915 \u0939\u0948 \u0964\u0935\u093f\u091f\u093e\u092e\u093f\u0928 \u0921\u0940 \u0915\u093e \u0915\u094b\u0930\u094d\u0938 \u0915\u093f\u092f\u093e \u092c\u0930\u093e\u092c\u0930? \u0939\u093e\u0901, \u0939\u093e\u0901\u0964 \u092c\u0940\u091a \u092e\u0947\u0902 \u0917\u0948\u092a \u0939\u094b \u0917\u092f\u093e \u0925\u093e \u0907\u0938\u0932\u093f\u090f \u092b\u093f\u0930, \u091c\u094b \u092b\u093f\u0930 \u0938\u0947 \u0938\u093e\u0924 \u0906\u0920 \u092e\u0947\u0921\u093f\u0938\u093f\u0928 \u0932\u093f\u092f\u093e \u0925\u093e \u0928\u093e \u0939\u093e\u0901 \u0939\u093e\u0901 \u0939\u093e\u0901\u0964",
+      "source_text": "The patient has diarrhea, problem listening, erratic temper  Note this down please  ",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1214,7 +1821,7 @@
     },
     {
       "case_id": "case_029",
-      "source_text": "Hello <PII>. How are you today? I don't feel that good. I have a blocked nose and sneezing and cold.since five days. Patient is reporting blocked nose, cold and sneezing past five days. We advised you to get honey waterHave warm water with honey three times a day. Have Dolo 650 after breakfast, after dinner, twice a day. That's all.Hope you feel better.",
+      "source_text": "My patient came for fitness for cataract surgery. Patient complained of giddiness while standing. On examination, his pulse is 80 beats per minute. Blood pressure is 150 by 90 mm of Hg, on systemic examination.Chest clear, CVS normal, on treatment, patient started on tablet Cilacar 10 mg once a day in the morning for 15 days.",
       "ground_truth": {
         "medication": {
           "value": null,
@@ -1243,7 +1850,1080 @@
     },
     {
       "case_id": "case_030",
-      "source_text": "\u0915\u093f \u092a\u0947\u0936\u0947\u0902\u091f \u0907\u0938 \u0938\u092b\u0930\u093f\u0902\u0917 \u092b\u094d\u0930\u0949\u092e \u090f\u092c\u094d\u0921\u094b\u092e\u093f\u0928\u0932 \u092a\u0947\u0928, \u092e\u0930\u093e\u0920\u0940 \u092e\u0927\u0947\u091a  \u092c\u094b\u0932\u0932\u094b  \u0938\u0930 . \u090f\u092c\u094d\u0921\u094b\u092e\u093f\u0928\u0932 \u092a\u0947\u0928 \u0939\u094b\u0924\u094b \u092f , \u0938\u094d\u091f\u092e\u0915  \u090f\u0915  \u0939\u094b\u0924\u094b \u092f , \u0928\u0940 \u091c\u0949\u0907\u0902\u091f \u092a\u0947\u0928 \u0906\u0939\u0947 \u092a\u0947\u0936\u0947\u0902\u091f\u0932\u093e, \u0906\u0923\u093f \u092b\u094d\u0930\u093f\u0915\u094d\u0935\u0947\u0902\u091f \u092f\u0942\u0930\u0940\u0928\u0947\u0936\u0928 \u092f . \u091f\u0948\u092c\u0932\u0947\u091f\u094d\u0938 \u0921\u094b\u0932\u094b 650 \u091f\u094d\u0935\u093e\u0908\u0938 \u0905 \u0921\u0947, \u092b\u0949\u0930 5 \u0921\u0947\u091c, \u091f\u0947\u0932\u092e\u093e \u091f\u0945\u092c\u0932\u0947\u091f \u0926\u093f\u0935\u0938\u093e\u0924\u0942\u0928 \u090f\u0915 \u0935\u0947\u0933\u0947\u0938\u091a\u093e\u0930 \u0926\u093f\u0935\u0938 \u0918\u094d\u092f\u093e\u092f\u091a\u0940 \u0906\u0939\u0947 \u092a\u0923 \u0924\u093e\u092a \u0905\u0938\u0932 \u0924\u0930 \u0918\u094d\u092f\u093e\u092f\u091a\u0940 \u0928\u093e\u0939\u0940 \u092f. \u090f\u0921\u0935\u093e\u0907\u0938 \u0907\u091f \u0932\u0940\u092b\u0940 \u0935\u0947\u091c\u093f\u091f\u0947\u092c\u0932\u094d\u0938 \u090f\u0902\u0921 \u092b\u094d\u0930\u0942\u091f\u094d\u0938 \u0964",
+      "source_text": "The patient is suffering from toothache laterally right. Since 5 days, severity is severe type of pain is cramping pain.  Diagnosis is dental cavity. gum ulceration.  hey bro, this went off. bro, open this The tablets suggested are:  Jhactions iron tonic, One time at the night with empty stomach, 5 days from day one.  Limcee chewable tablet, two tablets at a time, in the afternoon after meal, five days from day one.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_031",
+      "source_text": "consultation, and we can just say. So doctor i have a stomach pain, for the last. How many days? Last 3 days . Where is the pain exactly?Upper abdomen near rib cage. Do you have any vomiting with the pain?  No vomiting. How is your appetite? low, less appetite. Do you have any fever?Low grade. I had, I took, I had fever. I took crocin. How many times have you passed urine in the last 24 hours? 2 - 3 times. Urine is white or yellow in colour?Yellow. How about the stools, are normal? Yeah, stools are normal. Any history of outside food 2 days, 3 days back, any outside food. party or travel? Yeah, I had biryani 2 days ago.OK, can I check you out? Yeah,right. Record ? Yeah it's recording and you can say. yeah, abdomenNormal, Soft. Tongue is slightly moist, coated tongue. Temperature 99 degrees. On auscultationEverything is normal. Heart sounds and lungs are clinically OK. Abdomen, mild tenderness, guarding present in the epigastric area.And the diagnosis acute gastritis. query, may be due to food poisoning. And treatment is Tablet Pantop 40 mg once daily for 7 days on empty stomach.Tablet Taxim O 100 mg twice daily for 5 days after food. Tablet Drotin, one tablet SOS if the pain is unbearable.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_032",
+      "source_text": "So patient Mr. XYZ, has a complaint in the knee andrequires an MRI to be done. he has a anterior drawer grade 2 tenderness on the medialcompartment. and difficulty in walking and pain in the knee.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_033",
+      "source_text": "2 D Echo report2D Echo Report\nPatient Name: <PII>\nConclusion:\nNormal LV systolic function.\nMild MR, mild TRNo clot, no pericardial effusion.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_034",
+      "source_text": "Advising . patient is facing cough, fever, cold for the past three days. I advise the patient to take Dolo twice a day after breakfast, after dinner.also advising patient for warm water gargles three times a day. along with this honey, honitus , Dabur Honitus cough syrup twice a day. also just warm water gargles three times a day. andfollow the course of medicines for the next five days and we'll do a checkup after that. This was a doctor simulating this. This doctor app.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_035",
+      "source_text": "Patient complaining ofNose blocks since one week, left ear pain since yesterday night, unable to sleep.On examination, deviated nasal septum was found to the left side with right inferior turbinate enlarged,Mucopus both nasal cavities. Left eardrum was found congested and bulging, right TM was normal.Hearing test, Rinne's both positive, Weber's towards left side. Oral cavity normal.Lungs are clear. Diagnosis: deviated septum to left, right inferior turbinate enlarged, acute sinusitiswith left ASOM",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_036",
+      "source_text": "Fever for the last 5 days, breathlessness for the last 6 days.Chest pain for the last five, five 5 days",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_037",
+      "source_text": "58 year old male patient came with the complaints of fever with chills for last 5 days. On arrival, the patient has temperature of 102 \u00b0F.Patient were treated with IV antibiotics with IV injection Ceftriaxone BD for the last 5 days and injection Doxycycline 100 mg BD for last 5 days.And injection PCM and other supportive management. And repeat investigations showed sequential decrease in WBC counts.and even increase in platelet count. Patient, patient is afebrile for the last 3 days.Hence being discharged with the following advises",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_038",
+      "source_text": "Patient reported stomach pain since 3 days. He also reported severe headache, which is happening since a month. Patient in the past have had, episodes of headaches, wherein, there was a throbbing pain. I'm suspecting migraine, but, to make any decision.I advise patient to do CT MRI. Also, patient seems to be pale, so I advise him to take, complete body health checkup. I also want to analyse iron levels, so patients should do complete iron profile test.In the meanwhile, patients can take  Dolo 650 three times a day, after meals for 6 days, and patients should take Pantop DSR 40 mg tablet for, 6 days before breakfast once a day. And,  I advise patients to not have oily food, take enough rest, and,  in case of, any emergency.See, I'm giving his number to call me, and patient should come to me after 7 days.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_039",
+      "source_text": "So <PII> is a 39-year-old who has come with complaints of cough going on for the last 6 weeks. He has gone to a general practitioner and taken treatment which has partially resolved his symptoms. Details of treatment are not available. The other symptoms include intermittent shortness of breath. This is impacting his life currently.He also has night symptoms which is disturbing his sleep, and he has no other issues with chronic diseases such as tuberculosis. He's young and not a hypertensive or a diabetic and he has no specific allergies. Medications include, taken so far include aB and C, odd and further details are not known. On examination, he is otherwise stable. The ENT examination shows a congested nose with the DNS to the right, and oral examination shows slightly crowded airway but with a normal oropharynx.Chest examination shows raz in the bases, which is a little unusual, and diffuse rhonchi on both lung fields. My asse. We asked for a lung function test, which shows so and so, so and so, and so and so. We also asked for a pheno which is showing an elevated value. Overall diagnosis is uncontrolled asthma. At this point, he will be treated.On a GINA 3 protocol, the treatment will include education and counselling, which is also being done with using, aids given to him, and additionally we will start inhalers on him. The inhalers include Foracort , 200 two puffs twice a day synchro breathe.Taken for a period of 4 weeks after which he's supposed to visit us, in case he becomes delayed, the treatment is to be continued. Other medications include B, C, and D. Non-medical aspects which is important is nutritional precautions which have been conveyed, lifestyle precautions which have been conveyed and given to him as an addendum. And at the same time, if this.Continues we have to get into other aspects such as, what are the precipitating factors including psychological or exercise regimens which may improve his overall condition. Preventive aspects include vaccination and the flu shot has been recommended to him, and he has been asked to follow up in 4 weeks, end of consultation.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_040",
+      "source_text": "Yes <PII>, what do you have? I have nausea. Nausea. OK. So from how long are you experience this the problem? From about two days. OK. And do you have any history of any, you know, past complaints or any kind of things that you have been? not such   Not as of now OK. And are you on any medication right now? Yeah. What medication? for alopecia, for alopecia. So what are you using currently? Sorry?, what are you currently using? Minoxidil Finasteride and multivitamins, OK. Fine, so. I think  That is for now. I will send you the prescription. I will send you the drugs. You can go to the pharmacy and you can buy. OK,OK, OK.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_041",
+      "source_text": "deviated septum to left sideRight inferior turbinate enlarged, both tympanic membrane intact, normal. Post-nasal discharge present, greenish yellow in colorRest of the oral cavity normal. Lungs clear. Diagnosis is deviated septum to right, left HITacute URTI or sinusitisPut on medication, tablet Cepodem XP 325 milligram twice daily into one weekTablet Alaspan AM twice daily for a week, Nasivion nasal drops for a week, twice dailyTablet Dolonim P twice daily for 2 days, and review one week with a CT scan of the nose and sinuses",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_042",
+      "source_text": "Patient complained of severe headache on left side, intermittent since one month. On vital examination, pulse is 90 beats per minutes. Blood pressure is 130 by 80 mm of Hg. On systemic examination, respiratory system, clear, CVS normal, RS normal.CNS normal on treatment, start patient on Sibelium 10 mg at night for 1 month and tablet Naxdom 500 mg SOS for headache.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_043",
+      "source_text": "Patient has stomach pain, headache, leg pain, wherein leg pain is, flowing through his back of the thigh. Patient has had history of spondylolisthesis . Currently it's recuperated. Patient also has an ACL of the left knee. I recommend patient taking tendolife tablet for.three times a day for twelve days and show me after one week",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_044",
+      "source_text": "Patient came with the complaint of breathlessness, cough, fever for the last one week.On arrival patient saturation is SPO2 is 88 , 87% on room air. Patient got started on IV antibiotics in view of increased CRP.and CBC showed neutrophilic leukocytosis with AKI picture with serum creat of 1.3, and patient  IV antibiotics and IV supplementary treatment.and serial CRP and CBC were in decreasing trend and patient had no further fever spikes.for four days patient was in oxygen support with maximum requirement of four to five liters. Later on patientmaintained his saturation in room air for the last six days. Patient got mobilized with the help of physiotherapy. Active physiotherapy was done for about six days.Patient currently requires minimal support for walking and patient had no other complaints. Patient got started on plecanatidein view of his IBS with constipation and patient well responded to plecanatide and patient daily passes the motionAnd currently patient condition is stable with BP maintained around 130 to 140 mm of Hg.Saturation 97 on room air. No tachypnea, no fever. And patient hence patient being discharged with thefollowing advices. Advice include Budecort nebulization SOS, Duolin BD, Asthalin.BD bar SOS\nTab Deriphyllin Retard 150 mg\nSOSTab Dytor 10mg OD in the morning and Tab Neurokind LC in the afternoon.Tab Shelcal XT in the morning 1-0-0. Tab Normaxin RT 1-0-0.Tablet Plecanatide 2 mg 3 mg in the night.\nTablet Mirabegron 50 mg.in the morning. Tab Tamvas T 0-0-1 in the night. Tab Dolo SOS",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_045",
+      "source_text": "is a dictation mode. Hi, I've just met my patient <PII> and she is feeling symptoms of cough, cold and fever for the past three days.advising hot water gargles three times a day, honey and water three times a day, and Dolo 450 after breakfast and dinner.two times a day. Also advising a nutritious diet, like you know full of carrots and vitamin C.That's about it.  thank you. So",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_046",
+      "source_text": "<PII> came on 14th of April with complaints, with the reports of raised total cholesterol.raised LDL cholesterol, low vitamin D, raised uric acid, HbA1c raised.Fasting blood sugar of 120.\nTotal IGE 2107.examination, blood pressure was 137 by 81, pulse of 71.complaint of dyspnea on exertion, joint pains. treatment givenInjection Vitanova first dose. Tablet Calcirix XT once in the morning for 15 days. Tablet Levopoint M.at night for 10 days. Tablet Ubexa 40 once in the morning for 10 days. Tablet Statpure F.milligram once at night for three months.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_047",
+      "source_text": "complain of headache, not better. giddiness  On examination blood pressure 136 systolic and 88 diastolic.  On examination sinuses were tender. Treatment: tablet Cepodem  200 twice a day for two days. Injection Diclofenac 2 ml stat. Tablet Zady 250 twice a day for two days.  Tablet Colday\nThree times a day for two days\nTablet Mefenamic 500\nTwice a day for two days\nTablet Levocet once at night for two days  Tablet Solopose MD once at night for two days. Diagnosis sinusitis.  Tension headache",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_048",
+      "source_text": "complain of cough, dry cough. On examination  Temperature normal 97 degree Fahrenheit. BP 116 by 71.  Pulse 74 per minute  Treatment tablet Cepodem 200 twice a day for two days.  tablet Zady  250 milligram twice a day for two days. Tablet Costus Advance three times a day for two days. Tablet Mefenamic 500  twice a day for two days. Tablet C-Poff, three times a day for two days.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_049",
+      "source_text": "complaint of diarrhea, pain in abdomen. BP 115 by 70, pulse 64 per minute.  Diagnosis gastroenteritis. Treatment injection Amikacin first dose.  Tablet Cefixime 200 twice a day for two days. Tablet Metrogyl 400 three times a day for two days. Tablet Para Dicyclomine.  three times a day for two days.  capsule Omez 20 milligram twice a day before food for two days.  tablet Lomofen three times a day for one day.  Vital EZ sachet twice a day for one day.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_050",
+      "source_text": "Notes:  follow up of injury with stitches  Stitches removed today. Pus from wound.  Treatment : tablet Lizomed 600 twice a day after food.  for two days.  tablet Visnac SP twice a day for two days  Tablet Para 500 once in the afternoon for two days. Capsule BC  Once at night for two days. Cleaning and dressing done.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_051",
+      "source_text": "complaint of headache, nausea, ghabrahat since one day. On examination, BP 135 by 92.  pulse 80 per minute.  history of panic disorders,  past history of panic disorders.  Treatment: Injection Cynocal First.  Injection Vitanova first dose. Tab Tablet Calcirix XT once in the morning for 15 days. Capsule Omez twice a day for one day. Tablet Meftal Forte  twice a day for one day. Tablet Ondem MD twice a day for one day. Tablet Solopose MD once at night.  for two days.  Diagnosis anxiety disorder",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_052",
+      "source_text": "Complaining of throat pain since one day, with minimal phlegm. Has cold since last 15 daysThere is no history of fever. There is no history of body pains.There is no history of headaches. Cough is more in the mornings, dry in consistency.Not a known diabetic, hypertensive or asthmatic.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_053",
+      "source_text": "<PII>, patient,  38 years old, male, came with complaints ofLoose motions, elevated temperature, and chest pain, for the last three days, has been taking Dolo 650,  to manage the pain.has been taking Sinarest and Pantop. Heart rate is normal at 77 beats per minute. Blood pressure is normal, 120 over 80.And pulse, pulse ox , pulse saturation is good at 99%.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_054",
+      "source_text": "complain of headache, nausea, cold, cough, body ache.  Diagnosis migraine, URTI. On examination anemia.  treatment: Injection orofer S  Tablet Cepodem 200 twice a day for two days.\nTablet Zady.  250 twice a day for two days. Tablet Colday thrice a day for two days. Tablet Mefenamic 500 twice a day for two days.  Tablet Levocet once at night for two days.\nCapsule Ompec DM twice a day before food for five days.  Tablet Meftal Forte twice a day for five days,  to start after two days.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_055",
+      "source_text": "complain of cough not better irritation throat  Treatment\nInjection TT\nstat\nTab Amoxyclav 625 twice a day for two days.  Tablet Meftal Forte twice a day for two days. Tab Para 650 once in the afternoon for two days.  Tab Levocet twice a day for two days. Capsule Ompec D M twice a day for two days before food. Tablet Clarigard.  250 milligram twice a day for 5 days. On examination, throat congestion.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_056",
+      "source_text": "On 7th April 25 <PII> came with complaint of dribbling of urine since one day.  Treatment: injection Amikacin 1.5 ml. tablet Cefixime 200 milligram twice a day for two days.  tablet Parex paracetamol 500 three times a day for to three days.  tablet mefenamic 500  half tablet twice a day for two days. tablet pantocid 40 milligram twice a day for two days before food.  Investigation, urine routine, USG of abdomen.  Medicine Citro-Soda sachet three times a day for two days.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_057",
+      "source_text": "complaint of back ache, gastritis, loss of appetite, weakness.  Six fifty. Sade sahashe kar. Treatment. Injection. Injection, tablets. Vitanova. Six lakhs unit. nau kar tychamule . First dose.  Capsule Ompec D M twice a day before food for 5 days. purna ghasa kharab aahe. Investigation showing  USG: extensive gases, gallbladder polyp, simple renal cysts in both the kidneys.  X-ray of LS spine showing osteopenia, anterior  listhesis of L5 vertebra over sacral spine.  Treatment\ncapsule\nRinifol twice a day.\nho gya na aapka?\nBifilac GG sachet.  Once for for three days.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_058",
+      "source_text": "Chief complaints of right side chest pain, hemoptysis. Diagnosis light right lower zone pneumonia.  Treatment tablet Maxflox 400 once at night for two days. Tablet Cefixime 200  twice a day for two days. tablet Meftal forte, twice a day for two days. tablet Para 650, once in the afternoon for two days. tablet Deriphyllin 150.  Twice a day for two days. Capsule Ompec DM twice a day before food for two days.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_059",
+      "source_text": "Chief complaints of cough. medications  Cepodem 200 twice a day for two days. tablet Azi  250 twice a day for two days. tablet Meftal Forte twice a day for two days. tablet  Dolo 650 once in the afternoon for two days. Syrup  Costus D 10 ml three times a day. Tablet Levoset once at night for two days.  Notes: patient not examined.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_060",
+      "source_text": "Patient is experiencing cough, cold and sneezing, blocked nose for the past five days. Advisinghot water with honey along with steam three times a day, also advising Dolo 650 two times a day after breakfast after dinner",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_061",
+      "source_text": "Hello <PII>. How are you today? I don't feel that good. I have a blocked nose and sneezing and cold.since five days. Patient is reporting blocked nose, cold and sneezing past five days. We advised you to get honey waterHave warm water with honey three times a day. Have Dolo 650 after breakfast, after dinner, twice a day. That's all.Hope you feel better.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_062",
+      "source_text": "I advise the patient to take Dolo three times a day. He has  medical history of insomnia, not able to sleep properly for a couple of days, chest pain, anxiety for a few days, and palpitations in the night.Not able to breathe properly. I advise him to take Penta DSR capsule 2 times a day. Also take Dolo 650 tablet 2 times a day. Take Crocin on SOS basis and take.Gelusil when there is gastric issues and report to me with CBC test, blood test report and give information in couple of weeks.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_063",
+      "source_text": "Tablet Moxclav 625, three times a day after meal. Capsule Bifilac after breakfastTablet Ebast DC two times a day after meal.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_064",
+      "source_text": "Tablet Moxclav 625, three times a day. Capsule Bifilac twice daily.Tablet Ebast DC twice a day. Otrivin nasal drop, 2 drop three times a day. SyrupGrinlinctus DX, 2 teaspoon, three times a day, for five days.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_065",
+      "source_text": "Tablet lactoclav 1 BD Tablet meftal spas 1 BD. Tablet Limcee 1 BDSyrup UTI and 2 TSF BD.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_066",
+      "source_text": "Patient has fever, take Dolo 650. Take Crocin tablet,  whenever there is a headache, take amoxycillin 3 times a day, 1 in the morning, 1 in the evening, and one before night.Take proper bed rest, for insomnia, giving a sedative called Zolpidem. For pain medication, take Tramadol. For any other issues, report, let's keep a follow up within the next week.",
+      "ground_truth": {
+        "medication": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "dose": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "frequency": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        },
+        "allergy": {
+          "value": null,
+          "evidence": null,
+          "status": null
+        }
+      },
+      "labeller": null,
+      "labelled_at": null,
+      "notes": null
+    },
+    {
+      "case_id": "case_067",
+      "source_text": "Symptoms, abdominal pain, anorectal swelling,  high fever, and knee swelling. Tablets Telma twice a day for 4 days.Enzolam tablet once in a day after breakfast for 2 days, zerodol tablet for 2 days. Advice take a rest, eat leafy vegetables, and drink plenty of water. Sit in warm water, warm.Tub of water.",
       "ground_truth": {
         "medication": {
           "value": null,

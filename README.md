@@ -38,24 +38,43 @@ Flags that matter later:
 
 ### The dataset
 
-`ekacare/clinical_note_generation_dataset` at revision `662c58a`:
+`ekacare/clinical_note_generation_dataset` at revision `662c58a`, measured
+2026-09-16:
 
 | | |
 | --- | --- |
-| rows | **156** |
-| configs | 1 (`default`) |
-| splits | 1 (`test`) |
-| language | **English, 100% of rows** as declared by the dataset card (`language:en`) |
-| language filtering applied | **none - none was required** |
+| rows | 156, one config (`default`), one split (`test`) |
+| declared language | `language:en` on the dataset card |
+| **measured script** | **67 Latin, 88 Devanagari (~44 Hindi, ~44 Marathi), 1 Telugu** |
+| romanised code-mixed | 5 rows flagged (Hinglish written in Latin script) |
+| format | unlabelled run-on speech or dictation; no speaker tags |
+| reference labels | inside each row's `rubrics` text as `Category ID:` lines |
 | access | gated; licence accepted per Hugging Face account |
 
-There is no separate "English subset": the whole split is the English set,
-and every row in it is eligible for sampling. The 100% figure is the card's
-declaration. `template` also runs a per-row script check (Devanagari
-codepoints, non-ASCII letters, romanised-Hindi marker tokens) and writes the
-result to `provenance.language_check`. That check is the measured
-confirmation. If it flags code-mixed rows, report them rather than quietly
-dropping them.
+**The card's `language:en` does not hold row by row.** Most rows are Hindi or
+Marathi in Devanagari script, often with English medical terms transliterated
+("हेवी हेडेड फील"). An English-only analysis needs a filter:
+`--script latin` restricts the pool to the 67 Latin-script rows before
+sampling. `provenance.language` and `provenance.filter` record what was
+measured and which filter was applied.
+
+What the reference labels say about the four fields:
+
+| rows with a reference label | all 156 | Latin 67 |
+| --- | --- | --- |
+| medication | 56% | 81% |
+| dose (the rubric means quantity, e.g. "1 tablet") | 26% | 40% |
+| frequency | 53% | 79% |
+| allergy (drug or food) | 4% | **3% - 2 rows** |
+| medications per row with any (median / max) | 3 / 12 | 3 / 12 |
+
+Two consequences for the evaluation:
+
+- **Allergy recall can't be measured on this dataset.** Only 2 Latin-script
+  rows carry an allergy label at all. Measure allergy on MTSamples instead.
+- **Notes carry several medications**, but the extraction schema holds one. The
+  labelling guide and the extraction prompt must use the same rule for which
+  one counts.
 
 ### Access
 
@@ -75,32 +94,48 @@ and tells you to `unset HF_TOKEN`.
 ### Steps
 
 ```bash
-./.venv/bin/python evals/label_gold_v1.py profile --n 30 --seed 42
-./.venv/bin/python evals/label_gold_v1.py template --n 30 --seed 42
+./.venv/bin/python evals/label_gold_v1.py profile              # writes nothing
+./.venv/bin/python evals/label_gold_v1.py template             # = --script latin --n all
 ./.venv/bin/python evals/label_gold_v1.py label --labeller <name>
 ./.venv/bin/python evals/label_gold_v1.py stats
 ./.venv/bin/python evals/label_gold_v1.py validate --seal
-git tag -a gold-v1 -m "frozen gold labels, 30 cases, 4 critical fields"
+git tag -a gold-v1 -m "frozen gold labels, 67 hand-labelled Eka Care cases, 4 critical fields"
 ```
 
 `profile` takes the same arguments as `template` and writes nothing. Use it to
 look before committing to a draw.
 
-**Sampling.** `template` pulls all 156 rows, profiles them, and draws a seeded
-random sample of 30 without replacement (`--seed 42` by default; `--head`
-takes the first 30 instead). The printed table puts the full split, the
+**The gold set is all 67 Latin-script rows** (decided 2026-09-16, after
+profiling), so nothing is sampled and nothing can drift: 268 labels over notes
+with a median length of 58 words. Three of those rows (0, 2, 3) were partly
+read during format inspection before the decision; `provenance.exposure`
+records that.
+
+**Field definitions** live once, in `FIELD_RULES` in `src/schema.py`. The
+Gemini system prompt and the labelling session both render that same text, and
+the template stores a copy in `provenance.field_rules`. Decisions baked in:
+`medication` is the single most clinically significant one; `dose` is the
+*strength* as dictated (a quantity like "1 tablet" is not a dose); `dose` and
+`frequency` always describe that same medication. Type `?` at a status prompt
+to see a rule again, and use the case note to say why you picked the
+medication you did.
+
+**Sampling, if you ever want a subset.** `template` pulls all 156 rows and profiles them. It then applies
+`--script` and draws a seeded random sample of N from what remains, without
+replacement (`--seed 42` by default; `--head` takes the first N instead). The printed table puts the full split, the
 head 30 and the seeded 30 side by side: length, word count, speaker turns, and
-the share of rows with dose, frequency, dosage-form, drug-name and allergy
-mentions. Any draw that drifts past a threshold is named, line by line.
+the share of rows carrying each reference label, and the script mix. Any draw
+that drifts from its pool past a threshold is named, line by line.
 
 The seed, the selected `row_idx`, the Python version, the population and
 sample profiles, and any drift flags all go into `provenance`. **Choose the
 seed before looking, and don't re-roll it to make the numbers look nicer.** A
 seed picked after looking is a selected sample. If the draw drifts, report it.
 
-The entity figures are regex proxies, computed deterministically before any
-model has run. They show whether the sample looks like the population. They
-are not ground truth - labelling is.
+The reference figures come from the dataset's own rubric categories. The
+regex-proxy rows are a weaker, English-only fallback: a dictated
+"paracetamol 500" has no unit, so they undercount. Neither is ground truth -
+labelling is.
 
 **Labelling.** `label` refuses any evidence span that is not a verbatim
 substring of the note, using the *same* `verify_evidence` the pipeline runs at
