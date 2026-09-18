@@ -95,6 +95,7 @@ CODE_MIXED_MIN_HITS = 3    # romanised-Hindi marker tokens before we flag a row
 GOLD_DIR = ROOT / "data" / "gold_labels"
 TEMPLATE_PATH = GOLD_DIR / "gold_v1_template.json"
 SEALED_PATH = GOLD_DIR / "gold_v1.json"
+SEALED_SHA_PATH = GOLD_DIR / "gold_v1.sha256"
 
 SCRIPT = "./.venv/bin/python evals/label_gold_v1.py"
 # No `export HF_TOKEN=...` here: the token is read from .env, and a pasted
@@ -972,13 +973,40 @@ def cmd_validate(args) -> int:
                 f"refusing to seal: this file came from {source!r}, not {DATASET}.\n"
                 f"Only a template generated from the dataset can become {_rel(SEALED_PATH)}."
             )
-        if SEALED_PATH.exists() and not args.force:
-            sys.exit(f"{_rel(SEALED_PATH)} already exists. --force to overwrite.")
-        goldset.provenance["sealed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        save_goldset(goldset, SEALED_PATH)
-        print(f"sealed to {_rel(SEALED_PATH)}")
+        digest = seal_goldset(goldset, SEALED_PATH, SEALED_SHA_PATH)
+        print(f"sealed to {_rel(SEALED_PATH)} (read-only; sha256 {digest[:16]}... "
+              f"in {_rel(SEALED_SHA_PATH)})")
     print_seal_instructions(sealed=args.seal, cases=len(goldset.cases))
     return 0
+
+
+def seal_goldset(goldset: GoldSet, sealed_path: Path, sha_path: Path) -> str:
+    """Write gold-v1 once, and never again.
+
+    gold-v1 is immutable: a wrong label is fixed in a new file sealed as
+    gold-v2, never by editing gold-v1, because a recall number that moved
+    because the labels moved is not a result. So there is no overwrite
+    flag. The seal also records the prompt fingerprint and model, so a run
+    can prove the prompt was not tuned after the labels were frozen, and a
+    SHA-256 of the exact bytes, so evals/run_ekacare.py can prove the file
+    was not edited since. Both files are made read-only.
+    """
+    import extract
+
+    if sealed_path.exists() or sha_path.exists():
+        sys.exit(
+            f"{_rel(sealed_path)} is sealed and immutable. Put corrected labels in a new "
+            "file and seal that as gold-v2; do not edit or replace gold-v1."
+        )
+    goldset.provenance["sealed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    goldset.provenance["prompt_fingerprint"] = extract.prompt_fingerprint()
+    goldset.provenance["model_at_seal"] = extract.MODEL
+    save_goldset(goldset, sealed_path)
+    digest = hashlib.sha256(sealed_path.read_bytes()).hexdigest()
+    sha_path.write_text(f"{digest}  {sealed_path.name}\n", encoding="utf-8")
+    for path in (sealed_path, sha_path):
+        path.chmod(0o444)
+    return digest
 
 
 def cmd_stats(args) -> int:
@@ -1007,29 +1035,30 @@ def print_label_instructions(template: Path) -> None:
 
 
 def print_seal_instructions(sealed: bool = False, cases: int | None = None) -> None:
+    """What the human does next. This tool never runs git itself."""
     is_repo = (ROOT / ".git").exists()
     label = f"{cases} hand-labelled Eka Care cases" if cases else "hand-labelled Eka Care cases"
     print("\n" + "=" * 78)
     print("FREEZING gold-v1")
     print("=" * 78)
     if not sealed:
-        print("\n1. copy the completed labels to the canonical path:\n")
-        print("   cp data/gold_labels/gold_v1_template.json data/gold_labels/gold_v1.json")
-        print("\n   (or re-run this command with --seal to have it written for you)")
+        print("\n1. seal it - the only supported way to create gold_v1.json:\n")
+        print(f"   {SCRIPT} validate --seal")
+        print("\n   Do not copy the template by hand: the seal also records the prompt")
+        print("   fingerprint, writes gold_v1.sha256 and makes both files read-only.")
     else:
-        print("\n1. done - labels are at data/gold_labels/gold_v1.json")
-    print("\n2. commit and tag, BEFORE any model has seen these notes:\n")
+        print("\n1. done - data/gold_labels/gold_v1.json and gold_v1.sha256 are written,")
+        print("   read-only.")
+    print("\n2. commit and tag (you run these; nothing here touches git):\n")
     if not is_repo:
         print("   git init")
-        print("   git add -A")
-        print(f"   git commit -m \"gold-v1: {label}\"")
-    else:
-        print("   git add data/gold_labels/gold_v1.json")
-        print(f"   git commit -m \"gold-v1: {label}\"")
+    print("   git add data/gold_labels/gold_v1.json data/gold_labels/gold_v1.sha256")
+    print(f"   git commit -m \"gold-v1: {label}\"")
     print(f"   git tag -a gold-v1 -m \"frozen gold labels, {label}, 4 critical fields\"")
-    print("\n3. from here on, treat gold_v1.json as read-only. If a label turns out")
-    print("   to be wrong, fix it in a gold-v2 tag rather than editing gold-v1 -")
-    print("   a recall number that moved because the labels moved is not a result.")
+    print("\n3. gold-v1 is now immutable. If a label turns out to be wrong, fix it in")
+    print("   a new file sealed as gold-v2 - a recall number that moved because the")
+    print("   labels moved is not a result. evals/run_ekacare.py refuses a gold file")
+    print("   whose SHA-256 no longer matches gold_v1.sha256.")
     print()
 
 
@@ -1069,8 +1098,8 @@ def main() -> int:
 
     p = sub.add_parser("validate", help="check completeness and verbatim spans")
     p.add_argument("--file")
-    p.add_argument("--seal", action="store_true", help="also write data/gold_labels/gold_v1.json")
-    p.add_argument("--force", action="store_true")
+    p.add_argument("--seal", action="store_true",
+                   help="also write data/gold_labels/gold_v1.json - once; it is immutable after")
     p.set_defaults(func=cmd_validate)
 
     p = sub.add_parser("stats", help="progress and label distribution")

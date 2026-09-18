@@ -4,35 +4,110 @@ Four critical fields out of a dictated clinical note, with a verbatim
 evidence span for each, so a polyclinic physician can verify the whole
 extraction in under three seconds.
 
-Week 1 status: the smallest first version runs. Single note in, gated JSON out.
+Status: single-note pipeline and batch evaluation loop built and tested offline.
+Inference goes through OpenRouter (`google/gemini-2.5-flash`) via the OpenAI SDK.
 
 ## Run it
 
 ```bash
 python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
-export GEMINI_API_KEY=...                       # or put it in .env at the repo root
+# put OPENROUTER_API_KEY=<your key> in .env at the repo root (never commit it)
 
 ./.venv/bin/python src/extract.py --note gold/case_001.txt
 ```
 
-No key, no credit, still exercises the safety gate (the canned response
-contains a deliberate fabrication):
+Every request carries: a 15 s timeout and one retry (set on the SDK, whose
+defaults are 2 retries and a 600 s read timeout); a 1,024-token output cap;
+reasoning off; a strict JSON schema; and OpenRouter routing that only uses
+providers honouring every parameter (`require_parameters`) and not collecting
+prompts (`data_collection: deny`). For public or synthetic notes only,
+`--provider-data-collection allow` widens routing.
+
+No key, no credit, still exercises the safety gates (the canned response
+contains deliberate fabrications):
 
 ```bash
 ./.venv/bin/python src/extract.py --note gold/case_001.txt --mock
 ```
 
-`stdout` is only ever the JSON payload; the gate table goes to `stderr`.
-Exit code is 1 when the gate blanked at least one field, so the Week 3
-harness can count abstentions without parsing anything.
+`stdout` is only ever one JSON document: the extraction (`"status": "ok"`)
+or an error envelope (`"status": "error"`, with a `code`). While the
+pipeline runs, stdout is redirected to stderr, so a stray `print` from any
+library cannot corrupt the JSON a downstream parser reads. A field wiped by a
+gate is `null` in the extraction (a hard wipe); why it was wiped is a
+`code` in the separate `gate` list. stdout never carries human-readable text:
+the review screen maps a code to its label (for example
+`BLANK (Abstained: Ungrounded)`) with `guardrails.DISPLAY`, and gate reasons,
+error messages and evaluation tables go to stderr. An error envelope is
+`{"status": "error", "code": ..., "data": null, ...}`, with the message on stderr.
+
+A note carrying hidden or look-alike characters (bidirectional controls,
+zero-width or other invisible characters, homoglyphs such as a Cyrillic `е`
+inside `metformin`) is a **forced safe abstention**: every field is wiped with
+`ABSTAIN_ENCODING_ANOMALY`, the model is not called, and the dictation is
+never "cleaned" to rescue an extraction. Measured: 0 of the 156 Eka notes
+trigger it; µg, Ménière, β-blocker, mg/m² and similar notation do not.
 
 Flags that matter later:
 
 | flag | why |
 | --- | --- |
-| `--no-gate` | report gate verdicts but blank nothing — the abstention test |
-| `--thinking-budget N` | 0 by default; thinking spends latency we do not have |
+| `--no-gate` | report gate verdicts but wipe nothing — the abstention test |
+| `--budget-usd N` | total spend ceiling across runs (default $8.00, or `MEDIEXTRACT_BUDGET_USD`); checked before every call; the ledger records OpenRouter's reported cost |
+| `--provider-data-collection allow` | public or synthetic notes only; default is `deny` |
 | `--json-only` | suppress the stderr table |
+
+### Exit codes
+
+Every outcome has its own code, so the Week 3 harness can count abstentions
+off the exit code without mistaking a crash for one.
+
+| code | meaning | stdout |
+| --- | --- | --- |
+| 0 | every field verified, not stated, or routed to review | extraction |
+| 1 | at least one field wiped by a gate | extraction |
+| 2 | input rejected: missing, unreadable, empty, over 20,000 characters, binary, not UTF-8 | envelope `ERR_INPUT_*` |
+| 3 | upstream failure: timeout, unreachable, rate limited, auth, model unavailable (404), no eligible provider | envelope `ERR_UPSTREAM_*`, `ERR_RATE_LIMITED`, `ERR_MODEL_UNAVAILABLE`, `ERR_NO_ELIGIBLE_PROVIDER` |
+| 4 | model output failed the schema on both attempts, or was truncated at the token cap | envelope `ERR_SCHEMA_INVALID`, `ERR_OUTPUT_TRUNCATED` |
+| 5 | spend ceiling reached (the call was not made), or OpenRouter credit exhausted (402) | envelope `ERR_BUDGET_EXCEEDED`, `ERR_UPSTREAM_CREDITS_EXHAUSTED` |
+| 6 | configuration or internal error | envelope `ERR_CONFIG_*`, `ERR_INTERNAL` |
+
+argparse usage errors also exit 2, but print no envelope.
+
+### Batch evaluation (`evals/run_ekacare.py`)
+
+```bash
+./.venv/bin/python evals/run_ekacare.py        # live: needs the sealed gold-v1 and OPENROUTER_API_KEY
+./.venv/bin/python evals/run_ekacare.py --mock --gold data/gold_labels/gold_v1_template.json --limit 3
+```
+
+One model call per case (cached under `data/cache/runs/<run_id>/`, so
+`--run-id <same id>` resumes without paying twice); the same output is gated
+and ungated, so the abstention test costs no extra call; scores come from
+`evals/scoring.py`. Results land in `evals/results/<run_id>/` (manifest,
+gated and ungated JSONL, `scores.json`, `rows.csv` with formula-safe cells);
+stdout is one JSON summary.
+
+A live run refuses, before any call: any gold file other than the sealed
+`data/gold_labels/gold_v1.json`; a file whose SHA-256 no longer matches
+`gold_v1.sha256`; unlabelled fields; note text that drifted from its md5; a
+prompt changed since the seal (unless `--experiment NAME`, reported
+separately); and a worst case the remaining budget cannot cover. A circuit
+breaker halts the run after 3 consecutive system failures, above a 5% error
+rate after 20 calls, or at once on a spend refusal (batch exit codes: 0 done,
+2 refused, 3 halted, 5 spend, 6 internal). Tag a case `#negation`,
+`#attribution` or `#temporality` in its labelling note to put it in a slice.
+
+### Tests
+
+```bash
+./.venv/bin/python -m unittest discover -s tests
+```
+
+Offline, no API key, no spend: the live-call paths run against a fake
+client, or fail by design before any client exists. The suite also fails if
+an `assert` statement appears under `src/` — `python -O` strips them, so a
+gate written as one would silently stop running.
 
 ## Build the gold set (do this before any model sees the notes)
 
@@ -99,6 +174,7 @@ and tells you to `unset HF_TOKEN`.
 ./.venv/bin/python evals/label_gold_v1.py label --labeller <name>
 ./.venv/bin/python evals/label_gold_v1.py stats
 ./.venv/bin/python evals/label_gold_v1.py validate --seal
+git add data/gold_labels/gold_v1.json data/gold_labels/gold_v1.sha256
 git tag -a gold-v1 -m "frozen gold labels, 67 hand-labelled Eka Care cases, 4 critical fields"
 ```
 
@@ -146,7 +222,11 @@ says so, because that usually means you are on the wrong case.
 **Sealing.** `validate` blocks the tag on unlabelled fields, on non-verbatim
 spans, and when `source_text` has drifted from the md5 recorded at pull time.
 `--seal` refuses any file that didn't come from the real dataset, so a
-fixture can never land at `data/gold_labels/gold_v1.json`.
+fixture can never land at `data/gold_labels/gold_v1.json`. Sealing is
+**write-once**: it refuses if `gold_v1.json` exists (there is no overwrite
+flag), records the prompt fingerprint and model, writes `gold_v1.sha256`, and
+makes both files read-only. A wrong label is fixed in a new file sealed as
+gold-v2, never by editing gold-v1.
 
 The rows API serves only the default branch, so on that path the pinned
 revision is recorded but not enforced (`revision_enforced: false`). The
@@ -157,9 +237,12 @@ but needs `pip install datasets`.
 
 ```
 src/schema.py      wire schema (Gemini) + gold annotation schema, and the one bridge between them
-src/guardrails.py  deterministic gates, no model calls
-src/extract.py     one constrained call + the gate + latency/cost accounting
-evals/             label_gold_v1.py: profile / template / label / validate / stats
+src/guardrails.py  deterministic gates: evidence, value, number/unit, injection tripwire
+src/extract.py     the whole pipeline flow: input checks, one OpenRouter call, gates, one JSON document
+src/budget.py      spend ledger and hard ceiling (data/cache/, never note text)
+tests/             offline unittest suite: gates, budget, CLI contract, scoring, batch loop, seal
+evals/             label_gold_v1.py (profile / template / label / validate / stats),
+                   run_ekacare.py (batch loop), scoring.py (metrics, Wilson CIs)
 gold/              synthetic dictations for smoke tests. Real labels: data/gold_labels/.
 ```
 
@@ -192,17 +275,33 @@ hands you 120 free `not_stated` labels, every one of which scores as a correct
 abstention. `GoldField.to_extracted_field()` is the only bridge, so scoring
 compares like with like.
 
-## Known gap (next gate, Week 2)
+## Gates beyond the verbatim check
 
-`evidence in source_text` proves the span is real. It does **not** prove the
-`value` derived from it is right. A note saying `500 mg` with a verbatim span
-of `500 mg` and a value of `50 mg` passes today. That is precisely what the
-numeric/unit checker is for.
+`evidence in source_text` proves the span is real. It does not prove the
+`value` derived from it is right, so a second gate (`verify_value` in
+`src/guardrails.py`) checks the value against the verified span:
+
+- **dose** — every number and unit must match the span. `50 mg` against a
+  span of `15 mg` is blanked, as are `mcg` against `mg` and a unit the
+  physician never dictated.
+- **frequency** — the value must be a phrase of the span, or a recognised
+  equivalent of one (`bd` → `twice daily`).
+- **medication, allergy** — every word of the value must appear in the span.
+
+Known limit, pinned by a test: a value that is a verbatim sub-phrase of its
+span still passes (`daily` out of `twice daily`). The physician sees the quote
+beside it. The full control inventory is in `guardrails.md`.
 
 ## Not yet verified
 
-The live Gemini path has not been run — no API key was available in the
-environment where this was built. The Pydantic-to-Gemini schema conversion
-was verified offline (required fields, enum, property ordering all correct),
-and the gate is covered end to end via `--mock`, but the first real
-`--note` run is still unproven. Expect to spend a few cents settling it.
+No live call has been made from `src/`: there is no OpenRouter key in this
+environment. Verified offline instead: the request (SDK timeout, retries,
+token cap, strict schema, routing, data policy, no tools), every error
+mapping, retries, truncation, fenced JSON, the ledger, the stdout guard, the
+batch loop's refusals, resume, breaker and scoring (98 tests, also under
+`python -O`). `google/gemini-2.5-flash` is listed by OpenRouter's public models
+API (checked 2026-09-18, $0.30 / $2.50 per million tokens) - the 404 the Colab
+prototype hit came from Google's direct API. The first live smoke test should
+be one synthetic note (`src/extract.py --note gold/case_001.txt`); if routing
+returns `ERR_NO_ELIGIBLE_PROVIDER`, the data policy found no provider, which
+is a decision to take deliberately, not a flag to flip for patient data.

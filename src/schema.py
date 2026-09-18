@@ -10,15 +10,17 @@ The `evidence` field is what makes the deterministic safety gate in
 guardrails.py possible: if the span is not a literal substring of the
 dictation, the field is unverifiable and gets blanked.
 
-BLANK is the empty string rather than None so that the wire schema handed
-to Gemini stays inside the OpenAPI subset it accepts (no nullable types,
-no anyOf), and so a blanked field and an absent field look identical
-downstream.
+BLANK is the empty string rather than None inside the wire schema: the
+schema the model is constrained to stays free of nullable types and anyOf,
+which structured-output implementations translate unevenly. The payload
+extract.py prints converts BLANK to null ("hard wipe"), so a consumer never
+sees an empty string posing as a value.
 """
 
+import copy
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 BLANK = ""
 
@@ -95,7 +97,13 @@ class ExtractedField(BaseModel):
     `required` list in the generated Gemini schema, which lets the model
     silently omit `evidence` - exactly the field the whole design rests on.
     An explicit empty string is a claim; a missing key is an ambiguity.
+
+    Unknown keys are rejected (extra="forbid"): a model that invents a
+    fourth subfield has not followed the contract, and its output is not
+    trusted in part.
     """
+
+    model_config = ConfigDict(extra="forbid")
 
     evidence: str = Field(
         description=(
@@ -128,12 +136,42 @@ class ExtractedField(BaseModel):
 
 
 class ClinicalExtraction(BaseModel):
-    """The whole payload Gemini is constrained to emit."""
+    """The whole payload the model is constrained to emit."""
+
+    model_config = ConfigDict(extra="forbid")
 
     medication: ExtractedField
     dose: ExtractedField
     frequency: ExtractedField
     allergy: ExtractedField
+
+
+def response_json_schema() -> dict:
+    """ClinicalExtraction as a strict, self-contained JSON Schema for
+    OpenRouter's `response_format: json_schema` with `strict: true`.
+
+    Pydantic emits $defs/$ref; strict structured-output implementations
+    want every object inline, every property required, and
+    additionalProperties false. Built from the Pydantic model so the two
+    can never disagree.
+    """
+    raw = ClinicalExtraction.model_json_schema()
+    defs = raw.pop("$defs", {})
+
+    def inline(node):
+        if isinstance(node, dict):
+            if "$ref" in node:
+                return inline(copy.deepcopy(defs[node["$ref"].split("/")[-1]]))
+            out = {k: inline(v) for k, v in node.items() if k not in ("title", "default")}
+            if out.get("type") == "object" and "properties" in out:
+                out["required"] = list(out["properties"])
+                out["additionalProperties"] = False
+            return out
+        if isinstance(node, list):
+            return [inline(item) for item in node]
+        return node
+
+    return inline(raw)
 
 
 # ---------------------------------------------------------------------------
