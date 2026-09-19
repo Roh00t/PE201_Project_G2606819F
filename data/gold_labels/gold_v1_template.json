@@ -1012,28 +1012,28 @@
       "source_text": "Tablet paracetamol 500 three times a day. After food  Tablet chymoral forte three times a day after food. Tablet pan d before food, three times a day  ",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "chymoral forte",
+          "evidence": "paracetamol",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "500",
+          "evidence": "500",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "three times a day",
+          "evidence": "three times a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:20:56+00:00",
       "notes": null
     },
     {
@@ -1041,28 +1041,28 @@
       "source_text": "Complaint of pain abdomen. Vomiting, fever since 3 days.  On examination afebrile.  cvs normal, rs normal. Abdomen tenderness on the rif  Diagnosis looked like Acute appendicitis. Advices Tab MRD  ",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "MRD",
+          "evidence": "MRD",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:23:43+00:00",
       "notes": null
     },
     {
@@ -1070,28 +1070,28 @@
       "source_text": "25 year old female. She had progressive difficulty in upsquatting and difficulty in climbing stairs since last four to five years and the complaints are progressively worsening.  examination showed significant proximal lower girdle weakness. There is no family history of similar disorder. Her total CPK level is normal.  MRI spine which was done in the past was normal. Genetic testing has not been done. EMG, NCV study has not been done. Diagnosis is  degenerative muscular dystrophy, possibly limb-girdle type.\nHer treatment will include capsule Vernace.  one in the afternoon, tablet Shelcal one in the morning for a duration of one month along with physiotherapy for a duration of one month.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Vernace",
+          "evidence": "Vernace",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "one",
+          "evidence": "one",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "in the afternoon",
+          "evidence": "in the afternoon",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:25:37+00:00",
       "notes": null
     },
     {
@@ -1099,28 +1099,28 @@
       "source_text": "Kya ho raha hai doctor saab, teen din ho gaye. Hann. ek side so jaati hai, to aise ghumta ghumta hai. Okay. Patient has predominant complaints of giddiness. She feels in unsteadiness while walking.  She has been started on anti-parkinsonian treatment in the form of Syndopa half TDS, but still the clinical picture is not convincing for Parkinson's disease. but she has orofacial dyskinesias.  we need to consider or confirm whether she really has Parkinson's disease. So it is suggested that we should taper off her dose of Syndopa for the time being and once she is off Syndopa, we will see her after 15 days for features of Parkinson's disease. She looks little bit anxious also overall.  and anxiety looks to be an important part of her clinical syndrome.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Syndopa",
+          "evidence": "Syndopa",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "half",
+          "evidence": "half",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "TDS",
+          "evidence": "TDS",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:28:39+00:00",
       "notes": null
     },
     {
@@ -1128,28 +1128,28 @@
       "source_text": "Patient has diabetes mellitus since last four to five years. Her present complaints are tingling numbness in both feet throughout day and night since last few months.  Diagnosis is diabetes mellitus related painful peripheral neuropathy. Investigation suggested is NCV study. Treatment tablet Gabantin GRS 300 milligram.  at night.  tablet Symbal 20 milligram half at night for three days, followed by one at night to be continued for one month.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Gabantin GRS",
+          "evidence": "Gabantin GRS",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "300 milligram",
+          "evidence": "300 milligram",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "one at night",
+          "evidence": "one at night",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:30:30+00:00",
       "notes": null
     },
     {
@@ -1157,28 +1157,28 @@
       "source_text": "75 year old lady hypertension and diabetes as risk factor presented with acute onset left sided weakness on 17th April 2025.  was admitted in <PII> hospital. MRI brain showed right MCA territory ischemic stroke. Started on dual antiplatelet treatment, is improving. Present complaint is abdominal pain, loss of appetite and nausea vomiting and sleep disturbances at night.  The present prescription should include capsule Ecosprin AV 75 + 20 at night. Then tablet Met XL 25 milligram twice daily.  Tablet Cilacar T 40 + 10 once in the night. Tablet Vilda M 50 + 500 twice daily.  Tablet Rexipra LS once at night and capsule Pan D once in the afternoon. All this treatment to be continued for a duration of one month.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Ecosprin AV",
+          "evidence": "Ecosprin AV",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "75 + 20",
+          "evidence": "75 + 20",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "at night",
+          "evidence": "at night",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:34:36+00:00",
       "notes": null
     },
     {
@@ -1188,26 +1188,26 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:39:16+00:00",
       "notes": null
     },
     {
@@ -1215,28 +1215,28 @@
       "source_text": "Symptoms are fever, cold, cough. diagnosis: viral fever, URTI . medicines.Dolo 650,  twice a day. After meals, 7 days. Augmentin.One dosage at a time, twice a day, after meal for 7 days. Test prescribed,  CBC, lipid profile, HbA1C. Follow-up visit after 7 days.advices: daily walk for 30 minutes, avoid oily and cold",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "650",
+          "evidence": "650",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:41:04+00:00",
       "notes": null
     },
     {
@@ -1244,28 +1244,28 @@
       "source_text": "Symptoms: cough, fever, cold. Diagnosis: viral fever. Tablet Augmentin, one doseTwice a day, after meal for 7 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Augmentin",
+          "evidence": "Augmentin",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "one",
+          "evidence": "one",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Twice a day",
+          "evidence": "Twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:42:14+00:00",
       "notes": null
     },
     {
@@ -1275,26 +1275,26 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "augmentin",
+          "evidence": "augmentin",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:52:12+00:00",
       "notes": null
     },
     {
@@ -1302,28 +1302,28 @@
       "source_text": "After meal for 7 days. Augmentin twice a day, after meal for 7 days. Test prescribed CBC, HbA1C.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Augmentin",
+          "evidence": "Augmentin",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T11:58:15+00:00",
       "notes": null
     },
     {
@@ -1331,28 +1331,28 @@
       "source_text": "Augmentin, twice a day after meal for 3 days. Test prescribed CBC, HBA1C.Advices: avoid processed food, eat healthy, avoid cold and oily food. Follow up after 7 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Augmentin",
+          "evidence": "Augmentin",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day after meal for 3 days",
+          "evidence": "twice a day after meal for 3 days",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T12:01:36+00:00",
       "notes": null
     },
     {
@@ -1362,26 +1362,26 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T12:05:33+00:00",
       "notes": null
     },
     {
@@ -1391,55 +1391,55 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
-      "notes": null
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T12:07:27+00:00",
+      "notes": "While the doctor says \"prescribe\", the items listed like HSCRP, TFT, vitamin B12, FBS, PPBS, LFT, KFT, CBC, and 25 hydroxy vitamin D are all diagnostic blood tests/investigations, not therapeutic medications"
     },
     {
       "case_id": "case_015",
       "source_text": "Give this patient tablet Dolostat plus R one OD for 10 days. Tab bac Gabamax gold one HS at night for 10 days. Tablet Pan DIn the morning, empty stomach for 10 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolostat plus R",
+          "evidence": "Dolostat plus R",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "one",
+          "evidence": "one",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "OD",
+          "evidence": "OD",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:07:07+00:00",
       "notes": null
     },
     {
@@ -1447,28 +1447,28 @@
       "source_text": "This patient has fever since the last 4 days. He is also suffering from headache. Kindly prescribe him tablet Combiflam, 1 tablet TID after meal for 3 days. Tablet Pan D, 1 tablet in the morning, empty stomach for 3 days.And tablet Vomikind  MD 4 mg one tablet three times a day after food, OK.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Combiflam",
+          "evidence": "Combiflam",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "1 tablet",
+          "evidence": "1 tablet",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "TID",
+          "evidence": "TID",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:08:06+00:00",
       "notes": null
     },
     {
@@ -1476,28 +1476,28 @@
       "source_text": "Complain of cough, dyspnea. Treatment injection Dexa.Tablet CP CV twice a day for two days. Tablet Wysolone three times a day for two days. Tablet Costus Advance three times a day for two days.Tablet Deriphyllin Retard 300 milligram twice a day for two days. Tablet Levopoint M once at night for 10 days.Capsule Ompec DM twice a day before food for two days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Deriphyllin Retard",
+          "evidence": "Deriphyllin Retard",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "300 milligram",
+          "evidence": "300 milligram",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:10:10+00:00",
       "notes": null
     },
     {
@@ -1505,28 +1505,28 @@
       "source_text": "complain of knee pain, leg painsTreatment injection Vitanova first dose, IV NS250 ml 2 units .Injection Cyanocal,\nInjection B Complex,\nTablet Acecloran MR\nTwice a day after food for 5 days.Tab Pregastar D once at night for 10 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Acecloran MR",
+          "evidence": "Acecloran MR",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "250 ml",
+          "evidence": "250 ml",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Twice a day",
+          "evidence": "Twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:13:37+00:00",
       "notes": null
     },
     {
@@ -1534,57 +1534,57 @@
       "source_text": "<PII> came with reports, showing hemoglobin lowVitamin D was low. Cholesterol was high. SGOT SGPT raised. Vitamin B12 118 low.Treatment Injection Cynocal First doseinjection Nana Nova 6 lakhs units first dose . tablet Calcirix XT once in the morning forone month . tablet Zolfer XT once at night for 30 days . tablet Statpure F once at nightfor three months.  tablet liveril forte once in the morning for six weeksNotes: This is visit of 14th April.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Calcirix XT",
+          "evidence": "Calcirix XT",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "once in the morning",
+          "evidence": "once in the morning",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
-      "notes": null
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:38:28+00:00",
+      "notes": "Alternative valid options include Nana Nova [dose: 6 lakhs units], Zolfer XT [frequency: once at night], Statpure F [frequency: once at night], or liveril forte [frequency: once in the morning]"
     },
     {
       "case_id": "case_020",
       "source_text": "Complain of throat pain, cough, fever. On examinationPus on left tonsil. Treatment injection oxy plus dexa 1, 1 ml.Syrup Sensiclav ES 5ml twice a day. Syrup Mefkind DS 5ml three times a day. Syrup Cogof 5ml three times a day.Diagnosis septic tonsillitisNotes: visit of 14th April",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Sensiclav ES",
+          "evidence": "Sensiclav ES",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "5ml",
+          "evidence": "5ml",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:39:56+00:00",
       "notes": null
     },
     {
@@ -1592,28 +1592,28 @@
       "source_text": "complain of epigastric pain, severe. nausea, backache .Treatment injection pan IV stat.  injection spasmonormstat. Capsule Omez twice a day before food for two days. Five capsules. Tablet Ondem MD twice a day before food for two days. Tablet Para Dicyclomine.three times a day for two days. Tablet Mefenamic 500 twice a day for two days. Syrup Antolix O 10 ml three times a day after food.Investigation: USG of abdomenUSG of abdomen report normal",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Mefenamic",
+          "evidence": "Mefenamic",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "500",
+          "evidence": "500",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:41:20+00:00",
       "notes": null
     },
     {
@@ -1621,28 +1621,28 @@
       "source_text": "Complain of epigastric pain since morning. On examination, tenderness epigastric region.Treatment  Injection Pan IV Injection, Injection Spasmonorm.  Capsule Omez twice a day before food for two days. Five capsules.Tablet Ondem 4mg twice a day before food for two days. Tablet Para dicyclomine three times a day for two days. Tablet Mefenamic 500twice a day for two days.\nSyrup Antolix O 10 ml three times a day.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Ondem",
+          "evidence": "Ondem",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "4mg",
+          "evidence": "4mg",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:42:27+00:00",
       "notes": null
     },
     {
@@ -1650,28 +1650,28 @@
       "source_text": "<PII> to kuch nahi hai. X-ray of LS spine showing reversal of lumbar lordosis.diagnosis reversal of lumbar lordosis.  treatment injection Vitanova 6 lakhs unit first doseTablet Xykaa MR twice a day for 5 days.\nTablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before food for five days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Lekace",
+          "evidence": "Lekace",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "100 mg",
+          "evidence": "100 mg",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:43:33+00:00",
       "notes": null
     },
     {
@@ -1679,28 +1679,28 @@
       "source_text": "complaint of backache since two days, severe. treatmentInjection Dynapar AQ 1 ml stat. Tablet Aceclo MR twice a day for 3 days. TabletPara 650 once in the afternoon for three days. Tablet Shelong once in the morning after breakfast for 15 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dynapar AQ",
+          "evidence": "Dynapar AQ",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "1 ml",
+          "evidence": "1 ml",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "stat",
+          "evidence": "stat",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:44:29+00:00",
       "notes": null
     },
     {
@@ -1708,28 +1708,28 @@
       "source_text": "So this patient came in with the complaints of ear pain in the right ear since two days, previously taken tablet, Augmentin, 625 milligrams morning and night.For 5 days and some painkiller, or exact details of the previous prescription are not available. On examination, there was congestion of the right uh tympanic membrane and all other system examinations were within normal limits.The patient was prescribed tablet cefixime 200 milligrams morning and night for 5 days. Tablet diclomol SP morning and night for 3 days, tablet.Sompraz D one in the morning before food for 3 days along with advice to keep the ears completely dry for the next 5 days.The patient has been asked for a follow-up after one week and has been asked to avoid lifting heavy weights and avoidBlowing nose hard",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "cefixime",
+          "evidence": "cefixime",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200 milligrams",
+          "evidence": "200 milligrams",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "morning and night",
+          "evidence": "morning and night",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:45:22+00:00",
       "notes": null
     },
     {
@@ -1737,28 +1737,28 @@
       "source_text": "Write prescription for <PII>, 30 year old male, diagnosis stroke in young. He has hyperhomocysteinemia on evaluation. Vasculitis evaluation is normal. Now the prescription capsule Best CZD 0-1-0.For 15 days tablet Cogre P forte  1-0-1. Tablet Clopivas AP 75 by 75,0-1-0. Tablet Avas 40, 0-0-1. Capsule Homocheck 1-0-1.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Clopivas AP 75 by 75",
+          "evidence": "Clopivas AP 75 by 75",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "75 by 75",
+          "evidence": "75 by 75",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "0-1-0",
+          "evidence": "0-1-0",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:46:23+00:00",
       "notes": null
     },
     {
@@ -1768,26 +1768,26 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:46:42+00:00",
       "notes": null
     },
     {
@@ -1797,26 +1797,26 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:47:21+00:00",
       "notes": null
     },
     {
@@ -1824,28 +1824,28 @@
       "source_text": "My patient came for fitness for cataract surgery. Patient complained of giddiness while standing. On examination, his pulse is 80 beats per minute. Blood pressure is 150 by 90 mm of Hg, on systemic examination.Chest clear, CVS normal, on treatment, patient started on tablet Cilacar 10 mg once a day in the morning for 15 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cilacar",
+          "evidence": "Cilacar",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "10 mg",
+          "evidence": "10 mg",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "once a day",
+          "evidence": "once a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-19T16:48:06+00:00",
       "notes": null
     },
     {

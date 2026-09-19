@@ -37,7 +37,7 @@ library cannot corrupt the JSON a downstream parser reads. A field wiped by a
 gate is `null` in the extraction (a hard wipe); why it was wiped is a
 `code` in the separate `gate` list. stdout never carries human-readable text:
 the review screen maps a code to its label (for example
-`BLANK (Abstained: Ungrounded)`) with `guardrails.DISPLAY`, and gate reasons,
+`BLANK (Abstained: Ungrounded)`) with `extract.DISPLAY`, and gate reasons,
 error messages and evaluation tables go to stderr. An error envelope is
 `{"status": "error", "code": ..., "data": null, ...}`, with the message on stderr.
 
@@ -187,7 +187,7 @@ with a median length of 58 words. Three of those rows (0, 2, 3) were partly
 read during format inspection before the decision; `provenance.exposure`
 records that.
 
-**Field definitions** live once, in `FIELD_RULES` in `src/schema.py`. The
+**Field definitions** live once, in `FIELD_RULES` in `src/extract.py`. The
 Gemini system prompt and the labelling session both render that same text, and
 the template stores a copy in `provenance.field_rules`. Decisions baked in:
 `medication` is the single most clinically significant one; `dose` is the
@@ -236,10 +236,9 @@ but needs `pip install datasets`.
 ## What is here
 
 ```
-src/schema.py      wire schema (Gemini) + gold annotation schema, and the one bridge between them
-src/guardrails.py  deterministic gates: evidence, value, number/unit, injection tripwire
-src/extract.py     the whole pipeline flow: input checks, one OpenRouter call, gates, one JSON document
-src/budget.py      spend ledger and hard ceiling (data/cache/, never note text)
+src/extract.py     the whole pipeline, one file (CLAUDE.md 1.1), in sections:
+                   1 configuration, 2 schema (wire + gold), 3 prompt, 4 deterministic
+                   gates, 5 spend ledger, 6-7 pipeline and CLI
 tests/             offline unittest suite: gates, budget, CLI contract, scoring, batch loop, seal
 evals/             label_gold_v1.py (profile / template / label / validate / stats),
                    run_ekacare.py (batch loop), scoring.py (metrics, Wilson CIs)
@@ -279,7 +278,7 @@ compares like with like.
 
 `evidence in source_text` proves the span is real. It does not prove the
 `value` derived from it is right, so a second gate (`verify_value` in
-`src/guardrails.py`) checks the value against the verified span:
+`src/extract.py`) checks the value against the verified span:
 
 - **dose** — every number and unit must match the span. `50 mg` against a
   span of `15 mg` is blanked, as are `mcg` against `mg` and a unit the

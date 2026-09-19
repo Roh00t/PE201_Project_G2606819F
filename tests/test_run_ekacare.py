@@ -23,8 +23,7 @@ sys.path.insert(0, str(ROOT / "evals"))
 import extract  # noqa: E402
 import label_gold_v1  # noqa: E402
 import run_ekacare  # noqa: E402
-from budget import SpendLedger  # noqa: E402
-from schema import GoldCase, GoldField, GoldSet, Status  # noqa: E402
+from extract import GoldCase, GoldField, GoldSet, SpendLedger, Status  # noqa: E402
 
 CASE_001 = (ROOT / "gold" / "case_001.txt").read_text()
 CASE_002 = (ROOT / "gold" / "case_002_traps.txt").read_text()

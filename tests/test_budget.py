@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from budget import BudgetExceeded, SpendLedger, worst_case_cost  # noqa: E402
+from extract import BudgetExceeded, SpendLedger, worst_case_cost  # noqa: E402
 
 
 class WorstCase(unittest.TestCase):

@@ -9,14 +9,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from guardrails import (  # noqa: E402
+from extract import (  # noqa: E402
     ABSTAIN_ENCODING_ANOMALY, ABSTAIN_INCOHERENT, ABSTAIN_NEAR_MISS, ABSTAIN_NO_EVIDENCE, ABSTAIN_NUMERIC_MISMATCH,
     ABSTAIN_UNGROUNDED, ABSTAIN_UNIT_MISMATCH, ABSTAIN_VALUE_UNGROUNDED, BLANKED,
     DISPLAY, MAX_NOTE_CHARS, NOT_STATED, PASS, REVIEW_INJECTION_PATTERN,
     REVIEW_MODEL_UNSURE, SKIPPED, VERIFIED, InputRejected, apply_gates, check_input,
     scan_input, verify_evidence, verify_value,
 )
-from schema import BLANK, ClinicalExtraction, ExtractedField, Status  # noqa: E402
+from extract import BLANK, ClinicalExtraction, ExtractedField, Status  # noqa: E402
 
 
 def field(value, evidence, status=Status.FOUND):

@@ -9,7 +9,7 @@ Five subcommands:
     validate   refuse to let an incomplete or unverifiable file be tagged
     stats      progress and label distribution
 
-The gate applied while labelling is imported from src/guardrails.py. It is
+The gate applied while labelling is imported from src/extract.py. It is
 the identical function the pipeline runs at inference time, not a
 reimplementation of it. If a human cannot produce a span that survives the
 gate, the model will not be asked to either - that is the point, and it is
@@ -48,9 +48,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from guardrails import BLANKED, verify_evidence  # noqa: E402
-from schema import (  # noqa: E402
-    CRITICAL_FIELDS, FIELD_RULES, GoldCase, GoldField, GoldSet, Status, render_field_rules,
+from extract import (  # noqa: E402
+    BLANKED, CRITICAL_FIELDS, FIELD_RULES, GoldCase, GoldField, GoldSet, Status,
+    render_field_rules, verify_evidence,
 )
 
 DATASET = "ekacare/clinical_note_generation_dataset"

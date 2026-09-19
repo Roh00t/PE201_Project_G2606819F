@@ -30,8 +30,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from guardrails import FREQUENCY_EQUIVALENTS, _norm_phrase, _quantities, _tokens  # noqa: E402
-from schema import CRITICAL_FIELDS  # noqa: E402
+from extract import (  # noqa: E402
+    CRITICAL_FIELDS, FREQUENCY_EQUIVALENTS, _norm_phrase, _quantities, _tokens,
+)
 
 # Pre-registered: dosage-form words do not decide whether two medication or
 # allergy values name the same thing ("Tab Dolo 650" == "Dolo 650").
