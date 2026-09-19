@@ -60,13 +60,13 @@
 | **Act** *(Grounding Gate)* | Python Evidence Gate (Context) | ⭕ **NO (CIRCLED)** <br> `[TO BE BUILT]` | `assert evidence in source_text` <br> *(Case/whitespace normalized check)* |
 | **Learn** *(Sign-Off)* | EHR Database / Audit Log (Record / Agency) | ✅ YES | Verified schema fields saved; corrections logged for eval |
 
-
+```mermaid
 graph TD
     A["<b>1. DETECT [H]</b><br>System of Record<br>Trigger: Doctor finishes dictation & closes chart."] -->| | B["<b>2. DECIDE [A]</b><br>System of Insight<br>Model: Gemini 2.5 Flash extracts JSON + verbatim quotes."]
     B -->| | C["<b>3. ACT [A]</b><br>System of Engagement<br>Python Gate executes 'assert in text'; pre-fills review form."]
     C -->| | D["<b>4. LEARN [H+A]</b><br>System of Agency<br>Doctor reviews quotes in <3s, signs off or edits blank fields."]
     D -->| | A
-
+```
 
 Four critical fields out of a dictated clinical note, with a verbatim
 evidence span for each, so a polyclinic physician can verify the whole
