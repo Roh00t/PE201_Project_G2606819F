@@ -1,78 +1,72 @@
 # MediExtract
 
-====================================================================================================
-                                 WHITEBOARD DECOMPOSITION: MEDIEXTRACT
-                                 The Art of Decomposition
-====================================================================================================
+## Whiteboard Decomposition: MediExtract
+**PE6202 · Week 7 · The Art of Decomposition**
 
-01. THE DISRUPTION (Broken Experience)
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 👤 Persona: Dr. Aisha (Attending Family Physician, Singapore Polyclinic)                        │
-│                                                                                                  │
-│ 💬 Customer Quote:                                                                               │
-│ "I dictated the whole consult, but now I still have to manually retype medication, dose,       │
-│  and frequency into separate EHR boxes just to close the chart."                                 │
-│                                                                                                  │
-│ Pain Points & Quantified Impact:                                                                 │
-│ • 157 minutes/day spent on clerical documentation (44.2% of an 11.4h workday) + 86m pyjama time.│
-│ • Existing scribes generate raw prose well, but fail to prove WHERE a field value came from.     │
-│ • Dr. Aisha will not accept an AI-generated dose unless she can verify it in under 3 seconds.   │
-└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+---
 
-02. FUTURE-STATE LOOP (Detect → Decide → Act → Learn)
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                                  │
-│     ┌────────────────────────┐                   ┌────────────────────────┐                      │
-│     │   1. DETECT [H]        │──────────────────>│   2. DECIDE [A]        │                      │
-│     │   System of Record     │                   │   System of Insight    │                      │
-│     │   Trigger: Doctor      │                   │   Model: Gemini 2.5    │                      │
-│     │   finishes dictation   │                   │   Flash extracts JSON  │                      │
-│     │   & closes chart.      │                   │   + verbatim quotes.   │                      │
-│     └────────────────────────┘                   └────────────────────────┘                      │
-│                 ▲                                            │                                   │
-│                 │                                            ▼                                   │
-│     ┌────────────────────────┐                   ┌────────────────────────┐                      │
-│     │   4. LEARN [H+A]       │<──────────────────│   3. ACT [A]           │                      │
-│     │   System of Agency     │                   │   System of Engagement │                      │
-│     │   Doctor reviews quotes│                   │   Python Gate executes │                      │
-│     │   in <3s, signs off or │                   │   `assert in text`;    │                      │
-│     │   edits blank fields.  │                   │   pre-fills review form│                      │
-│     └────────────────────────┘                   └────────────────────────┘                      │
-│                                                                                                  │
-└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+### 01. THE DISRUPTION (Broken Experience)
 
-03. OUTCOME MATRIX
-┌───────────────────────┬───────────────────────────┬───────────────────────────┬───────────────────────────────┐
-│ Task / Outcome        │ Human Handoff (H)         │ Autonomous Agent (A)      │ AI / Automation Value         │
-├───────────────────────┼───────────────────────────┼───────────────────────────┼───────────────────────────────┤
-│ Entity Extraction     │ Reads full text manually  │ Single-pass LLM schema    │ Eliminates manual reading and │
-│ (Med/Dose/Freq/Allergy│ to locate drug details    │ extraction via OpenRouter │ text-scanning overhead        │
-├───────────────────────┼───────────────────────────┼───────────────────────────┼───────────────────────────────┤
-│ Grounding & Evidence  │ Line-by-line manual       │ Python Gate executes      │ Shifts verification time      │
-│ Verification          │ cross-checking            │ `assert evidence in text` │ from minutes to <3 seconds    │
-├───────────────────────┼───────────────────────────┼───────────────────────────┼───────────────────────────────┤
-│ Form Pre-filling &    │ Manually retypes into     │ Pre-fills form fields or  │ Deterministic safety gate;    │
-│ Abstention            │ discrete EHR boxes        │ blanks ungrounded fields  │ prevents dangerous wrong doses│
-├───────────────────────┼───────────────────────────┼───────────────────────────┼───────────────────────────────┤
-│ Final EHR Sign-off    │ Reviews pre-filled form,  │ Formats validated JSON for│ Strict safety boundary: Human │
-│ & Submission          │ confirms, and signs off   │ final EHR database commit │ remains in total control      │
-└───────────────────────┴───────────────────────────┴───────────────────────────┴───────────────────────────────┘
+**👤 Persona:** Dr. Aisha (Attending Family Physician, Singapore Polyclinic)
 
-04. DATA MAP
-┌─────────────────────┬───────────────────────────┬────────────────┬────────────────────────────────────┐
-│ Loop Step           │ Source System & Layer     │ Exists Today?  │ Context Quality / Gate             │
-├─────────────────────┼───────────────────────────┼────────────────┼────────────────────────────────────┤
-│ Detect (Trigger)    │ EHR System (Record)       │ YES            │ Raw dictated consult text          │
-├─────────────────────┼───────────────────────────┼────────────────┼────────────────────────────────────┤
-│ Decide (Extraction) │ Gemini 2.5 Flash API      │ YES            │ Schema-constrained structured JSON │
-│                     │ (Insight)                 │                │                                    │
-├─────────────────────┼───────────────────────────┼────────────────┼────────────────────────────────────┤
-│ Act (Grounding Gate)│ Python Evidence Gate      │ ⭕ NO (CIRCLED)│ `assert evidence in source_text`   │
-│                     │ (Context)                 │ [TO BE BUILT]  │ Case/whitespace normalized check   │
-├─────────────────────┼───────────────────────────┼────────────────┼────────────────────────────────────┤
-│ Learn (Sign-Off)    │ EHR Database / Audit Log  │ YES            │ Verified schema fields saved;      │
-│                     │ (Record / Agency)         │                │ corrections logged for eval        │
-└─────────────────────┴───────────────────────────┴────────────────┴────────────────────────────────────┘
+**💬 Customer Quote:**
+> "I dictated the whole consult, but now I still have to manually retype medication, dose, and frequency into separate EHR boxes just to close the chart."
+
+**Pain Points & Quantified Impact:**
+* 157 minutes/day spent on clerical documentation (44.2% of an 11.4h workday) + 86m pyjama time.
+* Existing scribes generate raw prose well, but fail to prove WHERE a field value came from.
+* Dr. Aisha will not accept an AI-generated dose unless she can verify it in under 3 seconds.
+
+---
+
+### 02. FUTURE-STATE LOOP (Detect → Decide → Act → Learn)
+
+*To visualize this loop in markdown, here is the cycle breakdown:*
+
+1. **DETECT [H]**
+   * **System:** System of Record
+   * **Action:** Trigger: Doctor finishes dictation & closes chart.
+2. **DECIDE [A]**
+   * **System:** System of Insight
+   * **Action:** Model: Gemini 2.5 Flash extracts JSON + verbatim quotes.
+3. **ACT [A]**
+   * **System:** System of Engagement
+   * **Action:** Python Gate executes `assert in text`; pre-fills review form.
+4. **LEARN [H+A]**
+   * **System:** System of Agency
+   * **Action:** Doctor reviews quotes in <3s, signs off or edits blank fields.
+
+*(Note: The cycle repeats, looping from Learn back to Detect for the next chart).*
+
+---
+
+### 03. OUTCOME MATRIX
+
+| Task / Outcome | Human Handoff (H) | Autonomous Agent (A) | AI / Automation Value |
+| :--- | :--- | :--- | :--- |
+| **Entity Extraction** <br>*(Med/Dose/Freq/Allergy)* | Reads full text manually to locate drug details | Single-pass LLM schema extraction via OpenRouter | Eliminates manual reading and text-scanning overhead |
+| **Grounding & Evidence Verification** | Line-by-line manual cross-checking | Python Gate executes `assert evidence in text` | Shifts verification time from minutes to <3 seconds |
+| **Form Pre-filling & Abstention** | Manually retypes into discrete EHR boxes | Pre-fills form fields or blanks ungrounded fields | Deterministic safety gate; prevents dangerous wrong doses |
+| **Final EHR Sign-off & Submission** | Reviews pre-filled form, confirms, and signs off | Formats validated JSON for final EHR database commit | Strict safety boundary: Human remains in total control |
+
+---
+
+### 04. DATA MAP
+
+| Loop Step | Source System & Layer | Exists Today? | Context Quality / Gate |
+| :--- | :--- | :--- | :--- |
+| **Detect** *(Trigger)* | EHR System (Record) | ✅ YES | Raw dictated consult text |
+| **Decide** *(Extraction)* | Gemini 2.5 Flash API (Insight) | ✅ YES | Schema-constrained structured JSON |
+| **Act** *(Grounding Gate)* | Python Evidence Gate (Context) | ⭕ **NO (CIRCLED)** <br> `[TO BE BUILT]` | `assert evidence in source_text` <br> *(Case/whitespace normalized check)* |
+| **Learn** *(Sign-Off)* | EHR Database / Audit Log (Record / Agency) | ✅ YES | Verified schema fields saved; corrections logged for eval |
+
+
+graph TD
+    A["<b>1. DETECT [H]</b><br>System of Record<br>Trigger: Doctor finishes dictation & closes chart."] -->| | B["<b>2. DECIDE [A]</b><br>System of Insight<br>Model: Gemini 2.5 Flash extracts JSON + verbatim quotes."]
+    B -->| | C["<b>3. ACT [A]</b><br>System of Engagement<br>Python Gate executes 'assert in text'; pre-fills review form."]
+    C -->| | D["<b>4. LEARN [H+A]</b><br>System of Agency<br>Doctor reviews quotes in <3s, signs off or edits blank fields."]
+    D -->| | A
+
 
 Four critical fields out of a dictated clinical note, with a verbatim
 evidence span for each, so a polyclinic physician can verify the whole
