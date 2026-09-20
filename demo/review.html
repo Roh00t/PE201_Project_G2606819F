@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>MediExtract review &mdash; baseline-pattern-report</title>
+<style>
+:root { --ink:#16191d; --muted:#5b6672; --line:#d8dee6; --bg:#fbfcfd; --panel:#fff;
+        --ok:#0a6b3d; --ok-bg:#e6f4ec; --held:#8a4b00; --held-bg:#fdf1e2;
+        --none:#5b6672; --none-bg:#f1f3f6;
+        --q-medication:#dbe9ff; --q-dose:#ffe9c9; --q-frequency:#d9f2e4; --q-allergy:#f6dcef; }
+* { box-sizing:border-box; }
+body { margin:0; font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       color:var(--ink); background:var(--bg); }
+header { padding:22px 24px 16px; background:var(--panel); border-bottom:1px solid var(--line); }
+h1 { margin:0 0 4px; font-size:20px; letter-spacing:-.01em; }
+.sub { margin:0 0 14px; color:var(--muted); font-size:13px; }
+.tiles { display:flex; flex-wrap:wrap; gap:8px; }
+.tile { border:1px solid var(--line); border-radius:8px; padding:8px 12px; background:var(--bg); }
+.tile .k { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+           color:var(--muted); }
+.tile .v { font-size:16px; font-variant-numeric:tabular-nums; }
+.caveat { margin:12px 0 0; color:var(--muted); font-size:12.5px; max-width:78ch; }
+.app { display:flex; align-items:flex-start; }
+.app > input { position:absolute; opacity:0; pointer-events:none; }
+nav { width:190px; flex:0 0 190px; border-right:1px solid var(--line); background:var(--panel);
+      max-height:calc(100vh - 40px); overflow:auto; padding:10px 0; }
+nav label { display:block; padding:7px 14px; font-size:13px; cursor:pointer;
+            border-left:3px solid transparent; }
+nav label:hover { background:var(--bg); }
+nav .badge { float:right; font-size:11px; color:var(--muted); }
+main { flex:1; min-width:0; padding:20px 24px 60px; }
+.panel { display:none; }
+h2 { margin:0 0 14px; font-size:16px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+h3 { margin:0 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:.06em;
+     color:var(--muted); font-weight:600; }
+.dictation { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+             padding:14px 16px; margin-bottom:16px; }
+.note { margin:0; white-space:pre-wrap; word-wrap:break-word; }
+mark { padding:1px 0; border-radius:2px; background:#eee; }
+mark.q-medication { background:var(--q-medication); }
+mark.q-dose { background:var(--q-dose); }
+mark.q-frequency { background:var(--q-frequency); }
+mark.q-allergy { background:var(--q-allergy); }
+table.fields { width:100%; border-collapse:collapse; background:var(--panel);
+               border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+table.fields th, table.fields td { text-align:left; vertical-align:top; padding:10px 12px;
+                                   border-top:1px solid var(--line); font-size:14px; }
+table.fields thead th { border-top:0; font-size:11px; text-transform:uppercase;
+                        letter-spacing:.06em; color:var(--muted); background:var(--bg); }
+table.fields tbody th { width:110px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+                        font-weight:500; color:var(--muted); }
+tr.ok .status { color:var(--ok); }
+tr.held { background:var(--held-bg); }
+tr.held .status { color:var(--held); }
+tr.none .status { color:var(--none); }
+.blank { color:var(--muted); font-style:italic; }
+q { color:var(--ink); }
+.status { width:270px; font-size:13px; }
+.action { color:var(--muted); font-size:12px; }
+.rejected { margin-top:6px; font-size:12px; color:var(--held); }
+.tag { display:inline-block; background:var(--held-bg); border:1px solid #e8d3b3;
+       border-radius:4px; padding:0 5px; margin-right:6px; font-size:11px; }
+.ok-tag { color:var(--ok); } .held-tag { color:var(--held); }
+.meta { color:var(--muted); font-size:12.5px; margin:14px 0 0;
+        font-variant-numeric:tabular-nums; }
+code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; }
+footer { padding:0 24px 40px; color:var(--muted); font-size:12px; max-width:88ch; }
+
+#r-case_001:checked ~ main #p-case_001 { display:block; }
+#r-case_001:checked ~ nav label[for="r-case_001"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_005:checked ~ main #p-case_005 { display:block; }
+#r-case_005:checked ~ nav label[for="r-case_005"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_008:checked ~ main #p-case_008 { display:block; }
+#r-case_008:checked ~ nav label[for="r-case_008"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_010:checked ~ main #p-case_010 { display:block; }
+#r-case_010:checked ~ nav label[for="r-case_010"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_011:checked ~ main #p-case_011 { display:block; }
+#r-case_011:checked ~ nav label[for="r-case_011"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_012:checked ~ main #p-case_012 { display:block; }
+#r-case_012:checked ~ nav label[for="r-case_012"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_013:checked ~ main #p-case_013 { display:block; }
+#r-case_013:checked ~ nav label[for="r-case_013"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_016:checked ~ main #p-case_016 { display:block; }
+#r-case_016:checked ~ nav label[for="r-case_016"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_017:checked ~ main #p-case_017 { display:block; }
+#r-case_017:checked ~ nav label[for="r-case_017"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_018:checked ~ main #p-case_018 { display:block; }
+#r-case_018:checked ~ nav label[for="r-case_018"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_019:checked ~ main #p-case_019 { display:block; }
+#r-case_019:checked ~ nav label[for="r-case_019"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_020:checked ~ main #p-case_020 { display:block; }
+#r-case_020:checked ~ nav label[for="r-case_020"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_021:checked ~ main #p-case_021 { display:block; }
+#r-case_021:checked ~ nav label[for="r-case_021"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_022:checked ~ main #p-case_022 { display:block; }
+#r-case_022:checked ~ nav label[for="r-case_022"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_023:checked ~ main #p-case_023 { display:block; }
+#r-case_023:checked ~ nav label[for="r-case_023"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_024:checked ~ main #p-case_024 { display:block; }
+#r-case_024:checked ~ nav label[for="r-case_024"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_025:checked ~ main #p-case_025 { display:block; }
+#r-case_025:checked ~ nav label[for="r-case_025"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_026:checked ~ main #p-case_026 { display:block; }
+#r-case_026:checked ~ nav label[for="r-case_026"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_027:checked ~ main #p-case_027 { display:block; }
+#r-case_027:checked ~ nav label[for="r-case_027"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_029:checked ~ main #p-case_029 { display:block; }
+#r-case_029:checked ~ nav label[for="r-case_029"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_030:checked ~ main #p-case_030 { display:block; }
+#r-case_030:checked ~ nav label[for="r-case_030"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_031:checked ~ main #p-case_031 { display:block; }
+#r-case_031:checked ~ nav label[for="r-case_031"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_034:checked ~ main #p-case_034 { display:block; }
+#r-case_034:checked ~ nav label[for="r-case_034"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_037:checked ~ main #p-case_037 { display:block; }
+#r-case_037:checked ~ nav label[for="r-case_037"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_039:checked ~ main #p-case_039 { display:block; }
+#r-case_039:checked ~ nav label[for="r-case_039"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_040:checked ~ main #p-case_040 { display:block; }
+#r-case_040:checked ~ nav label[for="r-case_040"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_041:checked ~ main #p-case_041 { display:block; }
+#r-case_041:checked ~ nav label[for="r-case_041"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_042:checked ~ main #p-case_042 { display:block; }
+#r-case_042:checked ~ nav label[for="r-case_042"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_043:checked ~ main #p-case_043 { display:block; }
+#r-case_043:checked ~ nav label[for="r-case_043"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_045:checked ~ main #p-case_045 { display:block; }
+#r-case_045:checked ~ nav label[for="r-case_045"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_046:checked ~ main #p-case_046 { display:block; }
+#r-case_046:checked ~ nav label[for="r-case_046"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_047:checked ~ main #p-case_047 { display:block; }
+#r-case_047:checked ~ nav label[for="r-case_047"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_049:checked ~ main #p-case_049 { display:block; }
+#r-case_049:checked ~ nav label[for="r-case_049"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_050:checked ~ main #p-case_050 { display:block; }
+#r-case_050:checked ~ nav label[for="r-case_050"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_051:checked ~ main #p-case_051 { display:block; }
+#r-case_051:checked ~ nav label[for="r-case_051"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_052:checked ~ main #p-case_052 { display:block; }
+#r-case_052:checked ~ nav label[for="r-case_052"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_053:checked ~ main #p-case_053 { display:block; }
+#r-case_053:checked ~ nav label[for="r-case_053"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_054:checked ~ main #p-case_054 { display:block; }
+#r-case_054:checked ~ nav label[for="r-case_054"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_055:checked ~ main #p-case_055 { display:block; }
+#r-case_055:checked ~ nav label[for="r-case_055"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_057:checked ~ main #p-case_057 { display:block; }
+#r-case_057:checked ~ nav label[for="r-case_057"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_058:checked ~ main #p-case_058 { display:block; }
+#r-case_058:checked ~ nav label[for="r-case_058"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_059:checked ~ main #p-case_059 { display:block; }
+#r-case_059:checked ~ nav label[for="r-case_059"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_060:checked ~ main #p-case_060 { display:block; }
+#r-case_060:checked ~ nav label[for="r-case_060"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_062:checked ~ main #p-case_062 { display:block; }
+#r-case_062:checked ~ nav label[for="r-case_062"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_064:checked ~ main #p-case_064 { display:block; }
+#r-case_064:checked ~ nav label[for="r-case_064"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_065:checked ~ main #p-case_065 { display:block; }
+#r-case_065:checked ~ nav label[for="r-case_065"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+#r-case_066:checked ~ main #p-case_066 { display:block; }
+#r-case_066:checked ~ nav label[for="r-case_066"] { background:var(--bg); border-left-color:var(--ink); font-weight:600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MediExtract &mdash; verification screen</h1>
+  <p class="sub">Run baseline-pattern-report &middot; baseline:pattern-only
+     &middot; baseline &middot; prompt
+     
+     &middot; experiment baseline-pattern-only</p>
+  <div class="tiles"><div class="tile"><span class="k">notes</span><span class="v">47</span></div>
+<div class="tile"><span class="k">median answer</span><span class="v">0 ms</span></div>
+<div class="tile"><span class="k">slowest</span><span class="v">0 ms</span></div>
+<div class="tile"><span class="k">cost for the batch</span><span class="v">$0.0000</span></div>
+<div class="tile"><span class="k">cost per note</span><span class="v">-</span></div>
+<div class="tile"><span class="k">recall</span><span class="v">0.3529</span></div>
+<div class="tile"><span class="k">precision</span><span class="v">0.4828</span></div>
+<div class="tile"><span class="k">abstention rate</span><span class="v">0.0</span></div>
+<div class="tile"><span class="k">silent-failure rate</span><span class="v">0.5172</span></div></div>
+  <p class="caveat">Recall and the other rates come from this run's
+     <code>scores.json</code> against the sealed gold set, and are the
+     pre-registered numbers, not a re-scoring. Every field below is the gated
+     payload &mdash; what the database would receive.</p>
+</header>
+<div class="app">
+<input type="radio" name="case" id="r-case_001" checked>
+<input type="radio" name="case" id="r-case_005">
+<input type="radio" name="case" id="r-case_008">
+<input type="radio" name="case" id="r-case_010">
+<input type="radio" name="case" id="r-case_011">
+<input type="radio" name="case" id="r-case_012">
+<input type="radio" name="case" id="r-case_013">
+<input type="radio" name="case" id="r-case_016">
+<input type="radio" name="case" id="r-case_017">
+<input type="radio" name="case" id="r-case_018">
+<input type="radio" name="case" id="r-case_019">
+<input type="radio" name="case" id="r-case_020">
+<input type="radio" name="case" id="r-case_021">
+<input type="radio" name="case" id="r-case_022">
+<input type="radio" name="case" id="r-case_023">
+<input type="radio" name="case" id="r-case_024">
+<input type="radio" name="case" id="r-case_025">
+<input type="radio" name="case" id="r-case_026">
+<input type="radio" name="case" id="r-case_027">
+<input type="radio" name="case" id="r-case_029">
+<input type="radio" name="case" id="r-case_030">
+<input type="radio" name="case" id="r-case_031">
+<input type="radio" name="case" id="r-case_034">
+<input type="radio" name="case" id="r-case_037">
+<input type="radio" name="case" id="r-case_039">
+<input type="radio" name="case" id="r-case_040">
+<input type="radio" name="case" id="r-case_041">
+<input type="radio" name="case" id="r-case_042">
+<input type="radio" name="case" id="r-case_043">
+<input type="radio" name="case" id="r-case_045">
+<input type="radio" name="case" id="r-case_046">
+<input type="radio" name="case" id="r-case_047">
+<input type="radio" name="case" id="r-case_049">
+<input type="radio" name="case" id="r-case_050">
+<input type="radio" name="case" id="r-case_051">
+<input type="radio" name="case" id="r-case_052">
+<input type="radio" name="case" id="r-case_053">
+<input type="radio" name="case" id="r-case_054">
+<input type="radio" name="case" id="r-case_055">
+<input type="radio" name="case" id="r-case_057">
+<input type="radio" name="case" id="r-case_058">
+<input type="radio" name="case" id="r-case_059">
+<input type="radio" name="case" id="r-case_060">
+<input type="radio" name="case" id="r-case_062">
+<input type="radio" name="case" id="r-case_064">
+<input type="radio" name="case" id="r-case_065">
+<input type="radio" name="case" id="r-case_066">
+<nav><label for="r-case_001">case_001<span class="badge">2 ok</span></label>
+<label for="r-case_005">case_005<span class="badge">3 ok</span></label>
+<label for="r-case_008">case_008<span class="badge">1 ok</span></label>
+<label for="r-case_010">case_010<span class="badge">1 ok</span></label>
+<label for="r-case_011">case_011<span class="badge">1 ok</span></label>
+<label for="r-case_012">case_012<span class="badge">1 ok</span></label>
+<label for="r-case_013">case_013<span class="badge">nothing stated</span></label>
+<label for="r-case_016">case_016<span class="badge">2 ok</span></label>
+<label for="r-case_017">case_017<span class="badge">2 ok</span></label>
+<label for="r-case_018">case_018<span class="badge">3 ok</span></label>
+<label for="r-case_019">case_019<span class="badge">3 ok</span></label>
+<label for="r-case_020">case_020<span class="badge">3 ok</span></label>
+<label for="r-case_021">case_021<span class="badge">2 ok</span></label>
+<label for="r-case_022">case_022<span class="badge">2 ok</span></label>
+<label for="r-case_023">case_023<span class="badge">3 ok</span></label>
+<label for="r-case_024">case_024<span class="badge">2 ok</span></label>
+<label for="r-case_025">case_025<span class="badge">1 ok</span></label>
+<label for="r-case_026">case_026<span class="badge">2 ok</span></label>
+<label for="r-case_027">case_027<span class="badge">1 ok</span></label>
+<label for="r-case_029">case_029<span class="badge">3 ok</span></label>
+<label for="r-case_030">case_030<span class="badge">1 ok</span></label>
+<label for="r-case_031">case_031<span class="badge">3 ok</span></label>
+<label for="r-case_034">case_034<span class="badge">1 ok</span></label>
+<label for="r-case_037">case_037<span class="badge">3 ok</span></label>
+<label for="r-case_039">case_039<span class="badge">1 ok</span></label>
+<label for="r-case_040">case_040<span class="badge">nothing stated</span></label>
+<label for="r-case_041">case_041<span class="badge">3 ok</span></label>
+<label for="r-case_042">case_042<span class="badge">3 ok</span></label>
+<label for="r-case_043">case_043<span class="badge">1 ok</span></label>
+<label for="r-case_045">case_045<span class="badge">1 ok</span></label>
+<label for="r-case_046">case_046<span class="badge">2 ok</span></label>
+<label for="r-case_047">case_047<span class="badge">3 ok</span></label>
+<label for="r-case_049">case_049<span class="badge">2 ok</span></label>
+<label for="r-case_050">case_050<span class="badge">3 ok</span></label>
+<label for="r-case_051">case_051<span class="badge">2 ok</span></label>
+<label for="r-case_052">case_052<span class="badge">nothing stated</span></label>
+<label for="r-case_053">case_053<span class="badge">nothing stated</span></label>
+<label for="r-case_054">case_054<span class="badge">2 ok</span></label>
+<label for="r-case_055">case_055<span class="badge">2 ok</span></label>
+<label for="r-case_057">case_057<span class="badge">1 ok</span></label>
+<label for="r-case_058">case_058<span class="badge">3 ok</span></label>
+<label for="r-case_059">case_059<span class="badge">3 ok</span></label>
+<label for="r-case_060">case_060<span class="badge">1 ok</span></label>
+<label for="r-case_062">case_062<span class="badge">1 ok</span></label>
+<label for="r-case_064">case_064<span class="badge">3 ok</span></label>
+<label for="r-case_065">case_065<span class="badge">3 ok</span></label>
+<label for="r-case_066">case_066<span class="badge">1 ok</span></label></nav>
+<main>
+
+<section class="panel" id="p-case_001">
+  <h2>case_001</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Tablet <mark class="q-medication" title="medication">paracetamol 500 </mark><mark class="q-frequency q-medication" title="frequency, medication">three</mark><mark class="q-frequency" title="frequency"> times a day</mark>. After food  Tablet chymoral forte three times a day after food. Tablet pan d before food, three times a day  </p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>paracetamol 500 three</strong></td><td><q>paracetamol 500 three</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>three times a day</strong></td><td><q>three times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_005">
+  <h2>case_005</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Patient has diabetes mellitus since last four to five years. Her present complaints are tingling numbness in both feet throughout day and night since last few months.  Diagnosis is diabetes mellitus related painful peripheral neuropathy. Investigation suggested is NCV study. Treatment tablet <mark class="q-medication" title="medication">Gabantin GRS </mark><mark class="q-dose q-medication" title="dose, medication">300</mark> milligram.  <mark class="q-frequency" title="frequency">at night</mark>.  tablet Symbal 20 milligram half at night for three days, followed by one at night to be continued for one month.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Gabantin GRS</strong></td><td><q>Gabantin GRS 300</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>300</strong></td><td><q>300</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>at night</strong></td><td><q>at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_008">
+  <h2>case_008</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Symptoms are fever, cold, cough. diagnosis: viral fever, URTI . medicines.Dolo 650,  <mark class="q-frequency" title="frequency">twice a day</mark>. After meals, 7 days. Augmentin.One dosage at a time, twice a day, after meal for 7 days. Test prescribed,  CBC, lipid profile, HbA1C. Follow-up visit after 7 days.advices: daily walk for 30 minutes, avoid oily and cold</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_010">
+  <h2>case_010</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">symptoms are fever, cold, cough. diagnosis: viral fever and urti. medicine prescribed augmentin <mark class="q-frequency" title="frequency">twice a day</mark> after meal, dolo 650 twice a day after meal for 7 daystest prescribed: cbc, hba1c, lipid profile. Advices areEat healthy, walk for 30 minutes daily. Avoid, avoid oily food and cold food and follow up  after 7 days.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_011">
+  <h2>case_011</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">After meal for 7 days. Augmentin <mark class="q-frequency" title="frequency">twice a day</mark>, after meal for 7 days. Test prescribed CBC, HbA1C.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_012">
+  <h2>case_012</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Augmentin, <mark class="q-frequency" title="frequency">twice a day</mark> after meal for 3 days. Test prescribed CBC, HBA1C.Advices: avoid processed food, eat healthy, avoid cold and oily food. Follow up after 7 days.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_013">
+  <h2>case_013</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Patient name is &lt;PII&gt;Age 27 female, she&#x27;s a case of ankle pain and stiffness. History of ankle fracture three months ago. She&#x27;s having difficulty in stair climbing. Examination finding tenderness grade one, swelling grade one. She&#x27;s having tight calf and hamstring muscles.Full ankle range of motion, painful inversion.Diagnosis : known case of lateral malleolus fracture left side</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_016">
+  <h2>case_016</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">This patient has fever since the last 4 days. He is also suffering from headache. Kindly prescribe him tablet <mark class="q-medication" title="medication">Combiflam</mark>, 1 tablet <mark class="q-frequency" title="frequency">TID</mark> after meal for 3 days. Tablet Pan D, 1 tablet in the morning, empty stomach for 3 days.And tablet Vomikind  MD 4 mg one tablet three times a day after food, OK.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Combiflam</strong></td><td><q>Combiflam</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>TID</strong></td><td><q>TID</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_017">
+  <h2>case_017</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Complain of cough, dyspnea. Treatment injection <mark class="q-medication" title="medication">Dexa</mark>.Tablet CP CV <mark class="q-frequency" title="frequency">twice a day</mark> for two days. Tablet Wysolone three times a day for two days. Tablet Costus Advance three times a day for two days.Tablet Deriphyllin Retard 300 milligram twice a day for two days. Tablet Levopoint M once at night for 10 days.Capsule Ompec DM twice a day before food for two days.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Dexa</strong></td><td><q>Dexa</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_018">
+  <h2>case_018</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complain of knee pain, leg painsTreatment injection <mark class="q-medication" title="medication">Vitanova first dose</mark>, IV NS250 ml <mark class="q-dose" title="dose">2 units</mark> .Injection Cyanocal,
+Injection B Complex,
+Tablet Acecloran MR
+<mark class="q-frequency" title="frequency">Twice a day</mark> after food for 5 days.Tab Pregastar D once at night for 10 days.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Vitanova first dose</strong></td><td><q>Vitanova first dose</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>2 units</strong></td><td><q>2 units</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>Twice a day</strong></td><td><q>Twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_019">
+  <h2>case_019</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">&lt;PII&gt; came with reports, showing hemoglobin lowVitamin D was low. Cholesterol was high. SGOT SGPT raised. Vitamin B12 118 low.Treatment Injection <mark class="q-medication" title="medication">Cynocal First doseinjection</mark> Nana Nova <mark class="q-dose" title="dose">6 lakhs</mark> units first dose . tablet Calcirix XT once in the morning forone month . tablet Zolfer XT once <mark class="q-frequency" title="frequency">at night</mark> for 30 days . tablet Statpure F once at nightfor three months.  tablet liveril forte once in the morning for six weeksNotes: This is visit of 14th April.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Cynocal First doseinjection</strong></td><td><q>Cynocal First doseinjection</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>6 lakhs</strong></td><td><q>6 lakhs</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>at night</strong></td><td><q>at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_020">
+  <h2>case_020</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Complain of throat pain, cough, fever. On examinationPus on left tonsil. Treatment injection <mark class="q-medication" title="medication">oxy plus dexa</mark> 1, <mark class="q-dose" title="dose">1 ml</mark>.Syrup Sensiclav ES 5ml <mark class="q-frequency" title="frequency">twice a day</mark>. Syrup Mefkind DS 5ml three times a day. Syrup Cogof 5ml three times a day.Diagnosis septic tonsillitisNotes: visit of 14th April</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>oxy plus dexa</strong></td><td><q>oxy plus dexa</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>1 ml</strong></td><td><q>1 ml</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_021">
+  <h2>case_021</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complain of epigastric pain, severe. nausea, backache .Treatment injection <mark class="q-medication" title="medication">pan IV</mark> stat.  injection spasmonormstat. Capsule Omez <mark class="q-frequency" title="frequency">twice a day</mark> before food for two days. Five capsules. Tablet Ondem MD twice a day before food for two days. Tablet Para Dicyclomine.three times a day for two days. Tablet Mefenamic 500 twice a day for two days. Syrup Antolix O 10 ml three times a day after food.Investigation: USG of abdomenUSG of abdomen report normal</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>pan IV</strong></td><td><q>pan IV</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_022">
+  <h2>case_022</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Complain of epigastric pain since morning. On examination, tenderness epigastric region.Treatment  Injection <mark class="q-medication" title="medication">Pan IV</mark> Injection, Injection Spasmonorm.  Capsule Omez <mark class="q-frequency" title="frequency">twice a day</mark> before food for two days. Five capsules.Tablet Ondem 4mg twice a day before food for two days. Tablet Para dicyclomine three times a day for two days. Tablet Mefenamic 500twice a day for two days.
+Syrup Antolix O 10 ml three times a day.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Pan IV</strong></td><td><q>Pan IV</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_023">
+  <h2>case_023</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">&lt;PII&gt; to kuch nahi hai. X-ray of LS spine showing reversal of lumbar lordosis.diagnosis reversal of lumbar lordosis.  treatment injection <mark class="q-medication" title="medication">Vitanova </mark><mark class="q-dose q-medication" title="dose, medication">6</mark><mark class="q-dose" title="dose"> lakhs</mark> unit first doseTablet Xykaa MR <mark class="q-frequency" title="frequency">twice a day</mark> for 5 days.
+Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before food for five days.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Vitanova</strong></td><td><q>Vitanova 6</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>6 lakhs</strong></td><td><q>6 lakhs</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_024">
+  <h2>case_024</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complaint of backache since two days, severe. treatmentInjection Dynapar AQ 1 ml stat. Tablet <mark class="q-medication" title="medication">Aceclo MR</mark> <mark class="q-frequency" title="frequency">twice a day</mark> for 3 days. TabletPara 650 once in the afternoon for three days. Tablet Shelong once in the morning after breakfast for 15 days.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Aceclo MR</strong></td><td><q>Aceclo MR</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_025">
+  <h2>case_025</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">So this patient came in with the complaints of ear pain in the right ear since two days, previously taken tablet, Augmentin, 625 milligrams morning and night.For 5 days and some painkiller, or exact details of the previous prescription are not available. On examination, there was congestion of the right uh tympanic membrane and all other system examinations were within normal limits.The patient was prescribed tablet <mark class="q-medication" title="medication">cefixime 200 milligrams</mark> morning and night for 5 days. Tablet diclomol SP morning and night for 3 days, tablet.Sompraz D one in the morning before food for 3 days along with advice to keep the ears completely dry for the next 5 days.The patient has been asked for a follow-up after one week and has been asked to avoid lifting heavy weights and avoidBlowing nose hard</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>cefixime 200 milligrams</strong></td><td><q>cefixime 200 milligrams</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_026">
+  <h2>case_026</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Write prescription for &lt;PII&gt;, 30 year old male, diagnosis stroke in young. He has hyperhomocysteinemia on evaluation. Vasculitis evaluation is normal. Now the prescription capsule <mark class="q-medication" title="medication">Best CZD 0-1-0</mark>.For 15 days tablet Cogre P forte  <mark class="q-frequency" title="frequency">1-0-1</mark>. Tablet Clopivas AP 75 by 75,0-1-0. Tablet Avas 40, 0-0-1. Capsule Homocheck 1-0-1.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Best CZD 0-1-0</strong></td><td><q>Best CZD 0-1-0</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>1-0-1</strong></td><td><q>1-0-1</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_027">
+  <h2>case_027</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">So, I want to create a  Plan for my patient. The patient name is &lt;PII&gt;. And the plan for the patient is for 3 months, weight loss due to obese.  So, weight loss program for obesity. And the treatment will include two massages per week, deep tissue massage  With sauna or steam. <mark class="q-frequency" title="frequency">3 times a week</mark> acupuncture session. For 20 minutes each The deep tissue massage would be for 1 hour, that is  60 minutes. Followed by steam and sauna or sauna , steam or sauna .  And Kansa would be. Again, 3 times a week. And  Diet consultation. Diet follow-up. Diet chart will be prepared.  And shared with the patient. And frequent follow-up. Also, Nadi Parika using Nadi Tarangini will be done.  Also Body composition will be checked. And  3 months later again body composition and Nadi Tarangini will be checked to .  Check the performance of the treatment. Also, hydrotherapy session would be once a week.  Which will include, include hydrojets. And Chromotherapy  in warm water. Then sitz bath jacuzzi  would be twice a week, With spinal spray. And this would,  this alltreatment would be for the next 3 months</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>3 times a week</strong></td><td><q>3 times a week</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_029">
+  <h2>case_029</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">My patient came for fitness for cataract surgery. Patient complained of giddiness while standing. On examination, his pulse is 80 beats per minute. Blood pressure is 150 by 90 mm of Hg, on systemic examination.Chest clear, CVS normal, on treatment, patient started on tablet <mark class="q-medication" title="medication">Cilacar </mark><mark class="q-dose q-medication" title="dose, medication">10</mark><mark class="q-dose" title="dose"> mg</mark> <mark class="q-frequency" title="frequency">once a day</mark> in the morning for 15 days.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Cilacar</strong></td><td><q>Cilacar 10</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>10 mg</strong></td><td><q>10 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>once a day</strong></td><td><q>once a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_030">
+  <h2>case_030</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">The patient is suffering from toothache laterally right. Since 5 days, severity is severe type of pain is cramping pain.  Diagnosis is dental cavity. gum ulceration.  hey bro, this went off. bro, open this The tablets <mark class="q-medication" title="medication">suggested are</mark>:  Jhactions iron tonic, One time at the night with empty stomach, 5 days from day one.  Limcee chewable tablet, two tablets at a time, in the afternoon after meal, five days from day one.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>suggested are</strong></td><td><q>suggested are</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_031">
+  <h2>case_031</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">consultation, and we can just say. So doctor i have a stomach pain, for the last. How many days? Last 3 days . Where is the pain exactly?Upper abdomen near rib cage. Do you have any vomiting with the pain?  No vomiting. How is your appetite? low, less appetite. Do you have any fever?Low grade. I had, I took, I had fever. I took crocin. How many times have you passed urine in the last 24 hours? 2 - 3 times. Urine is white or yellow in colour?Yellow. How about the stools, are normal? Yeah, stools are normal. Any history of outside food 2 days, 3 days back, any outside food. party or travel? Yeah, I had biryani 2 days ago.OK, can I check you out? Yeah,right. Record ? Yeah it&#x27;s recording and you can say. yeah, abdomenNormal, Soft. Tongue is slightly moist, coated tongue. Temperature 99 degrees. On auscultationEverything is normal. Heart sounds and lungs are clinically OK. Abdomen, mild tenderness, guarding present in the epigastric area.And the diagnosis acute gastritis. query, may be due to food poisoning. And treatment is Tablet <mark class="q-medication" title="medication">Pantop </mark><mark class="q-dose q-medication" title="dose, medication">40</mark><mark class="q-dose" title="dose"> mg</mark> <mark class="q-frequency" title="frequency">once daily</mark> for 7 days on empty stomach.Tablet Taxim O 100 mg twice daily for 5 days after food. Tablet Drotin, one tablet SOS if the pain is unbearable.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Pantop</strong></td><td><q>Pantop 40</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>40 mg</strong></td><td><q>40 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>once daily</strong></td><td><q>once daily</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_034">
+  <h2>case_034</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Advising . patient is facing cough, fever, cold for the past three days. I advise the patient to take Dolo <mark class="q-frequency" title="frequency">twice a day</mark> after breakfast, after dinner.also advising patient for warm water gargles three times a day. along with this honey, honitus , Dabur Honitus cough syrup twice a day. also just warm water gargles three times a day. andfollow the course of medicines for the next five days and we&#x27;ll do a checkup after that. This was a doctor simulating this. This doctor app.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_037">
+  <h2>case_037</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">58 year old male patient came with the complaints of fever with chills for last 5 days. On arrival, the patient has temperature of 102 °F.Patient were treated with IV antibiotics with IV injection <mark class="q-medication" title="medication">Ceftriaxone</mark> <mark class="q-frequency" title="frequency">BD</mark> for the last 5 days and injection Doxycycline <mark class="q-dose" title="dose">100 mg</mark> BD for last 5 days.And injection PCM and other supportive management. And repeat investigations showed sequential decrease in WBC counts.and even increase in platelet count. Patient, patient is afebrile for the last 3 days.Hence being discharged with the following advises</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Ceftriaxone</strong></td><td><q>Ceftriaxone</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>100 mg</strong></td><td><q>100 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>BD</strong></td><td><q>BD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_039">
+  <h2>case_039</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">So &lt;PII&gt; is a 39-year-old who has come with complaints of cough going on for the last 6 weeks. He has gone to a general practitioner and taken treatment which has partially resolved his symptoms. Details of treatment are not available. The other symptoms include intermittent shortness of breath. This is impacting his life currently.He also has night symptoms which is disturbing his sleep, and he has no other issues with chronic diseases such as tuberculosis. He&#x27;s young and not a hypertensive or a diabetic and he has no specific allergies. Medications include, taken so far include aB and C, odd and further details are not known. On examination, he is otherwise stable. The ENT examination shows a congested nose with the DNS to the right, and oral examination shows slightly crowded airway but with a normal oropharynx.Chest examination shows raz in the bases, which is a little unusual, and diffuse rhonchi on both lung fields. My asse. We asked for a lung function test, which shows so and so, so and so, and so and so. We also asked for a pheno which is showing an elevated value. Overall diagnosis is uncontrolled asthma. At this point, he will be treated.On a GINA 3 protocol, the treatment will include education and counselling, which is also being done with using, aids given to him, and additionally we will start inhalers on him. The inhalers include Foracort , 200 two puffs <mark class="q-frequency" title="frequency">twice a day</mark> synchro breathe.Taken for a period of 4 weeks after which he&#x27;s supposed to visit us, in case he becomes delayed, the treatment is to be continued. Other medications include B, C, and D. Non-medical aspects which is important is nutritional precautions which have been conveyed, lifestyle precautions which have been conveyed and given to him as an addendum. And at the same time, if this.Continues we have to get into other aspects such as, what are the precipitating factors including psychological or exercise regimens which may improve his overall condition. Preventive aspects include vaccination and the flu shot has been recommended to him, and he has been asked to follow up in 4 weeks, end of consultation.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_040">
+  <h2>case_040</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Yes &lt;PII&gt;, what do you have? I have nausea. Nausea. OK. So from how long are you experience this the problem? From about two days. OK. And do you have any history of any, you know, past complaints or any kind of things that you have been? not such   Not as of now OK. And are you on any medication right now? Yeah. What medication? for alopecia, for alopecia. So what are you using currently? Sorry?, what are you currently using? Minoxidil Finasteride and multivitamins, OK. Fine, so. I think  That is for now. I will send you the prescription. I will send you the drugs. You can go to the pharmacy and you can buy. OK,OK, OK.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_041">
+  <h2>case_041</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">deviated septum to left sideRight inferior turbinate enlarged, both tympanic membrane intact, normal. Post-nasal discharge present, greenish yellow in colorRest of the oral cavity normal. Lungs clear. Diagnosis is deviated septum to right, left HITacute URTI or sinusitisPut on medication, tablet <mark class="q-medication" title="medication">Cepodem XP </mark><mark class="q-dose q-medication" title="dose, medication">325</mark> milligram <mark class="q-frequency" title="frequency">twice daily</mark> into one weekTablet Alaspan AM twice daily for a week, Nasivion nasal drops for a week, twice dailyTablet Dolonim P twice daily for 2 days, and review one week with a CT scan of the nose and sinuses</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 4x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Cepodem XP</strong></td><td><q>Cepodem XP 325</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>325</strong></td><td><q>325</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice daily</strong></td><td><q>twice daily</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_042">
+  <h2>case_042</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Patient complained of severe headache on left side, intermittent since one month. On vital examination, pulse is 90 beats per minutes. Blood pressure is 130 by 80 mm of Hg. On systemic examination, respiratory system, clear, CVS normal, RS normal.CNS normal on treatment, start patient on Sibelium 10 mg at night for 1 month and tablet <mark class="q-medication" title="medication">Naxdom </mark><mark class="q-dose q-medication" title="dose, medication">500</mark><mark class="q-dose" title="dose"> mg</mark> <mark class="q-frequency" title="frequency">SOS</mark> for headache.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Naxdom</strong></td><td><q>Naxdom 500</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>500 mg</strong></td><td><q>500 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>SOS</strong></td><td><q>SOS</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_043">
+  <h2>case_043</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Patient has stomach pain, headache, leg pain, wherein leg pain is, flowing through his back of the thigh. Patient has had history of spondylolisthesis . Currently it&#x27;s recuperated. Patient also has an ACL of the left knee. I recommend patient taking tendolife tablet for.<mark class="q-frequency" title="frequency">three times a day</mark> for twelve days and show me after one week</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>three times a day</strong></td><td><q>three times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_045">
+  <h2>case_045</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">is a dictation mode. Hi, I&#x27;ve just met my patient &lt;PII&gt; and she is feeling symptoms of cough, cold and fever for the past three days.advising hot water gargles <mark class="q-frequency" title="frequency">three times a day</mark>, honey and water three times a day, and Dolo 450 after breakfast and dinner.two times a day. Also advising a nutritious diet, like you know full of carrots and vitamin C.That&#x27;s about it.  thank you. So</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>three times a day</strong></td><td><q>three times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_046">
+  <h2>case_046</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">&lt;PII&gt; came on 14th of April with complaints, with the reports of raised total cholesterol.raised LDL cholesterol, low vitamin D, raised uric acid, HbA1c raised.Fasting blood sugar of 120.
+Total IGE 2107.examination, blood pressure was 137 by 81, pulse of 71.complaint of dyspnea on exertion, joint pains. treatment givenInjection Vitanova first dose. Tablet <mark class="q-medication" title="medication">Calcirix XT</mark> once in the morning for 15 days. Tablet Levopoint M.<mark class="q-frequency" title="frequency">at night</mark> for 10 days. Tablet Ubexa 40 once in the morning for 10 days. Tablet Statpure F.milligram once at night for three months.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Calcirix XT</strong></td><td><q>Calcirix XT</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>at night</strong></td><td><q>at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_047">
+  <h2>case_047</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complain of headache, not better. giddiness  On examination blood pressure 136 systolic and 88 diastolic.  On examination sinuses were tender. Treatment: tablet <mark class="q-medication" title="medication">Cepodem  200</mark> <mark class="q-frequency" title="frequency">twice a day</mark> for two days. Injection Diclofenac <mark class="q-dose" title="dose">2 ml</mark> stat. Tablet Zady 250 twice a day for two days.  Tablet Colday
+Three times a day for two days
+Tablet Mefenamic 500
+Twice a day for two days
+Tablet Levocet once at night for two days  Tablet Solopose MD once at night for two days. Diagnosis sinusitis.  Tension headache</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Cepodem</strong></td><td><q>Cepodem  200</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>2 ml</strong></td><td><q>2 ml</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_049">
+  <h2>case_049</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complaint of diarrhea, pain in abdomen. BP 115 by 70, pulse 64 per minute.  Diagnosis gastroenteritis. Treatment injection <mark class="q-medication" title="medication">Amikacin first dose</mark>.  Tablet Cefixime 200 <mark class="q-frequency" title="frequency">twice a day</mark> for two days. Tablet Metrogyl 400 three times a day for two days. Tablet Para Dicyclomine.  three times a day for two days.  capsule Omez 20 milligram twice a day before food for two days.  tablet Lomofen three times a day for one day.  Vital EZ sachet twice a day for one day.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Amikacin first dose</strong></td><td><q>Amikacin first dose</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_050">
+  <h2>case_050</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Notes:  follow up of injury with stitches  Stitches removed today. Pus from wound.  Treatment : tablet <mark class="q-medication" title="medication">Lizomed </mark><mark class="q-dose q-medication" title="dose, medication">600</mark> <mark class="q-frequency" title="frequency">twice a day</mark> after food.  for two days.  tablet Visnac SP twice a day for two days  Tablet Para 500 once in the afternoon for two days. Capsule BC  Once at night for two days. Cleaning and dressing done.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Lizomed</strong></td><td><q>Lizomed 600</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>600</strong></td><td><q>600</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_051">
+  <h2>case_051</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complaint of headache, nausea, ghabrahat since one day. On examination, BP 135 by 92.  pulse 80 per minute.  history of panic disorders,  past history of panic disorders.  Treatment: Injection <mark class="q-medication" title="medication">Cynocal First</mark>.  Injection Vitanova first dose. Tab Tablet Calcirix XT once in the morning for 15 days. Capsule Omez <mark class="q-frequency" title="frequency">twice a day</mark> for one day. Tablet Meftal Forte  twice a day for one day. Tablet Ondem MD twice a day for one day. Tablet Solopose MD once at night.  for two days.  Diagnosis anxiety disorder</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Cynocal First</strong></td><td><q>Cynocal First</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_052">
+  <h2>case_052</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Complaining of throat pain since one day, with minimal phlegm. Has cold since last 15 daysThere is no history of fever. There is no history of body pains.There is no history of headaches. Cough is more in the mornings, dry in consistency.Not a known diabetic, hypertensive or asthmatic.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_053">
+  <h2>case_053</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">&lt;PII&gt;, patient,  38 years old, male, came with complaints ofLoose motions, elevated temperature, and chest pain, for the last three days, has been taking Dolo 650,  to manage the pain.has been taking Sinarest and Pantop. Heart rate is normal at 77 beats per minute. Blood pressure is normal, 120 over 80.And pulse, pulse ox , pulse saturation is good at 99%.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_054">
+  <h2>case_054</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complain of headache, nausea, cold, cough, body ache.  Diagnosis migraine, URTI. On examination anemia.  treatment: Injection <mark class="q-medication" title="medication">orofer S</mark>  Tablet Cepodem 200 <mark class="q-frequency" title="frequency">twice a day</mark> for two days.
+Tablet Zady.  250 twice a day for two days. Tablet Colday thrice a day for two days. Tablet Mefenamic 500 twice a day for two days.  Tablet Levocet once at night for two days.
+Capsule Ompec DM twice a day before food for five days.  Tablet Meftal Forte twice a day for five days,  to start after two days.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 5x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>orofer S</strong></td><td><q>orofer S</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_055">
+  <h2>case_055</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complain of cough not better irritation throat  Treatment
+Injection <mark class="q-medication" title="medication">TT</mark>
+stat
+Tab Amoxyclav 625 <mark class="q-frequency" title="frequency">twice a day</mark> for two days.  Tablet Meftal Forte twice a day for two days. Tab Para 650 once in the afternoon for two days.  Tab Levocet twice a day for two days. Capsule Ompec D M twice a day for two days before food. Tablet Clarigard.  250 milligram twice a day for 5 days. On examination, throat congestion.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 5x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>TT</strong></td><td><q>TT</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_057">
+  <h2>case_057</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">complaint of back ache, gastritis, loss of appetite, weakness.  Six fifty. Sade sahashe kar. Treatment. Injection. Injection, tablets. Vitanova. Six lakhs unit. nau kar tychamule . First dose.  Capsule Ompec D M <mark class="q-frequency" title="frequency">twice a day</mark> before food for 5 days. purna ghasa kharab aahe. Investigation showing  USG: extensive gases, gallbladder polyp, simple renal cysts in both the kidneys.  X-ray of LS spine showing osteopenia, anterior  listhesis of L5 vertebra over sacral spine.  Treatment
+capsule
+Rinifol twice a day.
+ho gya na aapka?
+Bifilac GG sachet.  Once for for three days.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_058">
+  <h2>case_058</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Chief complaints of right side chest pain, hemoptysis. Diagnosis light right lower zone pneumonia.  Treatment tablet <mark class="q-medication" title="medication">Maxflox </mark><mark class="q-dose q-medication" title="dose, medication">400</mark> once <mark class="q-frequency" title="frequency">at night</mark> for two days. Tablet Cefixime 200  twice a day for two days. tablet Meftal forte, twice a day for two days. tablet Para 650, once in the afternoon for two days. tablet Deriphyllin 150.  Twice a day for two days. Capsule Ompec DM twice a day before food for two days.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Maxflox</strong></td><td><q>Maxflox 400</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>400</strong></td><td><q>400</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>at night</strong></td><td><q>at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_059">
+  <h2>case_059</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Chief complaints of cough. medications  Cepodem 200 <mark class="q-frequency" title="frequency">twice a day</mark> for two days. tablet <mark class="q-medication" title="medication">Azi  </mark><mark class="q-dose q-medication" title="dose, medication">250</mark> twice a day for two days. tablet Meftal Forte twice a day for two days. tablet  Dolo 650 once in the afternoon for two days. Syrup  Costus D 10 ml three times a day. Tablet Levoset once at night for two days.  Notes: patient not examined.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Azi</strong></td><td><q>Azi  250</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>250</strong></td><td><q>250</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_060">
+  <h2>case_060</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Patient is experiencing cough, cold and sneezing, blocked nose for the past five days. Advisinghot water with honey along with steam <mark class="q-frequency" title="frequency">three times a day</mark>, also advising Dolo 650 two times a day after breakfast after dinner</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>three times a day</strong></td><td><q>three times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_062">
+  <h2>case_062</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">I advise the patient to take Dolo <mark class="q-frequency" title="frequency">three times a day</mark>. He has  medical history of insomnia, not able to sleep properly for a couple of days, chest pain, anxiety for a few days, and palpitations in the night.Not able to breathe properly. I advise him to take Penta DSR capsule 2 times a day. Also take Dolo 650 tablet 2 times a day. Take Crocin on SOS basis and take.Gelusil when there is gastric issues and report to me with CBC test, blood test report and give information in couple of weeks.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>three times a day</strong></td><td><q>three times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_064">
+  <h2>case_064</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Tablet <mark class="q-medication" title="medication">Moxclav </mark><mark class="q-dose q-medication" title="dose, medication">625</mark>, <mark class="q-frequency" title="frequency">three times a day</mark>. Capsule Bifilac twice daily.Tablet Ebast DC twice a day. Otrivin nasal drop, 2 drop three times a day. SyrupGrinlinctus DX, 2 teaspoon, three times a day, for five days.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>Moxclav</strong></td><td><q>Moxclav 625</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>625</strong></td><td><q>625</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>three times a day</strong></td><td><q>three times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_065">
+  <h2>case_065</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Tablet <mark class="q-medication" title="medication">lactoclav </mark><mark class="q-dose q-medication" title="dose, medication">1</mark> <mark class="q-frequency" title="frequency">BD</mark> Tablet meftal spas 1 BD. Tablet Limcee 1 BDSyrup UTI and 2 TSF BD.</p>
+    <p class="caveat">Quote occurs more than once: dose (appears 3x); frequency (appears 4x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="ok"><th>medication</th><td><strong>lactoclav</strong></td><td><q>lactoclav 1</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>1</strong></td><td><q>1</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>BD</strong></td><td><q>BD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+
+<section class="panel" id="p-case_066">
+  <h2>case_066</h2>
+  <div class="dictation">
+    <h3>The dictation, as recorded</h3>
+    <p class="note">Patient has fever, take Dolo 650. Take Crocin tablet,  whenever there is a headache, take amoxycillin <mark class="q-frequency" title="frequency">3 times a day</mark>, 1 in the morning, 1 in the evening, and one before night.Take proper bed rest, for insomnia, giving a sedative called Zolpidem. For pain medication, take Tramadol. For any other issues, report, let&#x27;s keep a follow up within the next week.</p>
+    
+  </div>
+  <table class="fields">
+    <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
+    <th>Status and what to do</th></tr></thead>
+    <tbody>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>3 times a day</strong></td><td><q>3 times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">
+    0 ms to answer
+    (budget 3000 ms)
+    &middot; <span class="ok-tag">inside budget</span>
+    &middot; $0.000000 billed
+    &middot; ? in / ? out
+    &middot; served by -
+    
+  </p>
+</section>
+</main>
+</div>
+<footer>
+  <p>Generated by <code>demo/build_review.py</code> from
+     <code>baseline-pattern-report</code> and <code>gold_v1.json</code>. Static,
+     offline, no script: the case selector is CSS only and the page declares
+     <code>default-src 'none'</code>, so it cannot reach the network. Every value shown is
+     escaped, which is why the corpus's <code>&lt;PII&gt;</code> placeholders appear as text.</p>
+  <p>A blank is a result, not a gap: it means the pipeline could not find the words in your
+     dictation that justify the value, so it declines rather than guesses.</p>
+</footer>
+</body>
+</html>

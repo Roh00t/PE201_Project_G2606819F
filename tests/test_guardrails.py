@@ -169,6 +169,16 @@ class InjectionTripwire(unittest.TestCase):
             with self.subTest(note=path.name):
                 self.assertEqual(scan_input(path.read_text()).flags, [])
 
+    def test_the_demo_attack_note_still_trips_the_scanner(self):
+        # demo/notes/ holds crafted notes the recorded demonstration relies on.
+        # They live outside gold/ so the invariant above keeps its meaning, and
+        # they are pinned here so a demo cannot quietly stop demonstrating.
+        note = (ROOT / "demo" / "notes" / "homoglyph.txt").read_text(encoding="utf-8")
+        scan = scan_input(note)
+        self.assertEqual(scan.flags, ["homoglyph"])
+        self.assertTrue(scan.encoding_anomaly)
+        self.assertTrue(scan.review_required)
+
     def test_quiet_on_every_gold_note(self):
         # The acceptance criterion: a tripwire that fires on ordinary
         # dictation trains the reader to ignore it. Reports case ids only.
@@ -306,11 +316,14 @@ class EncodingAnomaly(unittest.TestCase):
 
 
 class NoAssertInRuntimeCode(unittest.TestCase):
-    def test_src_and_evals_have_no_assert_statements(self):
+    def test_runtime_code_has_no_assert_statements(self):
         # `python -O` strips assert statements. A gate written as one would
-        # silently stop running, so none may exist under src/ or evals/.
+        # silently stop running, so none may exist in any shipped script -
+        # src/ (the pipeline), evals/ (scoring and diagnosis) or demo/ (the
+        # review screen, which reads gate codes and renders untrusted text).
         offenders = []
-        for path in sorted([*(ROOT / "src").glob("*.py"), *(ROOT / "evals").glob("*.py")]):
+        for path in sorted([*(ROOT / "src").glob("*.py"), *(ROOT / "evals").glob("*.py"),
+                            *(ROOT / "demo").glob("*.py")]):
             for node in ast.walk(ast.parse(path.read_text(), filename=str(path))):
                 if isinstance(node, ast.Assert):
                     offenders.append(f"{path.name}:{node.lineno}")

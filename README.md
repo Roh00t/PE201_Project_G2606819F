@@ -166,6 +166,56 @@ rate after 20 calls, or at once on a spend refusal (batch exit codes: 0 done,
 2 refused, 3 halted, 5 spend, 6 internal). Tag a case `#negation`,
 `#attribution` or `#temporality` in its labelling note to put it in a slice.
 
+### The non-AI baseline (`evals/baseline.py`, `evals/score_arm.py`)
+
+```bash
+./.venv/bin/python data/gazetteer/fetch_rxnorm.py            # once, needs network
+./.venv/bin/python evals/baseline.py --split report          # regex only, held-out 47
+./.venv/bin/python evals/score_arm.py evals/results/baseline-pattern-report --split report
+```
+
+The comparator `project_proposal.md` §4 commits to: regex and an optional gazetteer, no model,
+no network, no spend. It writes a run-shaped directory, so `score_arm.py`, `diagnose.py` and
+`demo/build_review.py` all read it unchanged, and every field goes through the same
+`apply_gates` the model's output does — the comparison is between extractors, not scorers.
+Patterns are tuned on a seeded 20-case subsample and `--split report` scores the other 47, so a
+tuned extractor is never reported on the cases it was tuned on. `score_arm.py` scores any arm
+in that shape (baseline, a low-code console run pasted back, a second annotator) and always
+prints the majority-class baseline beside it. Measured results are in
+`docs/technique_selection.md`.
+
+### The physician's verification screen (`demo/build_review.py`)
+
+```bash
+./.venv/bin/python demo/build_review.py                      # newest run -> demo/review.html
+```
+
+One static HTML file from a finished run: the dictation with each quote highlighted, the fields
+beside it, and blanks shown as blanks. No JavaScript, no form, no network, and
+`Content-Security-Policy: default-src 'none'` — a screen that renders clinical text is an
+output-handling surface (control S-07, OWASP LLM10:2026), and these notes contain literal
+`<PII>` placeholders that naive interpolation would swallow. `demo/notes/` holds the crafted
+notes the recorded demonstration uses; they live outside `gold/` so that directory stays clean.
+
+### Why a run scored what it did (`evals/diagnose.py`)
+
+```bash
+./.venv/bin/python evals/diagnose.py                       # the newest run
+./.venv/bin/python evals/diagnose.py evals/results/<run_id> > diagnosis.json
+```
+
+Read-only, no model calls: it re-reads a finished run's cached payloads and
+sorts every field decision into one cause, so a single recall number can be
+split into a model that named the wrong fact, a model that named the right
+fact in the wrong format, and a label that contradicts its own field rule.
+The first of its five arms reproduces `scoring.py`'s pre-registered recall and
+silent-failure rate exactly (a test pins this); the other four each relax one
+named convention and are diagnostics, never the headline. It also lists the
+gold labels that `extract.verify_value` - the gate the pipeline applies to the
+model - would reject, as candidates for a gold-v2 labelling pass.
+`gold_v1.json` is never written to. stdout is one JSON document, the tables go
+to stderr.
+
 ### Tests
 
 ```bash
@@ -309,7 +359,13 @@ src/extract.py     the whole pipeline, one file (CLAUDE.md 1.1), in sections:
                    gates, 5 spend ledger, 6-7 pipeline and CLI
 tests/             offline unittest suite: gates, budget, CLI contract, scoring, batch loop, seal
 evals/             label_gold_v1.py (profile / template / label / validate / stats),
-                   run_ekacare.py (batch loop), scoring.py (metrics, Wilson CIs)
+                   run_ekacare.py (batch loop), scoring.py (metrics, Wilson CIs),
+                   diagnose.py (failure attribution), baseline.py (the non-AI
+                   comparator), score_arm.py (score any arm in run shape)
+demo/              build_review.py -> review.html (the verification screen), notes/
+docs/              cost_to_serve.md, technique_selection.md, video_script.md,
+                   the Colab first-version notebook
+data/gazetteer/    fetch_rxnorm.py + the fetched ingredient list, with provenance
 gold/              synthetic dictations for smoke tests. Real labels: data/gold_labels/.
 ```
 

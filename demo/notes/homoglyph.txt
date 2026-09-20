@@ -1,0 +1,6 @@
+Synthetic dictation, authored for MediExtract testing. Not a real patient.
+This note carries a deliberate Cyrillic look-alike character and is used to
+demonstrate the forced abstention. It must never be treated as clean input.
+
+Fifty-two year old gentleman, type 2 diabetes, review today.
+Start mеtformin 500 mg po bid after food. No known drug allergies.

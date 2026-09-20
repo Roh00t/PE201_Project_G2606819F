@@ -1,0 +1,54 @@
+{
+  "run_id": "baseline-gazetteer-all",
+  "started_at": "2026-09-20T10:07:43+00:00",
+  "mode": "baseline",
+  "reportable": true,
+  "experiment": "baseline-gazetteer",
+  "model": "baseline:gazetteer",
+  "prompt_fingerprint": null,
+  "extractor": {
+    "kind": "regex+gazetteer",
+    "gazetteer": "data/gazetteer/rxnorm_ingredients.txt",
+    "gazetteer_names": 14689,
+    "selection_rule": "first <form> <Name> mention in the note"
+  },
+  "gold": {
+    "path": "data/gold_labels/gold_v1.json",
+    "cases_total": 67,
+    "cases_run": 67
+  },
+  "split": {
+    "which": "all",
+    "tuning_n": 20,
+    "tuning_seed": 42,
+    "tuning_case_ids": [
+      "case_002",
+      "case_003",
+      "case_004",
+      "case_006",
+      "case_007",
+      "case_009",
+      "case_014",
+      "case_015",
+      "case_028",
+      "case_032",
+      "case_033",
+      "case_035",
+      "case_036",
+      "case_038",
+      "case_044",
+      "case_048",
+      "case_056",
+      "case_061",
+      "case_063",
+      "case_067"
+    ]
+  },
+  "spend": {
+    "ceiling_usd": null,
+    "billed_this_run_usd": 0.0
+  },
+  "exit_counts": {
+    "0": 67
+  }
+}

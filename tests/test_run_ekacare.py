@@ -229,10 +229,19 @@ class Batch(unittest.TestCase):
         self.assertEqual(summary["exit_counts"], {"0": 2, "1": 1})
 
     def test_main_prints_exactly_one_json_document(self):
+        # The fixture carries one unlabelled field, because that is what must
+        # stop scoring. It is built here rather than read from the working
+        # template: that file fills up as labelling proceeds, so a test that
+        # read it would pass only until the labeller finished.
+        gold = GoldSet(provenance={"dataset": run_ekacare.DATASET}, cases=[
+            GoldCase(case_id="case_001", source_text=CASE_001,
+                     ground_truth={**NOT_STATED, "medication": GoldField()})])
+        incomplete = self.tmp / "incomplete_gold.json"
+        incomplete.write_text(gold.model_dump_json(indent=1), encoding="utf-8")
         out, err = io.StringIO(), io.StringIO()
         with redirect_stdout(out), redirect_stderr(err):
             code = run_ekacare.main([
-                "--mock", "--gold", str(ROOT / "data" / "gold_labels" / "gold_v1_template.json"),
+                "--mock", "--gold", str(incomplete),
                 "--limit", "1", "--run-id", "m1",
                 "--results-dir", str(self.tmp / "results"), "--cache-dir", str(self.tmp / "cache")])
         summary = json.loads(out.getvalue())
