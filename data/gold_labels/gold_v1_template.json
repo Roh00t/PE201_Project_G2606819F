@@ -2143,57 +2143,57 @@
       "source_text": "Yes <PII>, what do you have? I have nausea. Nausea. OK. So from how long are you experience this the problem? From about two days. OK. And do you have any history of any, you know, past complaints or any kind of things that you have been? not such   Not as of now OK. And are you on any medication right now? Yeah. What medication? for alopecia, for alopecia. So what are you using currently? Sorry?, what are you currently using? Minoxidil Finasteride and multivitamins, OK. Fine, so. I think  That is for now. I will send you the prescription. I will send you the drugs. You can go to the pharmacy and you can buy. OK,OK, OK.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Minoxidil",
+          "evidence": "Minoxidil",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
-      "notes": null
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:29:33+00:00",
+      "notes": "Alternative valid options include Finasteride or multivitamins. These represent the patient's currently active medications for alopecia. While the doctor mentions sending a new prescription to the pharmacy for the nausea, no specific new drug names, doses, or frequencies are explicitly stated in the text, so the system correctly abstains from guessing"
     },
     {
       "case_id": "case_041",
       "source_text": "deviated septum to left sideRight inferior turbinate enlarged, both tympanic membrane intact, normal. Post-nasal discharge present, greenish yellow in colorRest of the oral cavity normal. Lungs clear. Diagnosis is deviated septum to right, left HITacute URTI or sinusitisPut on medication, tablet Cepodem XP 325 milligram twice daily into one weekTablet Alaspan AM twice daily for a week, Nasivion nasal drops for a week, twice dailyTablet Dolonim P twice daily for 2 days, and review one week with a CT scan of the nose and sinuses",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cepodem XP",
+          "evidence": "Cepodem XP",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "325 milligram",
+          "evidence": "325 milligram",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice daily",
+          "evidence": "twice daily",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:33:30+00:00",
       "notes": null
     },
     {
@@ -2201,28 +2201,28 @@
       "source_text": "Patient complained of severe headache on left side, intermittent since one month. On vital examination, pulse is 90 beats per minutes. Blood pressure is 130 by 80 mm of Hg. On systemic examination, respiratory system, clear, CVS normal, RS normal.CNS normal on treatment, start patient on Sibelium 10 mg at night for 1 month and tablet Naxdom 500 mg SOS for headache.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Sibelium",
+          "evidence": "Sibelium",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "10 mg",
+          "evidence": "10 mg",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "at night",
+          "evidence": "at night",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:37:11+00:00",
       "notes": null
     },
     {
@@ -2230,28 +2230,28 @@
       "source_text": "Patient has stomach pain, headache, leg pain, wherein leg pain is, flowing through his back of the thigh. Patient has had history of spondylolisthesis . Currently it's recuperated. Patient also has an ACL of the left knee. I recommend patient taking tendolife tablet for.three times a day for twelve days and show me after one week",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "tendolife tablet",
+          "evidence": "tendolife tablet",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "three times a day",
+          "evidence": "three times a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:38:44+00:00",
       "notes": null
     },
     {
@@ -2259,28 +2259,28 @@
       "source_text": "Patient came with the complaint of breathlessness, cough, fever for the last one week.On arrival patient saturation is SPO2 is 88 , 87% on room air. Patient got started on IV antibiotics in view of increased CRP.and CBC showed neutrophilic leukocytosis with AKI picture with serum creat of 1.3, and patient  IV antibiotics and IV supplementary treatment.and serial CRP and CBC were in decreasing trend and patient had no further fever spikes.for four days patient was in oxygen support with maximum requirement of four to five liters. Later on patientmaintained his saturation in room air for the last six days. Patient got mobilized with the help of physiotherapy. Active physiotherapy was done for about six days.Patient currently requires minimal support for walking and patient had no other complaints. Patient got started on plecanatidein view of his IBS with constipation and patient well responded to plecanatide and patient daily passes the motionAnd currently patient condition is stable with BP maintained around 130 to 140 mm of Hg.Saturation 97 on room air. No tachypnea, no fever. And patient hence patient being discharged with thefollowing advices. Advice include Budecort nebulization SOS, Duolin BD, Asthalin.BD bar SOS\nTab Deriphyllin Retard 150 mg\nSOSTab Dytor 10mg OD in the morning and Tab Neurokind LC in the afternoon.Tab Shelcal XT in the morning 1-0-0. Tab Normaxin RT 1-0-0.Tablet Plecanatide 2 mg 3 mg in the night.\nTablet Mirabegron 50 mg.in the morning. Tab Tamvas T 0-0-1 in the night. Tab Dolo SOS",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Tab Dytor",
+          "evidence": "Tab Dytor",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "10mg",
+          "evidence": "10mg",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "OD in the morning",
+          "evidence": "OD in the morning",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:39:53+00:00",
       "notes": null
     },
     {
@@ -2288,28 +2288,28 @@
       "source_text": "is a dictation mode. Hi, I've just met my patient <PII> and she is feeling symptoms of cough, cold and fever for the past three days.advising hot water gargles three times a day, honey and water three times a day, and Dolo 450 after breakfast and dinner.two times a day. Also advising a nutritious diet, like you know full of carrots and vitamin C.That's about it.  thank you. So",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "450",
+          "evidence": "450",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "after breakfast and dinner.two times a day",
+          "evidence": "after breakfast and dinner.two times a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:42:01+00:00",
       "notes": null
     },
     {
@@ -2317,28 +2317,28 @@
       "source_text": "<PII> came on 14th of April with complaints, with the reports of raised total cholesterol.raised LDL cholesterol, low vitamin D, raised uric acid, HbA1c raised.Fasting blood sugar of 120.\nTotal IGE 2107.examination, blood pressure was 137 by 81, pulse of 71.complaint of dyspnea on exertion, joint pains. treatment givenInjection Vitanova first dose. Tablet Calcirix XT once in the morning for 15 days. Tablet Levopoint M.at night for 10 days. Tablet Ubexa 40 once in the morning for 10 days. Tablet Statpure F.milligram once at night for three months.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Tablet Ubexa",
+          "evidence": "Tablet Ubexa",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "40",
+          "evidence": "40",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "once in the morning",
+          "evidence": "once in the morning",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:43:47+00:00",
       "notes": null
     },
     {
@@ -2346,28 +2346,28 @@
       "source_text": "complain of headache, not better. giddiness  On examination blood pressure 136 systolic and 88 diastolic.  On examination sinuses were tender. Treatment: tablet Cepodem  200 twice a day for two days. Injection Diclofenac 2 ml stat. Tablet Zady 250 twice a day for two days.  Tablet Colday\nThree times a day for two days\nTablet Mefenamic 500\nTwice a day for two days\nTablet Levocet once at night for two days  Tablet Solopose MD once at night for two days. Diagnosis sinusitis.  Tension headache",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cepodem",
+          "evidence": "Cepodem",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200",
+          "evidence": "200",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:45:25+00:00",
       "notes": null
     },
     {
@@ -2375,28 +2375,28 @@
       "source_text": "complain of cough, dry cough. On examination  Temperature normal 97 degree Fahrenheit. BP 116 by 71.  Pulse 74 per minute  Treatment tablet Cepodem 200 twice a day for two days.  tablet Zady  250 milligram twice a day for two days. Tablet Costus Advance three times a day for two days. Tablet Mefenamic 500  twice a day for two days. Tablet C-Poff, three times a day for two days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cepodem",
+          "evidence": "Cepodem",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200",
+          "evidence": "200",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:53:47+00:00",
       "notes": null
     },
     {
@@ -2404,28 +2404,28 @@
       "source_text": "complaint of diarrhea, pain in abdomen. BP 115 by 70, pulse 64 per minute.  Diagnosis gastroenteritis. Treatment injection Amikacin first dose.  Tablet Cefixime 200 twice a day for two days. Tablet Metrogyl 400 three times a day for two days. Tablet Para Dicyclomine.  three times a day for two days.  capsule Omez 20 milligram twice a day before food for two days.  tablet Lomofen three times a day for one day.  Vital EZ sachet twice a day for one day.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cefixime",
+          "evidence": "Cefixime",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200",
+          "evidence": "200",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:54:40+00:00",
       "notes": null
     },
     {
@@ -2433,28 +2433,28 @@
       "source_text": "Notes:  follow up of injury with stitches  Stitches removed today. Pus from wound.  Treatment : tablet Lizomed 600 twice a day after food.  for two days.  tablet Visnac SP twice a day for two days  Tablet Para 500 once in the afternoon for two days. Capsule BC  Once at night for two days. Cleaning and dressing done.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Lizomed",
+          "evidence": "Lizomed",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "600",
+          "evidence": "600",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day after food",
+          "evidence": "twice a day after food",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:55:20+00:00",
       "notes": null
     },
     {
@@ -2462,28 +2462,28 @@
       "source_text": "complaint of headache, nausea, ghabrahat since one day. On examination, BP 135 by 92.  pulse 80 per minute.  history of panic disorders,  past history of panic disorders.  Treatment: Injection Cynocal First.  Injection Vitanova first dose. Tab Tablet Calcirix XT once in the morning for 15 days. Capsule Omez twice a day for one day. Tablet Meftal Forte  twice a day for one day. Tablet Ondem MD twice a day for one day. Tablet Solopose MD once at night.  for two days.  Diagnosis anxiety disorder",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Omez",
+          "evidence": "Omez",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:57:28+00:00",
       "notes": null
     },
     {
@@ -2493,84 +2493,84 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
-      "notes": null
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:57:46+00:00",
+      "notes": "This transcript only contains the patient's presenting complaints, symptoms, and medical history. No medications, dosages, or frequencies were prescribed or documented"
     },
     {
       "case_id": "case_053",
       "source_text": "<PII>, patient,  38 years old, male, came with complaints ofLoose motions, elevated temperature, and chest pain, for the last three days, has been taking Dolo 650,  to manage the pain.has been taking Sinarest and Pantop. Heart rate is normal at 77 beats per minute. Blood pressure is normal, 120 over 80.And pulse, pulse ox , pulse saturation is good at 99%.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "650",
+          "evidence": "650",
+          "status": "found"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
-      "notes": null
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T05:59:03+00:00",
+      "notes": "Alternative valid options include Sinarest or Pantop. The transcript notes medications the patient has been taking prior to the visit, but no specific frequency is documented for any of them"
     },
     {
       "case_id": "case_054",
       "source_text": "complain of headache, nausea, cold, cough, body ache.  Diagnosis migraine, URTI. On examination anemia.  treatment: Injection orofer S  Tablet Cepodem 200 twice a day for two days.\nTablet Zady.  250 twice a day for two days. Tablet Colday thrice a day for two days. Tablet Mefenamic 500 twice a day for two days.  Tablet Levocet once at night for two days.\nCapsule Ompec DM twice a day before food for five days.  Tablet Meftal Forte twice a day for five days,  to start after two days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cepodem",
+          "evidence": "Cepodem",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200",
+          "evidence": "200",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:01:09+00:00",
       "notes": null
     },
     {
