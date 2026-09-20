@@ -1853,28 +1853,28 @@
       "source_text": "The patient is suffering from toothache laterally right. Since 5 days, severity is severe type of pain is cramping pain.  Diagnosis is dental cavity. gum ulceration.  hey bro, this went off. bro, open this The tablets suggested are:  Jhactions iron tonic, One time at the night with empty stomach, 5 days from day one.  Limcee chewable tablet, two tablets at a time, in the afternoon after meal, five days from day one.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Jhactions iron tonic",
+          "evidence": "Jhactions iron tonic",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "One time at the night",
+          "evidence": "One time at the night",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T02:22:32+00:00",
       "notes": null
     },
     {
@@ -1882,28 +1882,28 @@
       "source_text": "consultation, and we can just say. So doctor i have a stomach pain, for the last. How many days? Last 3 days . Where is the pain exactly?Upper abdomen near rib cage. Do you have any vomiting with the pain?  No vomiting. How is your appetite? low, less appetite. Do you have any fever?Low grade. I had, I took, I had fever. I took crocin. How many times have you passed urine in the last 24 hours? 2 - 3 times. Urine is white or yellow in colour?Yellow. How about the stools, are normal? Yeah, stools are normal. Any history of outside food 2 days, 3 days back, any outside food. party or travel? Yeah, I had biryani 2 days ago.OK, can I check you out? Yeah,right. Record ? Yeah it's recording and you can say. yeah, abdomenNormal, Soft. Tongue is slightly moist, coated tongue. Temperature 99 degrees. On auscultationEverything is normal. Heart sounds and lungs are clinically OK. Abdomen, mild tenderness, guarding present in the epigastric area.And the diagnosis acute gastritis. query, may be due to food poisoning. And treatment is Tablet Pantop 40 mg once daily for 7 days on empty stomach.Tablet Taxim O 100 mg twice daily for 5 days after food. Tablet Drotin, one tablet SOS if the pain is unbearable.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Pantop",
+          "evidence": "Pantop",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "40 mg",
+          "evidence": "40 mg",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "once daily",
+          "evidence": "once daily",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T02:23:23+00:00",
       "notes": null
     },
     {
@@ -1913,26 +1913,26 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T02:23:59+00:00",
       "notes": null
     },
     {
@@ -1942,55 +1942,55 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
-      "notes": null
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T02:24:31+00:00",
+      "notes": "This is a diagnostic imaging (2D Echo) report detailing echocardiographic findings such as LV function and valve regurgitation. No pharmaceutical medications, dosages, frequencies, or allergies are documented in this text"
     },
     {
       "case_id": "case_034",
       "source_text": "Advising . patient is facing cough, fever, cold for the past three days. I advise the patient to take Dolo twice a day after breakfast, after dinner.also advising patient for warm water gargles three times a day. along with this honey, honitus , Dabur Honitus cough syrup twice a day. also just warm water gargles three times a day. andfollow the course of medicines for the next five days and we'll do a checkup after that. This was a doctor simulating this. This doctor app.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "no dosage",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T02:26:00+00:00",
       "notes": null
     },
     {
@@ -2000,26 +2000,26 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T02:26:54+00:00",
       "notes": null
     },
     {
@@ -2029,27 +2029,27 @@
         "medication": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
-      "notes": null
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T02:27:07+00:00",
+      "notes": "This text documents presenting complaints and symptoms such as fever, breathlessness, and chest pain. No pharmaceutical medications, dosages, administration schedules, or drug allergies are documented in this note"
     },
     {
       "case_id": "case_037",
