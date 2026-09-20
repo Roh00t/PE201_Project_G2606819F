@@ -91,3 +91,130 @@ This document serves as the master operational directive. Strict adherence to th
 
 * **Batch Evaluation Execution:** The immediate operational priority is maintaining and executing the batch evaluation loop (`evals/run_ekacare.py`) to process the 67 Latin-script Eka Care clinical cases.
 * **Deployment Gate:** Any new code or logic adjustments merged into the repository must successfully pass the full evaluation suite while executing under optimized `python -O` conditions to prove that no security gates rely on fragile assertions.
+
+---
+
+## 5. Operational Runbook
+
+Sections 1–4 are the standing directives and are unchanged. This section records how the
+repository is actually driven, so a command is never reconstructed from memory.
+
+### 5.1 The verification gate before any commit
+
+```bash
+./.venv/bin/python -m unittest discover -s tests          # full suite
+./.venv/bin/python -O -m unittest discover -s tests       # §4 deployment gate
+./.venv/bin/python -m pyflakes src evals evals/probes tests demo data/gazetteer
+```
+
+Both suite runs must be green. `python -O` is not optional: it strips assertions, which is the
+whole reason §2.2 forbids them, and `tests/test_guardrails.py:NoAssertInRuntimeCode` scans
+`src/`, `evals/` and `demo/` for the statement so the ban cannot rot.
+
+### 5.2 Sealed-gold registry
+
+`evals/run_ekacare.py:REGISTRY` maps a version to its path, its SHA-256 file, the corpus it may
+score and the label schema its file must declare. This exists so §1.3 can be honoured without
+editing a guard: gold-v2 corrections and a second corpus are selectable rather than reachable
+only by loosening `load_gold`.
+
+```bash
+./.venv/bin/python evals/run_ekacare.py --gold-version gold-v1     # default
+./.venv/bin/python evals/run_ekacare.py --gold-version gold-v2     # refuses until sealed
+./.venv/bin/python evals/label_gold_v1.py validate --seal          # seal a labelled set
+```
+
+Registered today: `gold-v1` (sealed, `1f594e46…`), `gold-v2` (the 16 corrected labels plus slice
+tags, not yet sealed), `allergy-v1` (allergy-bearing notes for the leakage report, not yet
+sealed). Adding a version means adding a registry entry, and **sealing it must stamp the
+matching `schema_version` into the file** or loading is refused. `gold_v1.json` is never edited.
+
+### 5.3 Cost control
+
+```bash
+./.venv/bin/python evals/run_ekacare.py --experiment my-change --run-cap-usd 0.25
+```
+
+Two bounds. The `$8` ceiling is the project's and belongs to `extract.SpendLedger`; `--run-cap-usd`
+(default `$1.00`) is this run's and is checked against worst case before every call, because a
+loop inside one run would stay under the project ceiling while consuming it. A breach exits 5.
+
+`evals/spend_guard.py` audits every call — tokens including cached, list-price estimate against
+the provider's charge, latency, attempts, endpoint, provider, model requested versus served,
+response id — to `data/cache/metrics/<run_id>.jsonl`, with an aggregate `metrics.json` beside
+the run. It is **never imported by `src/extract.py`**, so §1.1 stands: the pipeline remains one
+standalone file.
+
+**Enforcement and measurement are different modules on purpose.** `spend_guard.py` can refuse a
+call; `evals/metrics.py` only reads finished artefacts. A module that can refuse a call should
+not also be the one that scores it, or a bug in the scoring can silence the refusal.
+
+**Exactly one writer per call.** `extract.call_model` records what it spends. A script that
+calls the endpoint directly must pass `CostGuard(records_to_ledger=True)` or its spend never
+reaches the ceiling meant to bound it.
+
+### 5.4 Prompt iteration
+
+A prompt change moves `prompt_fingerprint()`, and the sealed gold set records the fingerprint it
+was labelled against. That is deliberate friction, not an obstacle to route around.
+
+1. Change `FIELD_RULES` or `SYSTEM_INSTRUCTION` in `src/extract.py`.
+2. Confirm the fingerprint moved, and that a plain live run now refuses:
+   ```bash
+   ./.venv/bin/python -c "import sys; sys.path.insert(0,'src'); import extract; print(extract.prompt_fingerprint())"
+   ```
+3. Run it as a named experiment, never by relaxing the check:
+   ```bash
+   ./.venv/bin/python evals/run_ekacare.py --experiment <what-changed> --run-cap-usd 0.25
+   ```
+4. Attribute the change rather than reading the headline alone:
+   ```bash
+   ./.venv/bin/python evals/diagnose.py evals/results/<run_id>
+   ```
+   The first arm must reproduce `scoring.py`'s pre-registered recall and silent-failure rate
+   exactly; a test pins that. The other arms are diagnostics and never the headline.
+5. Record what moved and what did not in `project_proposal.md`'s Implementation Delta.
+
+**Two rules learned the hard way.** A rule that contradicts another rule costs real recall — the
+medication rule offering `Dolo 650` as a name while the dose rule claimed the `650` cost 8
+fields. And a prompt cannot fix a gold label: `half` and `1 tablet` are refused by the dose gate
+because `FIELD_RULES` says a quantity per administration is not a dose, so those belong in
+gold-v2, not in a prompt or a loosened gate.
+
+### 5.5 Comparators, never a bare number
+
+```bash
+./.venv/bin/python evals/baseline.py --split report                       # regex, held-out 47
+./.venv/bin/python evals/score_arm.py evals/results/<dir> --split report  # scores any arm
+./.venv/bin/python evals/probes/probe_v4_schema.py --dry-run              # schema spike, no spend
+./.venv/bin/python demo/build_review.py                                  # the review screen
+```
+
+`score_arm.py` prints the majority-class baseline beside every arm, because a recall figure with
+nothing to compare against says nothing: answering `not_stated` to everything already agrees
+with gold on 113 of 268 field decisions.
+
+### 5.6 Never report a gap without testing it
+
+```bash
+./.venv/bin/python evals/metrics.py evals/results/<run_a> evals/results/<run_b>
+```
+
+Two runs over the same gold set are **paired**, so only the fields that changed carry
+information and the test is an exact McNemar over those flips. Report the p-value with the delta,
+every time.
+
+The rule exists because it was broken once. The prompt correction of 2026-09-20 was reported as a
+4.5-point recall improvement; paired, it is 12 flips one way against 5 the other, **p = 0.14**,
+which is not separated at α 0.05. The A2 battery work is where this discipline comes from: three
+identical runs there scored 37, 41 and 49 of 60 with the model held fixed, a spread wider than
+most gaps between different models.
+
+Two claims, two confidence levels, and they must not be blurred:
+
+- **A named defect disappearing is a count.** "Same drug, strength appended" went from 8
+  occurrences to 0. That is solid.
+- **A recall delta is a rate.** It needs a test before it is called an improvement.
+
+A large p-value never means two systems are equally good. It means the evaluation is too small to
+tell, which is a fact about the evaluation.

@@ -1,0 +1,45 @@
+{
+  "run_id": "20260920T133717Z-gemini-2.5-flash",
+  "calls": 67,
+  "cap_usd": 0.25,
+  "ceiling_usd": 8.0,
+  "billed_usd": 0.041221,
+  "cap_used": 0.1649,
+  "cost_per_call_usd": 0.000615,
+  "tokens": {
+    "input": 57842,
+    "output": 9547,
+    "cached": 0,
+    "reasoning": 0
+  },
+  "latency_ms": {
+    "p50": 1213.1,
+    "p95": 1600.4,
+    "max": 11993.3
+  },
+  "retried_calls": 0,
+  "failed_calls": 0,
+  "price_check": {
+    "calls_with_provider_cost": 67,
+    "estimate_total_usd": 0.04122,
+    "provider_total_usd": 0.041221,
+    "drift_usd": 1e-06
+  },
+  "by_model": {
+    "google/gemini-2.5-flash": {
+      "calls": 67,
+      "billed_usd": 0.041221,
+      "input_tokens": 57842,
+      "output_tokens": 9547
+    }
+  },
+  "destinations": [
+    {
+      "endpoint": "https://openrouter.ai/api/v1",
+      "provider": "Google",
+      "model_served": "google/gemini-2.5-flash"
+    }
+  ],
+  "model_drift": [],
+  "per_call_log": "data/cache/metrics/20260920T133717Z-gemini-2.5-flash.jsonl"
+}

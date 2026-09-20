@@ -2,6 +2,7 @@
 spend, and the sealed gold set is never opened."""
 
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -178,6 +179,40 @@ class FrequencyCore(unittest.TestCase):
 
     def test_an_empty_side_never_matches(self):
         self.assertFalse(diagnose.frequency_matches_rule("", "twice a day"))
+
+
+class NewestRun(unittest.TestCase):
+    def test_the_newest_run_is_the_most_recent_not_the_last_alphabetically(self):
+        # "baseline-pattern-all" sorts after a timestamped run id, so name order
+        # silently made a regex arm the default target of every tool.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name, when, mode in (("20260920T133717Z-model", 2000, "live"),
+                                     ("20260921T000000Z-older", 1000, "live")):
+                run = root / name
+                run.mkdir()
+                manifest = run / "manifest.json"
+                manifest.write_text(json.dumps({"mode": mode}), encoding="utf-8")
+                os.utime(manifest, (when, when))
+            self.assertEqual(diagnose.newest_run(root).name, "20260920T133717Z-model")
+
+    def test_a_baseline_arm_is_not_what_the_newest_run_means(self):
+        # A baseline directory has no model, no provenance and no cost, so it
+        # must never become the default target of the review screen.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name, when, mode in (("20260920T133717Z-model", 1000, "live"),
+                                     ("baseline-pattern-all", 2000, "baseline")):
+                run = root / name
+                run.mkdir()
+                manifest = run / "manifest.json"
+                manifest.write_text(json.dumps({"mode": mode}), encoding="utf-8")
+                os.utime(manifest, (when, when))
+            self.assertEqual(diagnose.newest_run(root).name, "20260920T133717Z-model")
+
+    def test_an_empty_results_directory_has_no_newest_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertIsNone(diagnose.newest_run(Path(tmp)))
 
 
 class CommandLine(unittest.TestCase):

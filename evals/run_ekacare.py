@@ -45,6 +45,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "evals"))
 
 import extract  # noqa: E402
+import spend_guard  # noqa: E402
 import scoring  # noqa: E402
 from extract import (  # noqa: E402
     DEFAULT_LEDGER, ClinicalExtraction, GoldSet, SpendLedger, scan_input, wiped_extraction,
@@ -52,6 +53,7 @@ from extract import (  # noqa: E402
 )
 
 DATASET = "ekacare/clinical_note_generation_dataset"
+MTSAMPLES = "mtsamples"
 GOLD_DIR = ROOT / "data" / "gold_labels"
 SEALED_PATH = GOLD_DIR / "gold_v1.json"
 SEALED_SHA_PATH = GOLD_DIR / "gold_v1.sha256"
@@ -78,6 +80,48 @@ class Refused(Exception):
     def __init__(self, code: str, message: str, exit_code: int):
         super().__init__(message)
         self.code, self.message, self.exit_code = code, message, exit_code
+
+
+@dataclass(frozen=True)
+class SealedGold:
+    """One registered gold set: where it lives, what must hash to what, and
+    which corpus it is allowed to score.
+
+    Before this existed the sealed path was a module constant, so a live run
+    could only ever score `gold_v1.json` from the Eka Care corpus. That put
+    gold-v2 corrections and a second corpus out of reach without editing the
+    guard that protects the ground truth - which is how guards get weakened
+    under deadline pressure. Registering versions instead keeps every check
+    (path identity, SHA-256, dataset provenance, label schema, completeness,
+    prompt fingerprint) and only makes the target selectable.
+
+    Sealing a new version must stamp the matching `schema_version` into the
+    file, or loading it is refused.
+    """
+
+    version: str
+    path: Path
+    sha_path: Path
+    dataset: str
+    schema_version: str
+    describes: str
+
+
+REGISTRY: dict[str, SealedGold] = {
+    "gold-v1": SealedGold(
+        "gold-v1", SEALED_PATH, SEALED_SHA_PATH, DATASET, "gold-v1",
+        "67 Latin-script Eka Care cases, 268 hand labels, sealed 2026-09-20"),
+    "gold-v2": SealedGold(
+        "gold-v2", GOLD_DIR / "gold_v2.json", GOLD_DIR / "gold_v2.sha256", DATASET, "gold-v2",
+        "gold-v1 with the 16 labels that contradict their own field rules corrected, "
+        "plus slice tags. Registered, not yet sealed."),
+    "allergy-v1": SealedGold(
+        "allergy-v1", GOLD_DIR / "allergy_v1.json", GOLD_DIR / "allergy_v1.sha256",
+        MTSAMPLES, "allergy-v1",
+        "allergy-bearing notes with ALL-CAPS section headers, for the headers-intact "
+        "versus headers-stripped leakage report. Registered, not yet sealed."),
+}
+DEFAULT_GOLD_VERSION = "gold-v1"
 
 
 @dataclass
@@ -113,7 +157,8 @@ class CircuitBreaker:
 
 @dataclass
 class BatchConfig:
-    gold_path: Path
+    gold_version: str = DEFAULT_GOLD_VERSION
+    gold_path: Path | None = None
     mock: bool = False
     model: str = extract.MODEL
     limit: int | None = None
@@ -121,13 +166,30 @@ class BatchConfig:
     experiment: str | None = None
     budget_usd: float | None = None
     ledger_path: Path = DEFAULT_LEDGER
+    run_cap_usd: float = spend_guard.DEFAULT_RUN_CAP_USD
     data_collection: str = "deny"
     price_in: float | None = None
     price_out: float | None = None
     results_dir: Path = RESULTS_DIR
     cache_dir: Path = CACHE_DIR
-    sealed_path: Path = SEALED_PATH
-    sealed_sha_path: Path = SEALED_SHA_PATH
+    sealed_path: Path | None = None
+    sealed_sha_path: Path | None = None
+    dataset: str | None = None
+    gold_schema_version: str | None = None
+
+    def __post_init__(self):
+        """Anything not given explicitly comes from the registered version.
+        Explicit values win, so a test can point at a temporary seal."""
+        if self.gold_version not in REGISTRY:
+            raise Refused("ERR_GOLD_REFUSED",
+                          f"unknown gold version {self.gold_version!r}; registered: "
+                          f"{', '.join(sorted(REGISTRY))}", EXIT_REFUSED)
+        entry = REGISTRY[self.gold_version]
+        self.sealed_path = self.sealed_path or entry.path
+        self.sealed_sha_path = self.sealed_sha_path or entry.sha_path
+        self.gold_path = self.gold_path or self.sealed_path
+        self.dataset = self.dataset or entry.dataset
+        self.gold_schema_version = self.gold_schema_version or entry.schema_version
 
 
 def _rel(path: Path) -> str:
@@ -144,7 +206,13 @@ def sha256_of(path: Path) -> str:
 def load_gold(cfg: BatchConfig) -> tuple[GoldSet, str]:
     """Load the gold set and refuse anything a live run must not trust."""
     if not cfg.gold_path.is_file():
-        raise Refused("ERR_GOLD_REFUSED", f"gold file not found: {_rel(cfg.gold_path)}", EXIT_REFUSED)
+        entry = REGISTRY.get(cfg.gold_version)
+        detail = f" ({entry.describes})" if entry else ""
+        raise Refused(
+            "ERR_GOLD_REFUSED",
+            f"{cfg.gold_version} is not sealed: {_rel(cfg.gold_path)} does not exist"
+            f"{detail}. Label it, then run label_gold_v1.py validate --seal.",
+            EXIT_REFUSED)
     gold = GoldSet.model_validate_json(cfg.gold_path.read_text(encoding="utf-8"))
     digest = sha256_of(cfg.gold_path)
     problems = []
@@ -161,12 +229,20 @@ def load_gold(cfg: BatchConfig) -> tuple[GoldSet, str]:
                 f"live runs score only the sealed {_rel(cfg.sealed_path)}, not "
                 f"{_rel(cfg.gold_path)}: label, then run label_gold_v1.py validate --seal")
         elif not cfg.sealed_sha_path.is_file():
-            problems.append(f"{_rel(cfg.sealed_sha_path)} is missing: gold-v1 was not sealed by the tool")
+            problems.append(f"{_rel(cfg.sealed_sha_path)} is missing: {cfg.gold_version} "
+                            "was not sealed by the tool")
         elif cfg.sealed_sha_path.read_text(encoding="utf-8").split()[0] != digest:
             problems.append(f"{_rel(cfg.gold_path)} no longer matches {_rel(cfg.sealed_sha_path)}: "
-                            "it was edited after sealing; gold-v1 is immutable")
-        if gold.provenance.get("dataset") != DATASET:
-            problems.append(f"the gold file was not pulled from {DATASET}")
+                            f"it was edited after sealing; {cfg.gold_version} is immutable")
+        if gold.provenance.get("dataset") != cfg.dataset:
+            problems.append(f"{cfg.gold_version} must be pulled from {cfg.dataset}, but this "
+                            f"file records {gold.provenance.get('dataset')!r}")
+        if gold.schema_version != cfg.gold_schema_version:
+            # Third signal after path identity and the hash: a file that does
+            # not say which version it is cannot be scored as that version.
+            problems.append(f"{_rel(cfg.gold_path)} declares schema_version "
+                            f"{gold.schema_version!r}, but {cfg.gold_version} expects "
+                            f"{cfg.gold_schema_version!r}")
         unlabelled = [c.case_id for c in gold.cases if not c.is_complete]
         if unlabelled:
             problems.append(f"{len(unlabelled)} of {len(gold.cases)} cases have unlabelled fields")
@@ -215,16 +291,20 @@ def save_cached(cfg: BatchConfig, run_id: str, case_id: str, entry: dict) -> Non
     tmp.replace(path)
 
 
+def worst_case_one(cfg: BatchConfig, case, prices) -> float:
+    """Upper bound for one case: its schema retry taken, its output hitting
+    the token cap. The per-run cap in metrics.py is checked against this
+    before each call, so a runaway is refused rather than discovered."""
+    _, request = extract.build_request(cfg.model, case.source_text, cfg.data_collection)
+    chars = sum(len(m["content"]) for m in request["messages"])
+    chars += len(json.dumps(request["response_format"]))
+    return extract.SCHEMA_ATTEMPTS * worst_case_cost(chars, extract.MAX_OUTPUT_TOKENS, *prices)
+
+
 def worst_case_for(cfg: BatchConfig, cases, prices) -> float:
     """Upper bound for calling these cases: every one needing its schema
     retry, every output hitting the token cap."""
-    total = 0.0
-    for case in cases:
-        _, request = extract.build_request(cfg.model, case.source_text, cfg.data_collection)
-        chars = sum(len(m["content"]) for m in request["messages"])
-        chars += len(json.dumps(request["response_format"]))
-        total += extract.SCHEMA_ATTEMPTS * worst_case_cost(chars, extract.MAX_OUTPUT_TOKENS, *prices)
-    return total
+    return sum(worst_case_one(cfg, case, prices) for case in cases)
 
 
 def _read_only_git(*args: str) -> str | None:
@@ -280,8 +360,14 @@ def run_batch(cfg: BatchConfig, client=None) -> tuple[dict, int]:
             client_kwargs, _ = extract.build_request(cfg.model, "", cfg.data_collection)
             client = openai.OpenAI(api_key=extract.load_api_key(), **client_kwargs)
 
+    # Two bounds, not one: `ceiling` is the project's $8, `run_cap_usd` is this
+    # run's. A loop that stayed under the project ceiling could still burn it.
+    guard = spend_guard.CostGuard(run_id=run_id, cap_usd=cfg.run_cap_usd, ledger=ledger,
+                              ceiling_usd=ceiling, expected_calls=len(to_call),
+                              verbose=False)
     print(f"run {run_id}: {len(cases)} cases ({len(cases) - len(to_call)} cached), "
-          f"{'mock' if cfg.mock else cfg.model}, prompt {identity['prompt_fingerprint']}",
+          f"{'mock' if cfg.mock else cfg.model}, prompt {identity['prompt_fingerprint']}"
+          + ("" if cfg.mock else f", run cap ${cfg.run_cap_usd:.2f}"),
           file=sys.stderr)
 
     breaker = CircuitBreaker()
@@ -304,10 +390,19 @@ def run_batch(cfg: BatchConfig, client=None) -> tuple[dict, int]:
                     provenance = {"called": False, "requested_model": "mock",
                                   "prompt_fingerprint": identity["prompt_fingerprint"]}
                 else:
+                    try:
+                        guard.check_before(worst_case_one(cfg, case, prices))
+                    except extract.BudgetExceeded as exc:
+                        # Same code and the same immediate halt as the global
+                        # ceiling: a spend refusal is never an abstention.
+                        raise extract.PipelineError(
+                            "ERR_BUDGET_EXCEEDED", str(exc), extract.EXIT_BUDGET) from None
                     result = extract.call_model(case.source_text, cfg.model, prices, ledger,
                                                 ceiling, cfg.data_collection, client=client)
                     extraction, usage, provenance, api_ms = (
                         result.extraction, result.usage, result.provenance, result.api_ms)
+                    guard.record(spend_guard.CallRecord.from_result(
+                        run_id, case.case_id, cfg.model, usage, provenance, api_ms))
             except extract.PipelineError as exc:
                 envelope = extract.error_envelope(exc.code, case.case_id)
                 gated[case.case_id] = ungated[case.case_id] = envelope
@@ -341,7 +436,9 @@ def run_batch(cfg: BatchConfig, client=None) -> tuple[dict, int]:
         breaker.record(exit_code)
         codes = "  ".join(f"{r.field[:4]}={_short(r.code)}" for r in results)
         billed = entry["usage"].get("billed_usd", 0.0) or 0.0
-        print(f"[{index:>2}/{len(cases)}] {case.case_id}  {codes}  ${billed:.4f}"
+        running = ("" if cfg.mock
+                   else f"  run ${guard.spent_usd:.4f}/${cfg.run_cap_usd:.2f}")
+        print(f"[{index:>2}/{len(cases)}] {case.case_id}  {codes}  ${billed:.4f}{running}"
               f"{'  (cached)' if cached[case.case_id] else ''}", file=sys.stderr)
 
     all_labelled = all(c.is_complete for c in cases)
@@ -368,6 +465,7 @@ def run_batch(cfg: BatchConfig, client=None) -> tuple[dict, int]:
         "prompt_fingerprint": identity["prompt_fingerprint"],
         "data_collection": cfg.data_collection,
         "gold": {
+            "version": cfg.gold_version, "dataset": cfg.dataset,
             "path": _rel(cfg.gold_path), "sha256": gold_sha,
             "cases_total": len(gold.cases), "cases_run": len(cases),
             "sealed_at": gold.provenance.get("sealed_at"),
@@ -429,8 +527,17 @@ def run_batch(cfg: BatchConfig, client=None) -> tuple[dict, int]:
                 for n, c in scores["per_slice"].items()},
         },
         "results_dir": _rel(out_dir),
+        # Financial audit: tokens, dollars and destination for every call.
+        "cost": guard.summary(),
     }
+    guard.write_summary(out_dir / "metrics.json")
     print_evaluation_table(summary, scores, sys.stderr)
+    guard.print_summary(sys.stderr)
+    if breaker.reason_code == "SPEND_EXHAUSTED":
+        # A spend refusal is a spend refusal wherever it happens. Returning the
+        # generic halt code here would file it under "upstream problem" and let
+        # a budget breach hide among network failures (CLAUDE.md 3.3).
+        return summary, EXIT_BUDGET
     return summary, EXIT_HALTED if halted else EXIT_DONE
 
 
@@ -460,15 +567,25 @@ def print_evaluation_table(summary: dict, scores: dict | None, out) -> None:
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--gold", type=Path, default=SEALED_PATH,
-                        help=f"gold file (live runs accept only {_rel(SEALED_PATH)})")
+    parser.add_argument("--gold-version", choices=sorted(REGISTRY),
+                        default=DEFAULT_GOLD_VERSION,
+                        help="which registered gold set to score against "
+                             f"(default {DEFAULT_GOLD_VERSION}); "
+                             + "; ".join(f"{k}: {v.describes}" for k, v in sorted(REGISTRY.items())))
+    parser.add_argument("--gold", type=Path, default=None,
+                        help="an explicit gold file; a live run still accepts only the "
+                             "sealed path of the chosen --gold-version")
     parser.add_argument("--mock", action="store_true", help="no API call; canned response per case")
     parser.add_argument("--model", default=extract.MODEL)
     parser.add_argument("--limit", type=int, default=None, help="first N cases only (not reportable)")
     parser.add_argument("--run-id", default=None, help="reuse to resume a run from its cache")
     parser.add_argument("--experiment", default=None,
                         help="name a run whose prompt differs from the one sealed with gold-v1")
-    parser.add_argument("--budget-usd", type=float, default=None)
+    parser.add_argument("--budget-usd", type=float, default=None,
+                        help="the project-wide ceiling (default from the environment or $8)")
+    parser.add_argument("--run-cap-usd", type=float, default=spend_guard.DEFAULT_RUN_CAP_USD,
+                        help="hard cap for THIS run, checked before every call "
+                             f"(default ${spend_guard.DEFAULT_RUN_CAP_USD:.2f})")
     parser.add_argument("--price-in-per-mtok", type=float, default=None)
     parser.add_argument("--price-out-per-mtok", type=float, default=None)
     parser.add_argument("--provider-data-collection", choices=["deny", "allow"], default="deny")
@@ -482,9 +599,11 @@ def parse_args(argv=None):
 def main(argv=None) -> int:
     args = parse_args(argv)
     cfg = BatchConfig(
-        gold_path=args.gold, mock=args.mock, model=args.model, limit=args.limit,
+        gold_version=args.gold_version, gold_path=args.gold, mock=args.mock,
+        model=args.model, limit=args.limit,
         run_id=args.run_id, experiment=args.experiment, budget_usd=args.budget_usd,
-        ledger_path=args.ledger, data_collection=args.provider_data_collection,
+        ledger_path=args.ledger, run_cap_usd=args.run_cap_usd,
+        data_collection=args.provider_data_collection,
         price_in=args.price_in_per_mtok, price_out=args.price_out_per_mtok,
         results_dir=args.results_dir, cache_dir=args.cache_dir,
     )

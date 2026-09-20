@@ -72,9 +72,11 @@ Point at three things and no more:
    human-readable table went to `stderr`. That separation is why a rogue log line cannot
    corrupt an ingestion pipeline.
 2. **The four fields, each with its quote**, and `VERIFIED` beside each one.
-3. **The footer: milliseconds and dollars.** Say the measured numbers: median 1,216 ms, worst
-   case 2,442 ms across 67 notes, all 67 inside Dr Aisha's three-second budget, at
-   **$0.000594 per note**.
+3. **The footer: milliseconds and dollars.** Say the measured numbers: median **1,213 ms**,
+   95th percentile 1,600 ms, at **$0.000615 per note**. Be exact about the tail: in the current
+   run 66 of 67 notes finished inside Dr Aisha's three-second budget and one took 12 seconds.
+   The first run's worst case was 2,442 ms and all 67 were inside it. A tail like that is a
+   queueing problem to solve, not a number to hide.
 
 > If you want the pipe visible: `... | python -m json.tool | head -20`.
 

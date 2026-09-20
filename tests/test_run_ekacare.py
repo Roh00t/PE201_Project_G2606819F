@@ -228,6 +228,67 @@ class Batch(unittest.TestCase):
         # anomalous note is a safe abstention, exit 1.
         self.assertEqual(summary["exit_counts"], {"0": 2, "1": 1})
 
+    def test_a_registered_but_unsealed_version_refuses_and_says_what_to_do(self):
+        with self.assertRaises(run_ekacare.Refused) as caught:
+            run_ekacare.load_gold(run_ekacare.BatchConfig(gold_version="gold-v2"))
+        message = caught.exception.message
+        self.assertEqual(caught.exception.exit_code, run_ekacare.EXIT_REFUSED)
+        self.assertIn("gold-v2 is not sealed", message)
+        self.assertIn("validate --seal", message)
+
+    def test_an_unknown_gold_version_is_refused_at_configuration_time(self):
+        with self.assertRaises(run_ekacare.Refused) as caught:
+            self.config(gold_version="gold-v99")
+        self.assertIn("unknown gold version", caught.exception.message)
+
+    def test_a_file_that_does_not_declare_the_expected_version_is_refused(self):
+        # Third signal after path identity and the hash: scoring a gold-v1 file
+        # as if it were gold-v2 must not be possible by accident.
+        self.seal()
+        with self.assertRaises(run_ekacare.Refused) as caught:
+            run_ekacare.load_gold(self.config(gold_schema_version="gold-v2"))
+        self.assertIn("declares schema_version 'gold-v1'", caught.exception.message)
+
+    def test_a_file_from_another_corpus_is_refused(self):
+        self.seal()
+        with self.assertRaises(run_ekacare.Refused) as caught:
+            run_ekacare.load_gold(self.config(dataset=run_ekacare.MTSAMPLES))
+        self.assertIn("must be pulled from mtsamples", caught.exception.message)
+
+    def test_the_registry_still_points_gold_v1_at_the_real_seal(self):
+        # A guard on the guard: an edit to the registry that repointed gold-v1
+        # would silently change what every reportable run is scored against.
+        entry = run_ekacare.REGISTRY["gold-v1"]
+        self.assertEqual(entry.path, run_ekacare.SEALED_PATH)
+        self.assertEqual(entry.sha_path, run_ekacare.SEALED_SHA_PATH)
+        self.assertEqual(entry.dataset, run_ekacare.DATASET)
+        self.assertEqual(entry.schema_version, "gold-v1")
+
+    def test_a_run_cap_refuses_before_the_call_that_would_cross_it(self):
+        # The project ceiling is $8; this run may spend a hundredth of a cent.
+        # The first call must be refused before any money moves, and it must be
+        # filed as a spend problem rather than as an upstream failure.
+        self.seal()
+        client = self.fake()
+        summary, code = self.run_batch(self.config(run_cap_usd=0.0001), client)
+        self.assertEqual(client.calls, 0)
+        self.assertEqual(code, run_ekacare.EXIT_BUDGET)
+        self.assertEqual(summary["breaker"]["reason_code"], "SPEND_EXHAUSTED")
+        self.assertEqual(set(summary["error_codes"].values()), {"ERR_BUDGET_EXCEEDED"})
+        self.assertEqual(summary["cost"]["calls"], 0)
+        self.assertEqual(SpendLedger(self.tmp / "ledger.json").spent(), 0.0)
+
+    def test_a_generous_run_cap_leaves_the_run_alone_and_audits_it(self):
+        self.seal()
+        summary, code = self.run_batch(self.config(run_cap_usd=1.00), self.fake())
+        self.assertEqual(code, 0)
+        cost = summary["cost"]
+        self.assertEqual((cost["calls"], cost["cap_usd"]), (2, 1.00))
+        self.assertAlmostEqual(cost["billed_usd"], 2 * 0.00055)
+        self.assertEqual(cost["destinations"][0]["provider"], "Google AI Studio")
+        self.assertEqual(cost["failed_calls"], 0)
+        self.assertTrue((self.tmp / "results" / "t1" / "metrics.json").is_file())
+
     def test_main_prints_exactly_one_json_document(self):
         # The fixture carries one unlabelled field, because that is what must
         # stop scoring. It is built here rather than read from the working

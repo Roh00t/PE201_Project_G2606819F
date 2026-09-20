@@ -11,6 +11,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
@@ -347,6 +348,37 @@ class FakeClient:
                 return item
 
         self.chat = SimpleNamespace(completions=Completions())
+
+
+class LatencyBudget(unittest.TestCase):
+    """End to end means the API time plus ours. Measuring only the local clock
+    reported a 12-second call as inside the 3-second budget, because in a batch
+    the payload is built from a cached result and the local clock never saw it."""
+
+    def payload(self, api_ms):
+        extraction = extract.ClinicalExtraction.model_validate(extract.MOCK_RESPONSE)
+        note = "Start metformin 500 mg po bid."
+        payload, _, _ = extract.build_payload(
+            extraction, note, extract.scan_input(note), True, note="t",
+            model_label="test", usage={"called": True, "billed_usd": 0.0},
+            provenance={"called": True}, api_ms=api_ms, started=time.perf_counter())
+        return payload
+
+    def test_a_fast_call_is_inside_the_budget(self):
+        payload = self.payload(1200.0)
+        self.assertTrue(payload["within_budget"])
+        self.assertEqual(payload["latency_ms"]["api"], 1200.0)
+        self.assertGreaterEqual(payload["latency_ms"]["total"], 1200.0)
+
+    def test_a_slow_call_is_not_inside_the_budget(self):
+        payload = self.payload(11993.3)
+        self.assertFalse(payload["within_budget"])
+        self.assertGreater(payload["latency_ms"]["total"], extract.LATENCY_BUDGET_MS)
+
+    def test_the_total_is_the_api_time_plus_the_local_time(self):
+        payload = self.payload(1000.0)
+        latency = payload["latency_ms"]
+        self.assertAlmostEqual(latency["total"], latency["api"] + latency["local"], places=1)
 
 
 class ModelCallRetryAndLedger(unittest.TestCase):

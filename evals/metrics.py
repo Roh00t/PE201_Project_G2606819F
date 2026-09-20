@@ -1,0 +1,619 @@
+#!/usr/bin/env python3
+"""WHAT A RUN ACTUALLY MEASURED — populations, layers, and whether a gap is real.
+
+    ./.venv/bin/python evals/metrics.py evals/results/<run_id>
+    ./.venv/bin/python evals/metrics.py evals/results/<run_a> evals/results/<run_b>
+
+Free. Pure functions over artefacts already on disk. No network, no key, no
+tokens, nothing written anywhere. Enforcement lives in `evals/spend_guard.py`;
+this module only reads. A module that can refuse a call should not also be the
+one that scores it.
+
+## Why this exists, and why it exists late
+
+`evals/run_ekacare.py` answers "how good is it". `evals/diagnose.py` answers
+"why is that number what it is". Neither answers the question that decides
+whether a change was an improvement at all:
+
+> **How far apart must two of these numbers sit before the gap means anything?**
+
+The prompt correction on 2026-09-20 moved pooled recall from 0.600 to 0.645 and
+was reported as a 4.5-point improvement. At n = 155 labelled fields that gap may
+be indistinguishable from re-running the same system, and a recall figure quoted
+without that check is one sample of a noisy process presented as a finding. So
+this module reports:
+
+  - **populations**, which must sum to the case count: cases scored, cases whose
+    payload was an error envelope, and cases our own code refused to send. Only
+    the first can be read as a statement about the model.
+  - **layer ownership** for every failure, reusing `diagnose.attribute` rather
+    than re-deriving it. A second implementation of the same comparison is a
+    second answer to the same question.
+  - **cost per correct field**, not cost per call. Cost per call flatters a
+    system that fails cheaply.
+  - **separability**: paired McNemar between two runs over the same gold set,
+    and an unpaired two-proportion test when the case sets differ.
+
+A large p-value here does **not** mean two systems are equally good. It means
+this experiment was too small to tell, which is a statement about the experiment
+rather than about the systems. Report it that way.
+
+Standard library only, so `math.erfc` gives the normal tail and there is nothing
+to install.
+"""
+
+import argparse
+import collections
+import json
+import math
+import statistics
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "evals"))
+
+import diagnose  # noqa: E402  (its attribution, so causes cannot drift apart)
+from extract import CRITICAL_FIELDS  # noqa: E402
+from scoring import value_matches, wilson  # noqa: E402
+
+SEALED_PATH = ROOT / "data" / "gold_labels" / "gold_v1.json"
+RESULTS_DIR = ROOT / "evals" / "results"
+
+EXIT_OK = 0
+EXIT_UNUSABLE = 2
+EXIT_INTERNAL = 6
+
+# Which layer owns the fix. A count with no owner is an observation; a count
+# with an owner is a work item. Keyed off diagnose.CAUSES so the two files
+# cannot disagree about what a cause is.
+LAYER = {
+    "CORRECT": "-",
+    "CORRECT_NEGATIVE": "-",
+    "MED_STRENGTH_APPENDED": "prompt (field rules contradicted each other)",
+    "MED_DIFFERENT_DRUG": "schema (one slot, a median of three drugs)",
+    "MED_MODEL_SILENT": "model",
+    "MED_GOLD_SILENT": "labels or model (disputed)",
+    "DOSE_GOLD_NOT_A_STRENGTH": "labels (the label breaks its own field rule)",
+    "DOSE_OTHER_DRUG": "schema (cascade of the drug choice)",
+    "DOSE_MODEL_SILENT": "model",
+    "DOSE_GATE_BLANKED": "gate (correct on inspection; the label is the defect)",
+    "DOSE_GOLD_SILENT": "labels or model (disputed)",
+    "FREQ_PHRASE_LENGTH": "labels (food timing the field rule excludes)",
+    "FREQ_DIFFERENT_REGIMEN": "schema (cascade of the drug choice)",
+    "FREQ_MODEL_SILENT": "model",
+    "FREQ_GOLD_SILENT": "labels or model (disputed)",
+    "ALLERGY_MISMATCH": "corpus (no allergy positives exist)",
+}
+
+
+# =====================================================================
+# FRACTIONS THAT DO NOT OVERCLAIM
+# =====================================================================
+def frac(n, d):
+    """A fraction that never pretends to be a rate it cannot support."""
+    return {"n": n, "d": d,
+            "rate": (float(n) / d) if d else None,
+            "text": ("%d/%d (%.1f%%)" % (n, d, 100.0 * n / d)) if d
+                    else "%d/0 (n/a)" % n}
+
+
+def percentile(values, p):
+    """Nearest-rank percentile, round-half-up. None, never 0, for an empty list.
+
+    The convention is stated because there are three in common use and they
+    disagree on small samples: the 90th percentile of 1..10 is 10 here, and 9
+    under the ceiling convention. This is the definition for the whole project;
+    `spend_guard.py` repeats the expression rather than importing it, so that
+    enforcement never depends on measurement, and says so there.
+    """
+    if not values:
+        return None
+    ordered = sorted(values)
+    rank = max(1, int(round(p / 100.0 * len(ordered) + 0.5)))
+    return ordered[min(rank, len(ordered)) - 1]
+
+
+# =====================================================================
+# THE SPLIT — and it must sum to the case count
+# =====================================================================
+def split(gold_cases, gated, ungated):
+    """Three populations. Only `scored` says anything about the model.
+
+    `refused` is this project's equivalent of a run our own code stopped: the
+    note carried hidden or look-alike characters, so the encoding gate wiped
+    every field and no call was ever made. Counting those as model abstentions
+    would report the model declining something it never saw.
+    """
+    scored, errored, refused = [], [], []
+    for case in gold_cases:
+        case_id = case["case_id"]
+        run, raw = gated.get(case_id), ungated.get(case_id)
+        if run is None:
+            continue
+        if run.get("status") != "ok" or not raw or raw.get("status") != "ok":
+            errored.append(case_id)
+        elif (run.get("gate")
+              and all(g["code"] == "ABSTAIN_ENCODING_ANOMALY" for g in run["gate"])):
+            refused.append(case_id)
+        else:
+            scored.append(case_id)
+    return {"scored": scored, "errored": errored, "refused": refused,
+            "total": len(gold_cases)}
+
+
+# =====================================================================
+# FIELD QUALITY — scored cases only
+# =====================================================================
+def field_quality(gold_cases, gated, scored_ids=None):
+    """Per-field precision, recall and F1, plus macro-F1 over the four fields.
+
+    Definitions are `scoring.py`'s, deliberately and exactly: a field is
+    *proposed* when the gates let it through (VERIFIED or REVIEW), *correct*
+    when it is proposed, gold says found, and the values match under the
+    pre-registered `scoring.value_matches`; **precision is correct / proposed**
+    and **recall is correct / gold-found**.
+
+    The textbook `tp / (tp + fn)` is wrong for this task and was wrong here
+    first. A field that is proposed but wrong is not only a false positive - it
+    is also a gold fact the physician did not get - so counting it solely as a
+    false positive made medication recall read 100% while `scores.json` said
+    69.6%. Two implementations of one metric are two answers to one question,
+    and the pre-registered one wins. Macro-F1 is all this module adds.
+    """
+    scored_ids = set(scored_ids) if scored_ids is not None else None
+    per_field, f1s = {}, []
+    for field in CRITICAL_FIELDS:
+        tp = proposed_n = gold_found = 0
+        for case in gold_cases:
+            case_id = case["case_id"]
+            if case_id not in gated or (scored_ids is not None
+                                        and case_id not in scored_ids):
+                continue
+            truth = case["ground_truth"][field]
+            code = {g["field"]: g["code"] for g in gated[case_id]["gate"]}[field]
+            proposed = code == "VERIFIED" or code.startswith("REVIEW")
+            value = gated[case_id]["extraction"][field]["value"] or ""
+            right = (truth["status"] == "found"
+                     and value_matches(field, value, truth["value"] or ""))
+            tp += bool(proposed and right)
+            proposed_n += bool(proposed)
+            gold_found += truth["status"] == "found"
+        precision, recall = frac(tp, proposed_n), frac(tp, gold_found)
+        p, r = precision["rate"], recall["rate"]
+        f1 = (2 * p * r / (p + r)) if (p and r) else (
+            0.0 if (p is not None and r is not None) else None)
+        per_field[field] = {"support": gold_found, "precision": precision,
+                            "recall": recall, "f1": f1}
+        if f1 is not None:
+            f1s.append(f1)
+    return {"per_field": per_field,
+            "macro_f1": (sum(f1s) / len(f1s)) if f1s else None}
+
+
+# =====================================================================
+# RUN SHAPE — what a CORRECT field cost
+# =====================================================================
+def run_shape(gold_cases, gated, correct_fields):
+    """Tokens, dollars and latency, with cost expressed per correct field.
+
+    `cost_per_correct_field` is the number to quote. Cost per call flatters a
+    system that fails cheaply, and the two differ by however wrong the system
+    is: at 0.645 recall a correct field costs roughly 1.5x a call.
+    """
+    served = [p for p in gated.values() if (p.get("provenance") or {}).get("called")]
+    api = [p["latency_ms"]["api"] for p in served]
+    billed = sum((p.get("usage") or {}).get("billed_usd", 0.0) or 0.0 for p in served)
+    budget = next((p.get("latency_budget_ms") for p in gated.values()
+                   if p.get("latency_budget_ms")), None)
+    inside = sum(1 for p in served
+                 if budget and (p["latency_ms"]["api"]
+                                + (p["latency_ms"].get("local") or 0.0)) < budget)
+    return {
+        "calls": len(served),
+        "tokens_in": sum((p.get("usage") or {}).get("input_tokens", 0) or 0 for p in served),
+        "tokens_out": sum((p.get("usage") or {}).get("output_tokens", 0) or 0 for p in served),
+        "tokens_cached": sum((p.get("usage") or {}).get("cached_tokens", 0) or 0
+                             for p in served),
+        "cost_usd": round(billed, 6),
+        "cost_per_call": round(billed / len(served), 6) if served else None,
+        # None, never 0: a run that got nothing right has no cost per correct
+        # field, and 0.0 there would read as "free and correct".
+        "cost_per_correct_field": round(billed / correct_fields, 6) if correct_fields else None,
+        # `median` is statistics.median; the tails are nearest-rank round-half-up
+        # (percentile above). The key is named for the convention rather than
+        # called p50, because under nearest-rank the 50th percentile of an even
+        # sample is the upper middle value and not the median.
+        "latency_ms": {"median": statistics.median(api) if api else None,
+                       "p90": percentile(api, 90), "p95": percentile(api, 95),
+                       "max": max(api) if api else None},
+        "latency_budget_ms": budget,
+        "inside_budget": frac(inside, len(served)),
+    }
+
+
+# =====================================================================
+# FAILURE TAXONOMY — and the layer that owns each bucket
+# =====================================================================
+def failure_taxonomy(gold_cases, gated, ungated, scored_ids=None):
+    """Every failing field bucketed by cause, with the layer that owns the fix.
+
+    Causes come from `diagnose.attribute`, not from a second implementation
+    here. Two implementations of the same comparison are two answers to the
+    same question, and the one in `diagnose.py` is the one the tests pin.
+    """
+    scored_ids = set(scored_ids) if scored_ids is not None else None
+    disagreed = diagnose_disagreements(gold_cases, gated)
+    buckets, examples = collections.Counter(), {}
+    for case in gold_cases:
+        case_id = case["case_id"]
+        if case_id not in gated or case_id not in ungated:
+            continue
+        if scored_ids is not None and case_id not in scored_ids:
+            continue
+        for field in CRITICAL_FIELDS:
+            cause = diagnose.attribute(case, field, gated[case_id], ungated[case_id],
+                                       case_id in disagreed)
+            if cause.startswith("CORRECT"):
+                continue
+            buckets[cause] += 1
+            if cause not in examples:
+                truth = case["ground_truth"][field]
+                got = gated[case_id]["extraction"][field]["value"]
+                examples[cause] = f"{case_id} {field}: gold {truth['value']!r} vs {got!r}"
+    by_layer = collections.Counter()
+    for cause, count in buckets.items():
+        by_layer[LAYER.get(cause, "unclassified")] += count
+    return {
+        "failed_fields": sum(buckets.values()),
+        "buckets": [{"cause": cause, "count": count,
+                     "layer": LAYER.get(cause, "unclassified"),
+                     "example": examples.get(cause, "")}
+                    for cause, count in buckets.most_common()],
+        "by_layer": dict(by_layer.most_common()),
+    }
+
+
+def diagnose_disagreements(gold_cases, gated):
+    """Cases where the labeller and the model named different drugs."""
+    out = set()
+    for case in gold_cases:
+        case_id = case["case_id"]
+        if case_id not in gated:
+            continue
+        truth = case["ground_truth"]["medication"]
+        if truth["status"] != "found":
+            continue
+        value = gated[case_id]["extraction"]["medication"]["value"] or ""
+        gold_value = truth["value"] or ""
+        if value and not value_matches("medication", value, gold_value) and \
+                diagnose.medication_core(value) != diagnose.medication_core(gold_value):
+            out.add(case_id)
+    return out
+
+
+# =====================================================================
+# COST PROVENANCE — measured versus estimated, never blended
+# =====================================================================
+def cost_provenance(gated):
+    """What the provider charged versus what the price table predicted.
+
+    A figure built from a mixture of the two is neither, so they are reported
+    apart. A drift beyond rounding means the price table is stale, and a stale
+    price table makes the spend ceiling a guess.
+    """
+    served = [p for p in gated.values() if (p.get("provenance") or {}).get("called")]
+    measured = [p for p in served
+                if (p.get("usage") or {}).get("provider_cost_usd") is not None]
+    reported = sum((p["usage"]["provider_cost_usd"] or 0.0) for p in measured)
+    estimate = sum((p["usage"].get("est_cost_usd") or 0.0) for p in measured)
+    return {"calls_priced_by_provider": frac(len(measured), len(served)),
+            "provider_usd": round(reported, 6),
+            "estimate_usd": round(estimate, 6),
+            "drift_usd": round(reported - estimate, 6),
+            "all_measured": bool(served) and len(measured) == len(served)}
+
+
+# =====================================================================
+# HOW MUCH OF A DIFFERENCE IS REAL
+# =====================================================================
+def wilson_interval(passes, trials, z=1.96):
+    """95% Wilson interval, delegated to the pre-registered implementation.
+
+    `scoring.wilson` is the one every reported number already uses. Writing a
+    second one here would mean two intervals for the same count.
+    """
+    if not trials:
+        return (None, None)
+    return wilson(passes, trials, z)
+
+
+def two_proportion_p(passes_a, trials_a, passes_b, trials_b):
+    """Two-sided p for 'these two rates are the same'. Unpaired.
+
+    Use when the two arms did not see the same cases - the regex baseline on its
+    held-out 47 against the model on 67, for instance. When they did see the
+    same cases, `mcnemar` is both correct and far more powerful, because it
+    looks at which fields changed rather than at two summary rates.
+    """
+    if not trials_a or not trials_b:
+        return (0.0, 1.0)
+    p_a, p_b = passes_a / trials_a, passes_b / trials_b
+    pooled = (passes_a + passes_b) / (trials_a + trials_b)
+    se = math.sqrt(pooled * (1.0 - pooled) * (1.0 / trials_a + 1.0 / trials_b))
+    if se == 0:
+        return (0.0, 1.0)
+    z = (p_a - p_b) / se
+    return (z, math.erfc(abs(z) / math.sqrt(2.0)))
+
+
+def _binomial_two_sided(k, n):
+    """Exact two-sided binomial p at p=0.5. No scipy, and honest at small n,
+    where the chi-square form of McNemar is not."""
+    if n == 0:
+        return 1.0
+    tail = sum(math.comb(n, i) for i in range(0, min(k, n - k) + 1)) / (2.0 ** n)
+    return min(1.0, 2.0 * tail)
+
+
+def mcnemar(flips_to_right, flips_to_wrong):
+    """Exact McNemar for two systems over the same fields.
+
+    The two runs are scored on the same 67 cases against the same labels, so the
+    samples are paired and only the fields that CHANGED carry information. A
+    field both runs got right says nothing about which is better. `b` is
+    wrong -> right, `c` is right -> wrong; under "no difference" each flip is a
+    coin toss, so the exact binomial is the test.
+    """
+    b, c = flips_to_right, flips_to_wrong
+    return {"flipped_to_right": b, "flipped_to_wrong": c, "discordant": b + c,
+            "p": _binomial_two_sided(min(b, c), b + c),
+            "net": b - c}
+
+
+def field_outcomes(gold_cases, gated):
+    """(case_id, field) -> was it correct. The unit both comparisons need."""
+    out = {}
+    for case in gold_cases:
+        case_id = case["case_id"]
+        if case_id not in gated:
+            continue
+        codes = {g["field"]: g["code"] for g in gated[case_id]["gate"]}
+        for field in CRITICAL_FIELDS:
+            truth = case["ground_truth"][field]
+            if truth["status"] != "found":
+                continue          # recall's denominator, and the only paired unit
+            code = codes[field]
+            proposed = code == "VERIFIED" or code.startswith("REVIEW")
+            value = gated[case_id]["extraction"][field]["value"] or ""
+            out[(case_id, field)] = bool(
+                proposed and value_matches(field, value, truth["value"] or ""))
+    return out
+
+
+def compare(gold_cases, gated_a, gated_b, label_a="A", label_b="B"):
+    """Is B's recall really different from A's? Paired where possible.
+
+    Reported per field as well as pooled, because a change can be real in one
+    field and noise overall - which is exactly what the 2026-09-20 prompt
+    correction turned out to be.
+    """
+    a, b = field_outcomes(gold_cases, gated_a), field_outcomes(gold_cases, gated_b)
+    shared = sorted(set(a) & set(b))
+    rows = {}
+    for scope in ("pooled",) + tuple(CRITICAL_FIELDS):
+        keys = [k for k in shared if scope == "pooled" or k[1] == scope]
+        if not keys:
+            continue
+        ka, kb = sum(a[k] for k in keys), sum(b[k] for k in keys)
+        to_right = sum(1 for k in keys if b[k] and not a[k])
+        to_wrong = sum(1 for k in keys if a[k] and not b[k])
+        test = mcnemar(to_right, to_wrong)
+        rows[scope] = {
+            "n": len(keys),
+            label_a: frac(ka, len(keys)), label_b: frac(kb, len(keys)),
+            "delta_pp": round(100.0 * (kb - ka) / len(keys), 1),
+            "mcnemar": test,
+            "separated": test["p"] < 0.05,
+            "ci95_a": wilson_interval(ka, len(keys)),
+            "ci95_b": wilson_interval(kb, len(keys)),
+        }
+    return {"paired_fields": len(shared), "labels": [label_a, label_b], "scopes": rows}
+
+
+# =====================================================================
+# ONE RUN, IN ONE DICT
+# =====================================================================
+def load_run(run_dir: Path) -> dict:
+    def jsonl(name):
+        path = run_dir / name
+        if not path.is_file():
+            return {}
+        return {r["case_id"]: r for r in
+                (json.loads(line) for line in
+                 path.read_text(encoding="utf-8").splitlines() if line)}
+
+    manifest_path = run_dir / "manifest.json"
+    return {
+        "dir": run_dir,
+        "manifest": (json.loads(manifest_path.read_text(encoding="utf-8"))
+                     if manifest_path.is_file() else {}),
+        "gated": jsonl("gated.jsonl"),
+        "ungated": jsonl("ungated.jsonl"),
+    }
+
+
+def headline(run_dir: Path, gold_path: Path = SEALED_PATH) -> dict:
+    """Everything one run says, in one dict, for cross-run history."""
+    run = load_run(Path(run_dir))
+    gold_cases = json.loads(Path(gold_path).read_text(encoding="utf-8"))["cases"]
+    gated, ungated = run["gated"], run["ungated"] or run["gated"]
+    pops = split(gold_cases, gated, ungated)
+    quality = field_quality(gold_cases, gated, pops["scored"])
+    outcomes = field_outcomes(gold_cases, gated)
+    correct = sum(outcomes.values())
+    manifest = run["manifest"]
+    return {
+        "run_id": manifest.get("run_id", Path(run_dir).name),
+        "mode": manifest.get("mode"),
+        "model": manifest.get("model"),
+        "experiment": manifest.get("experiment"),
+        "prompt_fingerprint": manifest.get("prompt_fingerprint"),
+        "gold_version": (manifest.get("gold") or {}).get("version"),
+        "populations": {k: len(v) for k, v in pops.items() if k != "total"},
+        "cases": pops["total"],
+        "recall": frac(correct, len(outcomes)),
+        "recall_ci95": wilson_interval(correct, len(outcomes)),
+        "macro_f1": quality["macro_f1"],
+        "per_field": {f: {"recall": v["recall"]["text"], "precision": v["precision"]["text"],
+                          "f1": v["f1"]} for f, v in quality["per_field"].items()},
+        "shape": run_shape(gold_cases, gated, correct),
+        "cost_provenance": cost_provenance(gated),
+        "taxonomy": failure_taxonomy(gold_cases, gated, ungated, pops["scored"]),
+    }
+
+
+# =====================================================================
+# RENDERING
+# =====================================================================
+def render(head: dict) -> str:
+    out, w = [], None
+    out.append("=" * 74)
+    out.append("  %s · %s · prompt %s%s" % (
+        head["run_id"], head["model"], head["prompt_fingerprint"],
+        f" · experiment {head['experiment']}" if head.get("experiment") else ""))
+    out.append("=" * 74)
+    w = out.append
+
+    pops = head["populations"]
+    w("")
+    w("  WHAT HAPPENED TO %d CASES" % head["cases"])
+    w("    scored (the model answered)        %d" % pops["scored"])
+    w("    error envelope, never scored       %d" % pops["errored"])
+    w("    refused by our own code            %d" % pops["refused"])
+    if pops["errored"] or pops["refused"]:
+        w("    ^ only the first row is a statement about the model. An upstream")
+        w("      failure is not an abstention, and a note our encoding gate")
+        w("      refused to send was never seen by any model.")
+
+    w("")
+    w("  FIELD QUALITY - scored cases only")
+    w("    %-12s %-14s %-14s %s" % ("field", "precision", "recall", "F1"))
+    for field, v in head["per_field"].items():
+        w("    %-12s %-14s %-14s %s" % (
+            field, v["precision"], v["recall"],
+            "%.2f" % v["f1"] if v["f1"] is not None else "n/a"))
+    low, high = head["recall_ci95"]
+    w("    pooled recall %s   95%% CI %.3f-%.3f   macro-F1 %s" % (
+        head["recall"]["text"], low, high,
+        "%.2f" % head["macro_f1"] if head["macro_f1"] is not None else "n/a"))
+
+    shape = head["shape"]
+    w("")
+    w("  RUN SHAPE")
+    w("    calls            %d" % shape["calls"])
+    w("    tokens           %s in / %s out%s" % (
+        "{:,}".format(shape["tokens_in"]), "{:,}".format(shape["tokens_out"]),
+        " / {:,} cached".format(shape["tokens_cached"]) if shape["tokens_cached"] else ""))
+    w("    cost per call            %s" % (
+        "US$%.6f" % shape["cost_per_call"] if shape["cost_per_call"] is not None else "n/a"))
+    w("    cost per CORRECT field   %s" % (
+        "US$%.6f" % shape["cost_per_correct_field"]
+        if shape["cost_per_correct_field"] is not None else "n/a - nothing was correct"))
+    w("    ^ the second is the one to quote. A system that fails cheaply looks")
+    w("      cheap only on the first.")
+    if shape["latency_ms"]["median"] is not None:
+        w("    latency          median %.0f ms  p90 %.0f ms  p95 %.0f ms  max %.0f ms" % (
+            shape["latency_ms"]["median"], shape["latency_ms"]["p90"],
+            shape["latency_ms"]["p95"], shape["latency_ms"]["max"]))
+        w("    inside the %s ms budget   %s" % (
+            shape["latency_budget_ms"], shape["inside_budget"]["text"]))
+
+    prov = head["cost_provenance"]
+    w("")
+    w("  COST PROVENANCE - measured against the price table, never blended")
+    w("    provider priced %s   US$%.6f charged / US$%.6f predicted (drift US$%+.6f)" % (
+        prov["calls_priced_by_provider"]["text"], prov["provider_usd"],
+        prov["estimate_usd"], prov["drift_usd"]))
+    if not prov["all_measured"]:
+        w("    ^ not every call carries a provider figure: do not quote the total")
+
+    tax = head["taxonomy"]
+    w("")
+    w("  WHY %d FIELDS FAILED, AND WHOSE PROBLEM EACH IS" % tax["failed_fields"])
+    w("    %-30s %-6s %s" % ("cause", "count", "layer that owns the fix"))
+    for bucket in tax["buckets"]:
+        w("    %-30s %-6d %s" % (bucket["cause"][:30], bucket["count"], bucket["layer"]))
+    w("")
+    w("    by layer:")
+    for layer, count in tax["by_layer"].items():
+        w("      %-58s %d" % (layer, count))
+    w("")
+    return "\n".join(out)
+
+
+def render_comparison(result: dict) -> str:
+    label_a, label_b = result["labels"]
+    out = ["=" * 74,
+           "  IS THE DIFFERENCE REAL?  %s  ->  %s" % (label_a, label_b),
+           "=" * 74, "",
+           "  Paired over %d labelled fields: the same cases, the same labels, so"
+           % result["paired_fields"],
+           "  only fields that CHANGED carry information (exact McNemar).", ""]
+    out.append("    %-12s %-14s %-14s %-8s %-14s %s"
+               % ("scope", label_a[:14], label_b[:14], "delta", "flips r/w", "p"))
+    for scope, row in result["scopes"].items():
+        test = row["mcnemar"]
+        out.append("    %-12s %-14s %-14s %+7.1fpp %-14s %.3f%s" % (
+            scope, row[label_a]["text"], row[label_b]["text"], row["delta_pp"],
+            "%d / %d" % (test["flipped_to_right"], test["flipped_to_wrong"]),
+            test["p"], "  SEPARATED" if row["separated"] else ""))
+    out.append("")
+    pooled = result["scopes"].get("pooled")
+    if pooled and not pooled["separated"]:
+        out.append("  Pooled: NOT separated at alpha 0.05. That does not mean the two are")
+        out.append("  equally good - it means this experiment is too small to tell, which")
+        out.append("  is a statement about the experiment and not about the systems.")
+    separated = [s for s, r in result["scopes"].items() if r["separated"] and s != "pooled"]
+    if separated:
+        out.append("  Separated in: %s. A change can be real in one field and noise"
+                   % ", ".join(separated))
+        out.append("  overall; report it at the level where the evidence supports it.")
+    out.append("")
+    return "\n".join(out)
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("run_dir", nargs="+", type=Path,
+                        help="one run to describe, or two to compare")
+    parser.add_argument("--gold", type=Path, default=SEALED_PATH)
+    parser.add_argument("--quiet", action="store_true", help="JSON on stdout only")
+    args = parser.parse_args(argv)
+
+    for path in args.run_dir:
+        if not (path / "gated.jsonl").is_file():
+            print(f"{path}: no gated.jsonl", file=sys.stderr)
+            return EXIT_UNUSABLE
+    if not args.gold.is_file():
+        print(f"{args.gold}: not found", file=sys.stderr)
+        return EXIT_UNUSABLE
+
+    report = {"runs": [headline(path, args.gold) for path in args.run_dir]}
+    if not args.quiet:
+        for head in report["runs"]:
+            print(render(head), file=sys.stderr)
+    if len(args.run_dir) == 2:
+        gold_cases = json.loads(args.gold.read_text(encoding="utf-8"))["cases"]
+        a, b = (load_run(p)["gated"] for p in args.run_dir)
+        labels = [h["prompt_fingerprint"] or h["run_id"] for h in report["runs"]]
+        report["comparison"] = compare(gold_cases, a, b, labels[0], labels[1])
+        if not args.quiet:
+            print(render_comparison(report["comparison"]), file=sys.stderr)
+    sys.stdout.write(json.dumps(report, indent=2, default=str) + "\n")
+    return EXIT_OK
+
+
+if __name__ == "__main__":
+    sys.exit(main())

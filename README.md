@@ -145,7 +145,9 @@ argparse usage errors also exit 2, but print no envelope.
 ### Batch evaluation (`evals/run_ekacare.py`)
 
 ```bash
-./.venv/bin/python evals/run_ekacare.py        # live: needs the sealed gold-v1 and OPENROUTER_API_KEY
+./.venv/bin/python evals/run_ekacare.py                          # live: sealed gold-v1 + OPENROUTER_API_KEY
+./.venv/bin/python evals/run_ekacare.py --gold-version gold-v2   # once gold-v2 is sealed
+./.venv/bin/python evals/run_ekacare.py --experiment my-change --run-cap-usd 0.25
 ./.venv/bin/python evals/run_ekacare.py --mock --gold data/gold_labels/gold_v1_template.json --limit 3
 ```
 
@@ -156,11 +158,16 @@ and ungated, so the abstention test costs no extra call; scores come from
 gated and ungated JSONL, `scores.json`, `rows.csv` with formula-safe cells);
 stdout is one JSON summary.
 
-A live run refuses, before any call: any gold file other than the sealed
-`data/gold_labels/gold_v1.json`; a file whose SHA-256 no longer matches
-`gold_v1.sha256`; unlabelled fields; note text that drifted from its md5; a
-prompt changed since the seal (unless `--experiment NAME`, reported
-separately); and a worst case the remaining budget cannot cover. A circuit
+**Which gold set.** `--gold-version` selects a registered, sealed set; each entry
+(`run_ekacare.py:REGISTRY`) declares its path, its SHA-256 file, the corpus it may score and
+the label schema the file must itself declare. `gold-v1` is the default; `gold-v2` and
+`allergy-v1` are registered and refuse with the command that would seal them until they exist.
+
+A live run refuses, before any call: any gold file other than the sealed file of the requested
+version; a file whose SHA-256 no longer matches its seal; a file from another corpus or
+declaring another schema version; unlabelled fields; note text that drifted from its md5; a
+prompt changed since the seal (unless `--experiment NAME`, reported separately); and a worst
+case the remaining budget cannot cover. A circuit
 breaker halts the run after 3 consecutive system failures, above a 5% error
 rate after 20 calls, or at once on a spend refusal (batch exit codes: 0 done,
 2 refused, 3 halted, 5 spend, 6 internal). Tag a case `#negation`,
@@ -197,6 +204,59 @@ output-handling surface (control S-07, OWASP LLM10:2026), and these notes contai
 `<PII>` placeholders that naive interpolation would swallow. `demo/notes/` holds the crafted
 notes the recorded demonstration uses; they live outside `gold/` so that directory stays clean.
 
+### Cost and token accounting (`evals/spend_guard.py`)
+
+Every live call is audited: prompt, completion, cached and reasoning tokens, the list-price
+estimate against OpenRouter's own charge, latency, attempts, and where it went — endpoint,
+provider, model requested versus model served, response id. Per-call lines land in
+`data/cache/metrics/<run_id>.jsonl` (gitignored, they carry response ids); an aggregate
+`metrics.json` is written beside the run's other artefacts, and the running total appears on
+each progress line.
+
+Two bounds, not one. The `$8` project ceiling belongs to `extract.SpendLedger`; each run also
+carries `--run-cap-usd` (default `$1.00`), checked against *worst case* before every call,
+because a loop inside one run would stay under the project ceiling while consuming it. A breach
+is refused before the call, carries `ERR_BUDGET_EXCEEDED` and exits 5 — never the generic halt
+code. Exactly one component records each call to the ledger: `extract.call_model` for the
+pipeline, or `CostGuard(records_to_ledger=True)` for a script that calls the endpoint directly.
+
+Measured over 67 live calls, the list-price model matched the provider's charge to $0.000001 in
+total, which is what makes the ceiling trustworthy rather than notional.
+
+### Schema probes (`evals/probes/`)
+
+```bash
+./.venv/bin/python evals/probes/probe_v4_schema.py --dry-run   # schemas only, no spend
+./.venv/bin/python evals/probes/probe_v4_schema.py             # live, capped at $0.002
+```
+
+`probe_v4_schema.py` asks the endpoint a question that cannot be answered offline: does strict
+structured output still work when the schema is an array of objects with `maxItems`? It tries
+the strict v4 list, then the same list without the wire-level bound, then today's v3 schema as
+a control, and stops at the first accepted variant. **Result (2026-09-20): `v4-strict`
+accepted on the first attempt** — `maxItems: 12`, nested objects, `additionalProperties: false`,
+`require_parameters: true`, `temperature: 0`, `seed: 0`, one call, $0.000635.
+
+### Is the difference real? (`evals/metrics.py`)
+
+```bash
+./.venv/bin/python evals/metrics.py evals/results/<run_id>              # describe one run
+./.venv/bin/python evals/metrics.py evals/results/<run_a> <run_b>       # compare two
+```
+
+Pure functions over artefacts already on disk: no network, no key, nothing written. It reports
+the three **populations** (scored, error envelope, refused by our own encoding gate — only the
+first says anything about the model), **layer ownership** for every failing field (schema,
+labels, prompt, gate or model), **cost per correct field** rather than per call, and the question
+neither of the other tools answers: *how far apart must two of these numbers sit before the gap
+means anything?* Two runs over the same gold set are paired, so only fields that changed carry
+information and the test is an exact McNemar.
+
+It is built so it cannot contradict `scores.json`: per-field precision and recall use
+`scoring.py`'s definitions, the confidence interval is `scoring.wilson`, and causes come from
+`diagnose.attribute`. A test asserts the match against every finished run on disk, because two
+implementations of one metric are two answers to one question.
+
 ### Why a run scored what it did (`evals/diagnose.py`)
 
 ```bash
@@ -215,6 +275,57 @@ gold labels that `extract.verify_value` - the gate the pipeline applies to the
 model - would reject, as candidates for a gold-v2 labelling pass.
 `gold_v1.json` is never written to. stdout is one JSON document, the tables go
 to stderr.
+
+### Results so far
+
+Every row is the same 67 sealed gold cases, the same gates, and the same pre-registered
+matching rules in `evals/scoring.py`. Recall is the headline; the silent-failure rate — a field
+shown as VERIFIED that is wrong — is the one to drive to zero.
+
+| Arm | recall | precision | silent | abstain | medication | dose | frequency |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| model, prompt `a92d2abc` (current) | **0.645** | 0.694 | 0.308 | 0.027 | 0.696 | 0.565 | 0.660 |
+| model, prompt `73c882d1` (first run) | 0.600 | 0.650 | 0.350 | 0.021 | 0.571 | 0.543 | 0.679 |
+
+The two model rows are **not statistically separated** (paired McNemar p = 0.14); see below
+before quoting the gap between them as an improvement.
+| regex baseline, pattern-only | 0.381 | 0.527 | 0.473 | 0.000 | 0.321 | 0.196 | 0.604 |
+| regex baseline, held-out 47 cases | 0.353 | 0.483 | 0.517 | 0.000 | 0.233 | 0.200 | 0.610 |
+| regex + RxNorm gazetteer (14,689 names) | 0.381 | 0.488 | 0.512 | 0.000 | 0.339 | 0.196 | 0.585 |
+| majority class ("everything is not_stated") | 0.000 | — | — | — | — | — | — |
+
+The majority-class row is why the others need context: answering `not_stated` to everything
+already agrees with gold on **113 of 268** field decisions (42.2%) while finding nothing.
+
+**What the prompt fix bought, and what cannot yet be claimed.** `a92d2abc` corrected a
+contradiction in `FIELD_RULES` — one rule offered `Dolo 650` as a medication name while the other
+claimed the `650` as the dose — and told the model that `not_stated` means the empty string, not
+the word. Two different kinds of evidence came back, and they deserve different confidence:
+
+- **The mechanism is established.** The failure category "same drug, strength appended to the
+  name" went from **8 occurrences to zero** (`evals/diagnose.py`). That is a count of a named
+  defect, not a noisy rate.
+- **The recall improvement is not.** Paired over the same 155 labelled fields, 12 fields flipped
+  wrong → right and 5 flipped right → wrong: exact McNemar **p = 0.14**, so the 4.5-point pooled
+  gain is *not separated* at α 0.05. Medication alone is 9 flips against 2, **p = 0.065** —
+  suggestive, still not separated. Run `evals/metrics.py <run_a> <run_b>` to reproduce.
+
+A large p-value here does not mean the two prompts are equally good; it means 155 fields is too
+small a sample to tell, which is a fact about this evaluation rather than about the prompts. The
+remedy is more labelled fields, which is one more argument for gold-v2. Cost $0.041221 for 67
+calls.
+
+**Where the rest of the gap is.** Not the model. Two of 65 failures in the first run were the
+model failing to read something; the remainder is a single medication slot in a corpus whose
+notes carry a median of three drugs, plus 16 gold labels that contradict a rule the gold set
+itself states. Conditioned on the 51 notes where the labeller and the model named the same
+drug, dose was right 24 of 26 and frequency 30 of 30. Full attribution in
+`docs/technique_selection.md`; the cost consequence in `docs/cost_to_serve.md`.
+
+**Operational.** API latency p50 1,213 ms, p95 1,600 ms across the current run, with one outlier
+at 11,993 ms — so 66 of 67 finished inside the 3,000 ms verification budget, not 67. (The first
+run's maximum was 2,442 ms and all 67 were inside it.) `within_budget` now means API time plus
+local time; measuring only the local clock reported that 12-second call as inside the budget.
 
 ### Tests
 
@@ -359,9 +470,13 @@ src/extract.py     the whole pipeline, one file (CLAUDE.md 1.1), in sections:
                    gates, 5 spend ledger, 6-7 pipeline and CLI
 tests/             offline unittest suite: gates, budget, CLI contract, scoring, batch loop, seal
 evals/             label_gold_v1.py (profile / template / label / validate / stats),
-                   run_ekacare.py (batch loop), scoring.py (metrics, Wilson CIs),
-                   diagnose.py (failure attribution), baseline.py (the non-AI
-                   comparator), score_arm.py (score any arm in run shape)
+                   run_ekacare.py (batch loop + the sealed-gold registry),
+                   scoring.py (metrics, Wilson CIs), diagnose.py (failure
+                   attribution), baseline.py (the non-AI comparator),
+                   score_arm.py (score any arm in run shape), spend_guard.py
+                   (per-call cost audit and the per-run cap: ENFORCEMENT),
+                   metrics.py (populations, layers, separability: MEASUREMENT),
+                   probes/ (live schema spikes)
 demo/              build_review.py -> review.html (the verification screen), notes/
 docs/              cost_to_serve.md, technique_selection.md, video_script.md,
                    the Colab first-version notebook

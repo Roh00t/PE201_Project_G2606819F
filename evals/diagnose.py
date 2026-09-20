@@ -406,9 +406,31 @@ def _rel(path: Path) -> str:
         return str(path)
 
 
-def newest_run(results_dir: Path) -> Path | None:
-    runs = [p for p in sorted(results_dir.glob("*")) if (p / "manifest.json").is_file()]
-    return runs[-1] if runs else None
+def newest_run(results_dir: Path, exclude_modes: tuple = ("baseline",)) -> Path | None:
+    """The most recently written run of the system, by modification time.
+
+    Two corrections live here. Sorting by name worked while every run id began
+    with a timestamp and broke as soon as the baseline arms appeared, because
+    "baseline-pattern-all" sorts after "20260920T133717Z-...". And a baseline arm
+    is not a run of the system - it has no model, no provenance and no cost - so
+    it is not what "the newest run" should mean by default. Point any tool at a
+    baseline directory explicitly to look at one.
+    """
+    runs = []
+    for path in results_dir.glob("*"):
+        manifest = path / "manifest.json"
+        if not manifest.is_file():
+            continue
+        try:
+            mode = json.loads(manifest.read_text(encoding="utf-8")).get("mode")
+        except ValueError:
+            mode = None
+        if mode in exclude_modes:
+            continue
+        runs.append(path)
+    if not runs:
+        return None
+    return max(runs, key=lambda p: (p / "manifest.json").stat().st_mtime)
 
 
 def print_report(report: dict, out) -> None:

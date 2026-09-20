@@ -3,7 +3,19 @@
 **System:** MediExtract. It turns a dictated consult note into four schema-valid fields (medication, dose, frequency, allergy), each with a verbatim quote behind it, and a blank where no quote can be found.
 **Course:** PE6201 Emerging AI Technologies, End-of-Course Project.
 **Document status:** version 1.1, 2026-09-18 (transport moved to OpenRouter; batch loop, scoring and the gold-v1 seal built).
-**Verified against:** the working tree on top of commit `9be6a78`. The uncommitted changes at verification time: `src/extract.py` (now the single pipeline file, with the former `schema.py`, `guardrails.py` and `budget.py` merged in as sections, per CLAUDE.md §1.1), the imports in `evals/` and `tests/`, and `README.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 107 tests, all passing, run offline and under `python -O`. One live call was made on 2026-09-18 (a synthetic note, `gold/case_001.txt`): all four fields verified or not stated, 2,357 ms end to end (1,808 ms model), $0.000592 billed.
+**Verified against:** the working tree on top of commit `66f9247`. Uncommitted at verification time: `src/extract.py` (the single pipeline file per CLAUDE.md §1.1, now with the P0 prompt corrections and the end-to-end latency fix), `evals/` (`metrics.py`, `baseline.py`, `score_arm.py`, `diagnose.py`, the sealed-gold registry in `run_ekacare.py`, and `probes/probe_v4_schema.py`), `demo/build_review.py`, the documents under `docs/`, `README.md` and `project_proposal.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 204 tests, all passing, run offline and under `python -O`; `pyflakes` clean over `src/`, `evals/`, `evals/probes/`, `tests/`, `demo/` and `data/gazetteer/`.
+
+**Live evidence behind the numbers in this document.** Two full batch runs over the sealed 67-case gold set and one schema probe, $0.081684 between them; the ledger's lifetime total is $0.082276 over 136 calls against the $8 ceiling, the difference being the single-note smoke test of 2026-09-18:
+
+| Run | Prompt | Result |
+| --- | --- | --- |
+| `20260920T065552Z` | `73c882d179a24bb1` | recall 0.600, precision 0.650, silent-failure 0.350, abstention 0.0205; 67 calls, $0.039828; API p50 1,216 ms, max 2,442 ms |
+| `20260920T133717Z` (`--experiment p0-prompt-fixes`) | `a92d2abcb2af4294` | recall 0.645, precision 0.694, silent-failure 0.308, abstention 0.027; 67 calls, $0.041221; API median 1,213 ms, p95 1,600 ms, one outlier at 11,993 ms |
+
+**The two batch runs are not statistically separated.** Paired over the same 155 labelled fields, 12 flipped wrong to right and 5 the other way: exact McNemar p = 0.14. The named defect the prompt fix targeted did disappear (8 occurrences to 0), but the 4.5-point recall gain is not evidence at this sample size, and no number in this document rests on it. `evals/metrics.py` reproduces the verdict.
+| `probe-v4-…` | n/a | the v4 medication-list schema with `maxItems: 12` accepted on the first attempt, one call, $0.000635, `data_collection: deny` |
+
+The second run also confirms that the stricter `provider.data_collection: "deny"` routes normally, so the `allow` used for the first run was never necessary.
 
 **Bound by:** the OWASP Top 10 for LLM Applications **2026** (not the Agentic list, which is used only as a cross-reference, and not the 2025 edition).
 
@@ -53,11 +65,12 @@ MediExtract exists for one moment. Dr. Aisha, a family physician at a Singapore 
 
 > **The model proposes; deterministic code disposes.** A rented language model does the one thing only it can do: read messy dictation and propose four fields, each with a quote. Everything that decides what the physician sees is ordinary, testable Python. That includes whether the quote is real, whether the value matches the quote, whether the numbers and units agree, whether the input is a note at all, and whether the budget allows the call.
 
-Three consequences follow.
+Four consequences follow.
 
 1. **A blank is a correct output.** Any field the system cannot tie to the physician's own words is shown as a blank with its reason. It is never shown as a guess.
 2. **No safety decision rests on a probability.** The model's self-reported status (`found`, `unsure`, `not_stated`) is an input to the gates, never their verdict. There is no numeric confidence threshold (§1.6 explains why).
-3. **Architecture is the strongest control.** MediExtract is a single pass with no tools, no retrieval, no memory and no write-back. A successful prompt injection therefore cannot move money, send data, run code or touch a record. Its worst outcome is a wrong proposal inside a review screen that shows the quote beside it. OWASP draws the same boundary [OWASP-2026 p. 7]: "This list owns the risk when the model is a component inside your application. The moment that model becomes an actor, with tools it can call, memory it carries between sessions, and consequences it sets in motion downstream, the risk moves to the OWASP Agentic Top 10." MediExtract is a component, which is why this specification is built on the LLM list and cross-references the Agentic list (§2.2).
+3. **In code, not in the prompt.** A rule written into the system instruction is a request; a rule written into Python is a constraint. Every control in this document that matters is the second kind, and the distinction is not theoretical here: on 2026-09-20 one note in 67 came back with the literal word `not_stated` in a value field, and one dose came back as `F.milligram`. The instruction to avoid both was already in the prompt. The gates caught both anyway, which is the whole argument. The prompt was then corrected as well — belt and braces — but the correction is the weaker of the two layers and is measured separately (§6.1).
+4. **Architecture is the strongest control.** MediExtract is a single pass with no tools, no retrieval, no memory and no write-back. A successful prompt injection therefore cannot move money, send data, run code or touch a record. Its worst outcome is a wrong proposal inside a review screen that shows the quote beside it. OWASP draws the same boundary [OWASP-2026 p. 7]: "This list owns the risk when the model is a component inside your application. The moment that model becomes an actor, with tools it can call, memory it carries between sessions, and consequences it sets in motion downstream, the risk moves to the OWASP Agentic Top 10." MediExtract is a component, which is why this specification is built on the LLM list and cross-references the Agentic list (§2.2).
 
 ### 1.2 Dual-layer security model
 
@@ -166,16 +179,19 @@ Span containment (`evidence in source_text`) is **deterministic**: it is a subst
 | G-21 | stdout carries one JSON document only; everything printed while the pipeline runs is redirected to stderr, and error lines always go to stderr, even with `--json-only` | IMPLEMENTED | src, evals | `src/extract.py:main`; `evals/run_ekacare.py:main` | LLM10 |
 | G-22 | Hard wipe and payload purity: wiped or absent values are `null`; stdout holds only codes, numbers, identifiers and validated values, with no display labels, gate reasons or error messages | IMPLEMENTED | src, evals | `src/extract.py:to_output`, `build_payload`, `error_envelope`; `evals/run_ekacare.py:run_batch` | LLM10, LLM07 |
 | G-23 | gold-v1 is write-once: the seal refuses to overwrite, records the prompt fingerprint and model, writes `gold_v1.sha256`, makes both read-only | IMPLEMENTED | evals | `evals/label_gold_v1.py:seal_goldset` | LLM05 |
-| G-24 | Batch preflight: live runs accept only the sealed, hash-verified, fully labelled gold file and the sealed prompt, and refuse when the worst case exceeds the remaining budget | IMPLEMENTED | evals | `evals/run_ekacare.py:load_gold`, `worst_case_for`, `run_batch` | LLM05, LLM06 |
+| G-24 | Batch preflight: live runs accept only the sealed, hash-verified, fully labelled gold file of the requested registry version (G-28), from the corpus that version declares, and the sealed prompt; and refuse when the worst case exceeds the remaining budget | IMPLEMENTED | evals | `evals/run_ekacare.py:load_gold`, `worst_case_for`, `run_batch` | LLM05, LLM06 |
 | G-25 | Placeholder API key refused (`OPENROUTER_API_KEY=sk-or-v1-...`) | IMPLEMENTED | src | `src/extract.py:load_api_key` | LLM02 |
 | G-26 | Encoding anomalies (bidirectional controls, invisible characters, homoglyphs) → **forced safe abstention**: every field wiped, the model never called, the note never cleaned | IMPLEMENTED | src, evals | `src/extract.py:encoding_flags`, `has_homoglyph`, `wiped_extraction`, `apply_gates`; `src/extract.py:run`; `evals/run_ekacare.py:run_batch` | LLM01, LLM07 |
+| G-27 | Per-call cost audit and a second, per-run cost cap: prompt, completion, cached and reasoning tokens, list-price estimate against the provider's own charge, latency, attempts and destination, refused before the call that would cross the cap | **IMPLEMENTED** | evals | `evals/spend_guard.py:CostGuard.check_before`, `record`, `summary`; `evals/run_ekacare.py:worst_case_one` | LLM06, LLM04 |
+| G-29 | Measurement kept separate from enforcement, and a result reported with its separability: populations that must sum to the case count, layer ownership per failing field, cost per correct field, and an exact paired test before a change is called an improvement | **IMPLEMENTED** | evals | `evals/metrics.py:split`, `failure_taxonomy`, `compare`, `mcnemar` | LLM07 |
+| G-28 | Sealed-gold registry: each version carries its own path, SHA-256 file, expected corpus and declared label schema, and a live run accepts only the registered sealed file for the version it was asked for | **IMPLEMENTED** | evals | `evals/run_ekacare.py:SealedGold`, `REGISTRY`, `BatchConfig.__post_init__`, `load_gold` | LLM05, LLM06 |
 | S-01 | PII and credential redaction (logs always; model payload optional, with a token map) | SPECIFIED, build #6 | src | new `src/redact.py` (§5.2) | LLM02 |
 | S-02 | Telemetry record: HMAC of the note, metadata only | SPECIFIED, build #5 | src | new `src/telemetry.py` (§5.3) | LLM02 |
 | S-03 | Per-request nonce delimiter (the template fingerprint part is IMPLEMENTED as `src/extract.py:prompt_fingerprint`) | SPECIFIED, build #10 | src | `src/extract.py` (§4.1) | LLM01, LLM08 |
 | S-04 | Refuse non-Latin-script notes (`ERR_INPUT_UNSUPPORTED_SCRIPT`) | SPECIFIED, build #3 | src | `src/extract.py:read_note` (§3 LLM01) | LLM07 |
 | S-05 | Hash-pinned lockfile plus `pip-audit` | SPECIFIED, build #7 | repo | `requirements.lock` (§3 LLM04) | LLM04 |
 | S-06 | No-secrets-in-context test | SPECIFIED, build #8 | tests | new `tests/test_prompt.py` (§3 LLM08) | LLM08 |
-| S-07 | HTML escaping in the review screen | SPECIFIED, build #12 | production | review UI (§3 LLM10) | LLM10 |
+| S-07 | Review screen output handling: every interpolated string escaped, highlights built from offsets rather than substitution, no script, no form, `Content-Security-Policy: default-src 'none'` | **IMPLEMENTED** | demo | `demo/build_review.py:esc`, `highlight`, `build` | LLM10 |
 | S-08 | CSV and spreadsheet formula neutralisation in evaluation exports | **IMPLEMENTED** | evals | `evals/scoring.py:csv_safe`, `write_rows_csv` | LLM10 |
 | S-09 | Scoring: recall, precision, abstention, silent-failure rate, Wilson CIs | **IMPLEMENTED** | evals | `evals/scoring.py:score`, `wilson`, `value_matches` | LLM07 |
 | S-10 | Batch loop with circuit breaker, cache and resume | **IMPLEMENTED** (alert thresholds beyond the breaker remain SPECIFIED, §6.3) | evals | `evals/run_ekacare.py:CircuitBreaker`, `run_batch` | LLM06 |
@@ -273,11 +289,11 @@ Before 2026-09-18, exit 1 meant "a gate blanked a field", "file not found" and "
 | LLM03:2026 (2025: LLM06) | Excessive Agency (autonomous tools, unintended scope, permission boundaries) | Low (L1 × I1): nothing to call, not applicable by design | Architectural, pinned deterministically: no tools, no tool choice, no write path | `src/extract.py:build_request` | `tests/test_extract_cli.py:RequestConfig.test_the_model_is_given_no_tools` |
 | LLM04:2026 (2025: LLM03) | Supply Chain (dependencies, third-party APIs, model weights) | Med (L2 × I2). A model deprecation already happened once (the prototype's 404 on Google's direct API); an aggregator (OpenRouter) now sits in the path. | Deterministic: model ID pinned and failing closed, unpriced-model refusal, `require_parameters` routing, served model and provider recorded per call, dataset revision and md5 pin, hash-pinned lockfile (S-05) | `src/extract.py:MODEL`, `PRICES_PER_MTOK`, `resolve_prices`, `upstream_error`, `call_model`; `evals/label_gold_v1.py:DATASET_REVISION`; S-05 | `tests/test_extract_cli.py:ModelCallRetryAndLedger.test_a_retired_model_fails_closed_and_costs_nothing`, `test_provenance_is_recorded`; `UpstreamErrorMapping`; `ExitCodesAndEnvelopes.test_unpriced_model_is_refused` |
 | LLM05:2026 (2025: LLM04) | Data and Model Poisoning (fine-tuning data, RAG index integrity) | Low (L1 × I2). No fine-tuning, no RAG. The poisonable assets are the gold labels and the prompt. | Deterministic: write-once gold-v1 with SHA-256 and read-only files, md5 drift checks, the prompt fingerprint frozen at seal time, a single source for field definitions | `evals/label_gold_v1.py:seal_goldset`, `cmd_validate`; `evals/run_ekacare.py:load_gold`; `src/extract.py:prompt_fingerprint`; `src/extract.py:FIELD_RULES` | `tests/test_run_ekacare.py:Seal.test_seal_is_write_once_and_read_only`, `Batch.test_edited_gold_is_refused`, `test_changed_prompt_needs_an_experiment_name`, `test_cache_from_another_prompt_is_refused` |
-| LLM06:2026 (2025: LLM10) | Unbounded Consumption (DoS, token explosion, cost spikes) | Med (L2 × I2): an $8 total budget | Deterministic: input caps, SDK-level timeout and retry limit, output cap, reasoning off, spend ceiling with provider-reported cost, batch preflight and circuit breaker | `src/extract.py:MAX_NOTE_CHARS`, `check_input`; `src/extract.py:MAX_NOTE_BYTES`, `build_request`, `HTTP_TIMEOUT_S`, `call_model`; `src/extract.py`; `evals/run_ekacare.py:CircuitBreaker`, `worst_case_for` | `tests/test_extract_cli.py:RequestConfig.test_sdk_limits_are_pinned`, `ExitCodesAndEnvelopes.test_budget_ceiling_refuses_before_any_network`; `tests/test_run_ekacare.py:Batch.test_budget_is_checked_before_any_call`, `test_breaker_halts_after_three_consecutive_failures`; `tests/test_budget.py` |
+| LLM06:2026 (2025: LLM10) | Unbounded Consumption (DoS, token explosion, cost spikes) | Med (L2 × I2): an $8 total budget | Deterministic: input caps, SDK-level timeout and retry limit, output cap, reasoning off, spend ceiling with provider-reported cost, a second per-run cap with a per-call audit, batch preflight and circuit breaker | `src/extract.py:MAX_NOTE_CHARS`, `check_input`; `src/extract.py:MAX_NOTE_BYTES`, `build_request`, `HTTP_TIMEOUT_S`, `call_model`; `src/extract.py`; `evals/spend_guard.py:CostGuard`; `evals/run_ekacare.py:CircuitBreaker`, `worst_case_for` | `tests/test_extract_cli.py:RequestConfig.test_sdk_limits_are_pinned`, `ExitCodesAndEnvelopes.test_budget_ceiling_refuses_before_any_network`; `tests/test_run_ekacare.py:Batch.test_budget_is_checked_before_any_call`, `test_breaker_halts_after_three_consecutive_failures`; `tests/test_budget.py` |
 | LLM07:2026 (2025: LLM09) | Misinformation & Hallucinations (ungrounded claims, confidence failures) | High (L3 × I3): a plausible wrong dose is the product's defining failure | Deterministic: evidence gate, value gate, dose number/unit gate; visible abstention; human sign-off (S-12). Probabilistic: prompt rules for negation, attribution and temporality, measured, not trusted. | `src/extract.py:verify_evidence`, `verify_value`, `_check_dose`, `FREQUENCY_EQUIVALENTS`, `DISPLAY`; `evals/scoring.py:score`; S-11, S-12 | `tests/test_guardrails.py:EvidenceGate`, `DoseGate`, `FrequencyGate`, `NameGate`, `ApplyGates`; gold-set evaluation, gated vs ungated (§6.1) |
 | LLM08:2026 (2025: LLM07) | Hidden Context Exposure (formerly System Prompt Leakage: prompt extraction, confidential system rules) | Low (L2 × I1). The prompt is public in the repository and contains no secrets. | Deterministic: nothing secret in context (S-06); the value gate stops the prompt being echoed into a field; tripwire on extraction phrasing | `src/extract.py:SYSTEM_INSTRUCTION`; `src/extract.py:FIELD_RULES`; `src/extract.py:verify_value`, `INJECTION_PATTERNS`; S-06 | `tests/test_guardrails.py:NameGate.test_value_must_come_from_the_evidence`; the red-team "print your system prompt" string is flagged; S-06 test |
 | LLM09:2026 (2025: LLM08) | Vector and Embedding Weaknesses (RAG retrieval manipulation, semantic drift) | Low (L1 × I1): no embeddings, no retrieval; not applicable by design | Architectural: no similarity search between any data source and the prompt; exact-key cache only (`run_ekacare` caches by case, model and prompt fingerprint) | none (preconditions in §3 LLM09 if retrieval is ever added) | Dependency review: no vector store or embedding client in `requirements.txt` |
-| LLM10:2026 (2025: LLM05) | Improper Output Handling (unsanitised outputs, downstream execution) | Med (L2 × I2). Future review screen (XSS); spreadsheet exports (formula injection); stdout pollution; the prototype's sentinel text in data. | Deterministic: strict schema, fence stripping, one JSON document per run with stdout redirected while the pipeline runs, hard wipe to `null`, display kept out of data, fixed-string stderr, CSV neutralisation, HTML escaping (S-07), never `eval`/`exec` output | `src/extract.py:ClinicalExtraction`, `response_json_schema`; `src/extract.py:parse_output`, `to_output`, `main`; `src/extract.py:DISPLAY`; `evals/scoring.py:csv_safe`; S-07, S-11 | `tests/test_extract_cli.py:StdoutPurity`, `ExitCodesAndEnvelopes.test_display_text_never_appears_in_extraction`, `ModelCallRetryAndLedger.test_fenced_json_is_accepted`; `tests/test_scoring.py:CsvSafety`; `tests/test_guardrails.py:ApplyGates.test_display_text_never_enters_a_data_field` |
+| LLM10:2026 (2025: LLM05) | Improper Output Handling (unsanitised outputs, downstream execution) | Med (L2 × I2). The review screen (XSS, and the corpus's own `<PII>` placeholders); spreadsheet exports (formula injection); stdout pollution; the prototype's sentinel text in data. | Deterministic: strict schema, fence stripping, one JSON document per run with stdout redirected while the pipeline runs, hard wipe to `null`, display kept out of data, fixed-string stderr, CSV neutralisation, HTML escaping (S-07), never `eval`/`exec` output | `src/extract.py:ClinicalExtraction`, `response_json_schema`; `src/extract.py:parse_output`, `to_output`, `main`; `src/extract.py:DISPLAY`; `evals/scoring.py:csv_safe`; `demo/build_review.py:esc`, `highlight`; S-11 | `tests/test_extract_cli.py:StdoutPurity`, `ExitCodesAndEnvelopes.test_display_text_never_appears_in_extraction`, `ModelCallRetryAndLedger.test_fenced_json_is_accepted`; `tests/test_scoring.py:CsvSafety`; `tests/test_guardrails.py:ApplyGates.test_display_text_never_enters_a_data_field`; `tests/test_review.py:Escaping`, `Highlighting` |
 
 ### 2.2 Crosswalk to the OWASP Top 10 for Agentic Applications (ASI01–ASI10)
 
@@ -859,7 +875,14 @@ if fingerprint != extract.prompt_fingerprint() or len(fingerprint) != 16:
 
 #### Output Post-processing & Grounding Verification
 
-- Headline numbers are computed only against the sealed `gold-v1` file.
+- Headline numbers are computed only against a **registered, sealed** gold file (G-28,
+  `evals/run_ekacare.py:REGISTRY`). Each version declares four things: its path, its SHA-256
+  file, the corpus it is allowed to score, and the label schema version the file must itself
+  declare. A live run selected with `--gold-version` accepts nothing else, and a version that
+  is registered but not yet sealed is refused with the reason and the command that would seal
+  it. Before the registry the sealed path was a module constant, which meant gold-v2 and a
+  second corpus were reachable only by editing the guard that protects the ground truth — the
+  usual way a guard gets weakened under deadline pressure.
 - A label found to be wrong after sealing is fixed in `gold-v2`, never by editing `gold-v1`. Both are reported.
 - The regex baseline and the model are scored against the same gold file, on the same notes, with the same scorer (S-09), so poisoning of either comparator is visible as a disagreement.
 
@@ -872,6 +895,10 @@ if fingerprint != extract.prompt_fingerprint() or len(fingerprint) != 16:
 | Prompt changed since sealing | A live run is refused unless named with `--experiment` | 2 (batch) |
 | `gold_v1.json` edited after sealing | SHA-256 no longer matches `gold_v1.sha256`: a live run is refused | 2 (batch) |
 | Sealing when gold-v1 exists | Refused: corrections go into a new file sealed as gold-v2 | non-zero |
+| A gold file whose `schema_version` is not the one the requested version declares | Refused: scoring a gold-v1 file as gold-v2 must not be possible by accident | 2 (batch) |
+| A gold file from a corpus the requested version does not declare | Refused, naming both corpora | 2 (batch) |
+| A registered version that has never been sealed | Refused, naming the missing file and `validate --seal` | 2 (batch) |
+| An unregistered `--gold-version` | Rejected at configuration time, listing the registered versions | 2 (batch) |
 
 ### LLM06:2026 Unbounded Consumption (2025: LLM10)
 
@@ -984,9 +1011,29 @@ A refused request returns the envelope `ERR_RATE_LIMITED_LOCAL` with HTTP 429 at
 
 #### Output Post-processing & Grounding Verification
 
-- **Cost attribution per call** (IMPLEMENTED): input, output and reasoning tokens, attempts, the list-price estimate (`est_cost_usd`) and OpenRouter's reported charge (`provider_cost_usd`) go in the payload's `usage`; the ledger records `billed_usd`, which is OpenRouter's charge when reported and the estimate otherwise, with running totals `by_model`.
-- **Latency** (IMPLEMENTED): `latency_ms.api`, `latency_ms.total` and `within_budget` against the 3,000 ms budget are in every payload.
-- Ledger totals are estimates from list prices. Reconcile them against the provider's billing console at each milestone; the invoice is the source of truth.
+- **Cost attribution per call** (IMPLEMENTED): input, output, cached and reasoning tokens, attempts, the list-price estimate (`est_cost_usd`) and OpenRouter's reported charge (`provider_cost_usd`) go in the payload's `usage`; the ledger records `billed_usd`, which is OpenRouter's charge when reported and the estimate otherwise, with running totals `by_model`.
+- **Latency** (IMPLEMENTED): `latency_ms.api`, `latency_ms.local`, `latency_ms.total` (their sum) and `within_budget` against the 3,000 ms budget are in every payload. End to end deliberately means the API time *plus* ours: measuring only the local clock reported a 12,000 ms call as inside the budget in a batch run, because there the payload is built from a cached result and the local clock never saw the call (`tests/test_extract_cli.py:LatencyBudget`).
+- Ledger totals are estimates from list prices. Reconcile them against the provider's billing console at each milestone; the invoice is the source of truth. The per-run audit makes that reconciliation continuous rather than occasional: over 67 live calls the list-price model matched the provider's own charge to **$0.000001** in total, so a drift in that figure is a stale price table rather than noise.
+
+**A second bound, scoped to one run** (G-27, `evals/spend_guard.py:CostGuard`). The $8 ceiling is
+the project's; a loop inside a single run would stay under it while consuming the lot, so every
+run also carries `--run-cap-usd` (default $1.00, and $0.002 for the schema probe), checked
+against *worst case* before each call. A breach is refused before the call, carries
+`ERR_BUDGET_EXCEEDED`, halts the run through the circuit breaker and exits 5 — never the
+generic halt code, so a budget breach cannot hide among network failures.
+
+**Exactly one writer per call.** `extract.call_model` records every call it makes, so the batch
+loop leaves `spend_guard.CostGuard.records_to_ledger` false or the ceiling would count each call twice. A
+script that talks to the endpoint directly must set it true, or its spend never reaches the
+ceiling meant to bound it. This was a real hole: the first run of the v4 schema probe spent
+$0.000635 that the ledger never saw. Both directions are now pinned by
+`tests/test_spend_guard.py:LedgerOwnership`.
+
+**Destination audit.** Every call records the endpoint, the provider, the model requested, the
+model actually served and the response id to `data/cache/metrics/<run_id>.jsonl`, with an
+aggregate `metrics.json` beside the run's other artefacts. A served model that differs from the
+one requested is surfaced as `model_drift` rather than averaged away, because silent
+substitution changes both the bill and the result.
 
 #### Abstention & Failure State Behavior
 
@@ -1337,7 +1384,7 @@ Model output in MediExtract is four values and four quotes. Each quote is verbat
 | 1 | stdout JSON, read by the harness, the UI or a database pipe | A stray `print` or SDK warning mixed into the JSON; control characters | IMPLEMENTED: stdout is redirected to stderr while the pipeline runs, then exactly one document is written (G-21); `json.dumps` escapes control characters and, with `ensure_ascii`, all non-ASCII |
 | 1a | The parser of the model's own output | JSON wrapped in a markdown fence by the provider | IMPLEMENTED: exactly one whole-document fence is unwrapped, then strict Pydantic validation (G-08) |
 | 2 | stderr, a terminal | ANSI escape injection | IMPLEMENTED by construction: stderr prints fixed display strings and gate reasons. A reason can include value tokens, which are letters and digits only (`_TOKEN`), never raw model text. |
-| 3 | The review screen (HTML) | XSS. A note containing `<script>` becomes a verbatim quote. | SPECIFIED S-07 |
+| 3 | The review screen (HTML) | XSS. A note containing `<script>` becomes a verbatim quote. And the benign version of the same bug: this corpus's `<PII>` de-identification placeholders vanish silently if interpolated raw. | **IMPLEMENTED** (S-07): `demo/build_review.py` escapes every interpolated string, builds highlights from character offsets instead of substituting into escaped text, ships no script and no form, and declares `default-src 'none'`. Pinned by `tests/test_review.py:Escaping`. |
 | 4 | Spreadsheet export of evaluation results | Formula injection: `=HYPERLINK(...)`, `+cmd|' /C calc'!A0`, `@SUM(...)` | IMPLEMENTED: `evals/scoring.py:csv_safe` on every cell of `rows.csv` (S-08) |
 | 5 | A consumer of the Colab prototype's output | The display sentinel `"BLANK (Abstained: Ungrounded)"` inside `drug_name` would be recorded as a drug name | SPECIFIED S-11 (§3 LLM07) |
 | 6 | Code execution | `eval`, `exec` or unpickling of model output | IMPLEMENTED by absence; SPECIFIED as a test below |
@@ -1370,24 +1417,31 @@ if gated.dose.value != "" or not results[1].display.startswith("BLANK (Abstained
     raise SystemExit("display text leaked into data, or the blank carries no explanation")
 ```
 
-SPECIFIED (S-07): HTML rendering for the review screen. Every model-authored string is escaped at the point of rendering, with no exceptions and no "trusted" fields.
+IMPLEMENTED (S-07): `demo/build_review.py` renders the review screen as one static file. Every model-authored *and* note-authored string is escaped at the point of rendering, with no exceptions and no "trusted" fields.
 
 ```python
-import html
-
-
-def render_field(label: str, value: str, quote: str, display_text: str, tier: str) -> str:
-    """One review-screen row. `tier` is VERIFIED, REVIEW or BLANK, chosen by
-    the gates, so it is not model text, but it is escaped anyway."""
-    return (
-        f'<div class="field tier-{html.escape(tier.lower())}">'
-        f'<span class="label">{html.escape(label)}</span>'
-        f'<input name="{html.escape(label)}" value="{html.escape(value, quote=True)}">'
-        f'<q class="evidence">{html.escape(quote)}</q>'
-        f'<span class="badge">{html.escape(display_text)}</span>'
-        "</div>"
-    )
+def esc(value) -> str:
+    """Every string that reaches the page passes through here."""
+    return html.escape("" if value is None else str(value), quote=True)
 ```
+
+Three decisions beyond escaping, because escaping alone is one mistake away from failing:
+
+- **No script and no form.** The case selector is CSS `:checked` sibling matching on bare
+  radio inputs, so the page needs no JavaScript and no inline handler. A review screen has
+  nothing to compute, and a page with no script cannot execute an injected one.
+- **`Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; base-uri 'none';
+  form-action 'none'`**, set in a meta element. No remote origin can be reached even if
+  something slipped through, which also means the page renders identically offline.
+- **Highlights are built from character offsets, not by substitution.** Each character of the
+  note carries the set of fields whose quote covers it; runs of equal sets are escaped and
+  emitted together. Substituting `<mark>` into already-escaped text is how a span ends up
+  splitting an entity such as `&amp;`; doing the arithmetic first makes that impossible, and
+  it handles overlapping quotes (a dose inside a medication phrase) without unbalanced tags.
+
+The test that matters feeds a note containing both `<script>alert("xss")</script>` and the
+corpus's own `<PII>` placeholder, and asserts the page contains neither as markup and both as
+text (`tests/test_review.py:Escaping`).
 
 Deploy the screen with a Content Security Policy that forbids inline scripts (`script-src 'self'`) as a second layer.
 

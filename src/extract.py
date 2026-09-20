@@ -162,16 +162,20 @@ CRITICAL_FIELDS = ("medication", "dose", "frequency", "allergy")
 FIELD_RULES = {
     "medication": (
         "The single most clinically significant medication prescribed or "
-        "continued at this visit. Brand names count ('Dolo 650', 'Telma'). If "
-        "two are equally significant and there is no principled way to choose, "
-        "use status unsure."
+        "continued at this visit. Give the product NAME ONLY, never its "
+        "strength: dictated 'Dolo 650' -> medication 'Dolo' and dose '650'. "
+        "Brand names count ('Telma', 'Moxclav', 'Pan D'). If two are equally "
+        "significant and there is no principled way to choose, use status "
+        "unsure."
     ),
     "dose": (
         "The STRENGTH of that same medication exactly as dictated: '500', "
         "'500 mg', '0.5 mg'. Dictation often omits the unit - leave it omitted, "
         "do not infer it. A strength inside a product name counts ('Dolo 650' -> "
-        "value '650'). A quantity per administration ('1 tablet', 'half') is "
-        "NOT a dose; if only a quantity is given, dose is not_stated."
+        "value '650'). A dose value always contains a digit - if the dictation "
+        "gives no number, dose is not_stated rather than a word. A quantity per "
+        "administration ('1 tablet', 'half') is NOT a dose; if only a quantity "
+        "is given, dose is not_stated."
     ),
     "frequency": (
         "How often that same medication is taken, as dictated: 'twice daily', "
@@ -452,7 +456,8 @@ WHAT DOES NOT COUNT
 STATUS
   found      - stated for this patient, now, and you have a verbatim span.
   not_stated - the note is silent, or the mention is excluded by the rules
-               above. Leave value and evidence as empty strings.
+               above. Leave value and evidence as "" - the empty string
+               itself, never the word "not_stated" and never a dash.
   unsure     - stated but genuinely ambiguous. Supply your best verbatim span.
                Prefer `unsure` over a confident guess; an unsure field costs
                the physician one glance, a wrong field costs a patient.\
@@ -1375,6 +1380,10 @@ def parse_output(content: str | None) -> ClinicalExtraction | None:
 def _usage(completion, prices) -> dict:
     usage = getattr(completion, "usage", None)
     details = getattr(usage, "completion_tokens_details", None)
+    # Cached input tokens are billed at a lower rate by some providers. Recorded
+    # for the cost audit (evals/metrics.py); the estimate below still prices
+    # every input token at full rate, so the estimate can only over-state.
+    prompt_details = getattr(usage, "prompt_tokens_details", None)
     extra = (getattr(usage, "model_extra", None) or {}) if usage is not None else {}
     reported = extra.get("cost")
     price_in, price_out = prices
@@ -1386,6 +1395,8 @@ def _usage(completion, prices) -> dict:
         "input_tokens": input_tokens,
         "output_tokens": output_tokens,
         "reasoning_tokens": (getattr(details, "reasoning_tokens", 0) or 0) if details else 0,
+        "cached_tokens": ((getattr(prompt_details, "cached_tokens", 0) or 0)
+                         if prompt_details else 0),
         "est_cost_usd": estimate,
         "provider_cost_usd": float(reported) if reported_ok else None,
         # What the ledger records: OpenRouter's own charge when it reports
@@ -1415,7 +1426,8 @@ def call_model(note, model, prices, ledger, budget_usd, data_collection="deny", 
     worst = worst_case_cost(prompt_chars, MAX_OUTPUT_TOKENS, *prices)
 
     totals = {"called": True, "input_tokens": 0, "output_tokens": 0, "reasoning_tokens": 0,
-              "est_cost_usd": 0.0, "provider_cost_usd": None, "billed_usd": 0.0, "attempts": 0}
+              "cached_tokens": 0, "est_cost_usd": 0.0, "provider_cost_usd": None,
+              "billed_usd": 0.0, "attempts": 0}
     api_ms = 0.0
     for attempt in range(1, SCHEMA_ATTEMPTS + 1):
         try:
@@ -1438,7 +1450,7 @@ def call_model(note, model, prices, ledger, budget_usd, data_collection="deny", 
 
         usage = _usage(completion, prices)
         ledger.record(usage["billed_usd"], model)
-        for key in ("input_tokens", "output_tokens", "reasoning_tokens"):
+        for key in ("input_tokens", "output_tokens", "reasoning_tokens", "cached_tokens"):
             totals[key] += usage[key]
         for key in ("est_cost_usd", "billed_usd"):
             totals[key] = round(totals[key] + usage[key], 6)
@@ -1502,7 +1514,12 @@ def build_payload(extraction, source_text, scan, gate_enabled, *, note, model_la
     """Gate the extraction and assemble the stdout document.
     Returns (payload, exit code, gate results)."""
     gated, results = apply_gates(extraction, source_text, enabled=gate_enabled, scan=scan)
-    total_ms = (time.perf_counter() - started) * 1000
+    # `started` marks the beginning of the LOCAL work, so end to end is the API
+    # time plus ours. Measuring only the local clock made `within_budget` true
+    # for a 12-second call in a batch run, because there the payload is built
+    # from a cached result and the local clock never saw the call.
+    local_ms = (time.perf_counter() - started) * 1000
+    total_ms = api_ms + local_ms
     payload = {
         "status": "ok",
         "schema_version": OUTPUT_SCHEMA_VERSION,
@@ -1510,7 +1527,8 @@ def build_payload(extraction, source_text, scan, gate_enabled, *, note, model_la
         "model": model_label,
         "provenance": provenance,
         "gate_enabled": gate_enabled,
-        "latency_ms": {"api": round(api_ms, 1), "total": round(total_ms, 1)},
+        "latency_ms": {"api": round(api_ms, 1), "local": round(local_ms, 1),
+                       "total": round(total_ms, 1)},
         "latency_budget_ms": LATENCY_BUDGET_MS,
         "within_budget": total_ms < LATENCY_BUDGET_MS,
         "usage": usage,
@@ -1591,7 +1609,6 @@ def run(args):
     source_text = read_note(args.note)
     scan = scan_input(source_text)
 
-    started = time.perf_counter()
     if scan.encoding_anomaly:
         # Forced safe abstention, decided before any call: hidden or
         # look-alike characters mean the note is not what the physician
@@ -1616,10 +1633,11 @@ def run(args):
         extraction, usage, provenance, api_ms = (
             result.extraction, result.usage, result.provenance, result.api_ms)
 
+    local_started = time.perf_counter()
     payload, exit_code, results = build_payload(
         extraction, source_text, scan, not args.no_gate,
         note=str(args.note), model_label="mock" if args.mock else args.model,
-        usage=usage, provenance=provenance, api_ms=api_ms, started=started,
+        usage=usage, provenance=provenance, api_ms=api_ms, started=local_started,
     )
     return payload, exit_code, results, scan
 

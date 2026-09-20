@@ -1,7 +1,8 @@
 # MediExtract — cost to serve, ROI, and build vs buy
 
 Every figure here is measured from run `20260920T065552Z-gemini-2.5-flash` (67 live calls
-against the sealed gold set) or from this repository's own history. Assumptions are labelled as
+against the sealed gold set), from the later `20260920T133717Z` run on the corrected prompt, or
+from this repository's own history. Assumptions are labelled as
 assumptions and carry the study that would settle them. The framework is the Class 5 / C2
 cost-to-serve model, and MediExtract is that framework's **v4 human-in-the-loop archetype**:
 `C_agent + (1 − S) · C_human`, adapted below because this design never skips the human.
@@ -24,6 +25,7 @@ Cost_call = N_in × P_in/1e6  +  N_out × P_out/1e6
 | reasoning tokens | **0** — `reasoning: {effort: "none"}` is honoured, and it is verified rather than assumed |
 | cost per note | mean **$0.000594**, range $0.000527–$0.000703 |
 | cost for the batch | **$0.039828** |
+| cost per note, current prompt (`a92d2abc`) | $0.000615 (+3.5%: the medication rule is three lines longer) |
 | notes per US dollar | **1,682** |
 
 **The ledger is validated against the provider's own accounting.** For 65 of 67 calls the
@@ -51,10 +53,11 @@ At 24 notes a day, 250 days:
 | 100 physicians | 600,000 | $357 |
 | 1,000 physicians | 6,000,000 | $3,566 |
 
-The $8 project ceiling would have covered **13,468 notes**. Actual spend across the whole
-project is $0.04042 over 68 calls. The budget was never the binding constraint — hand-labelling
-time was, which is worth saying plainly because it is the opposite of what the pricing
-discussion in the proposal assumed.
+The $8 project ceiling would have covered **13,468 notes**. Lifetime spend across the whole
+project is **$0.082276 over 136 calls** — two full batch runs, one schema probe and a smoke test
+— which is 1.0% of the ceiling. The budget was never the binding constraint; hand-labelling time
+was, and that is worth saying plainly because it is the opposite of what the pricing discussion
+in the proposal assumed.
 
 ## 3. The number that actually decides the business case
 
@@ -171,7 +174,7 @@ the five days went into evaluation and labelling.
 
 | Concern | What is enforced, and where |
 | :--- | :--- |
-| Per-call latency | SDK timeout 15 s, `max_retries=1`; measured p50 1,216 ms, p95 1,608 ms, max 2,442 ms; 67/67 inside the 3,000 ms budget, and `within_budget` is recorded per note |
+| Per-call latency | SDK timeout 15 s, `max_retries=1`. First run: p50 1,216 ms, p95 1,608 ms, max 2,442 ms, all 67 inside the 3,000 ms budget. Current run: p50 1,213 ms, p95 1,600 ms, one outlier at 11,993 ms, so **66 of 67**. `within_budget` is recorded per note and now means API plus local time; measuring only the local clock reported that 12-second call as inside the budget |
 | Output size | `MAX_OUTPUT_TOKENS = 1024`, hard ceiling $0.00256 per note |
 | Input size | `MAX_NOTE_CHARS = 20_000`; the largest note in the corpus is 9,450 |
 | Runaway spend | Pre-flight worst-case check against a file-locked ledger; a $8 ceiling that refuses before calling, not after |

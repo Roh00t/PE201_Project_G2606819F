@@ -191,7 +191,7 @@ measured precision — not a better model.
 | Gold set frozen first | **Done.** 67 cases, 268 labels, SHA-256 `1f594e46…`, chmod 0444, prompt fingerprint frozen into the seal, `gold-v1` tag on the commit that carries it. The harness refuses any other file, any SHA drift, any unlabelled field, and any prompt change unless the run is marked `--experiment`. |
 | Gated vs ungated abstention | **Done.** Both arms come from one cached call, so the abstention measurement costs no extra spend. Abstention rate 0.0205; all three abstentions were defensible on inspection. |
 | Committed regex baseline | **Done.** `evals/baseline.py`, scored through the same gates by `evals/score_arm.py`. Pattern-only recall **0.381** and gazetteer-assisted **0.381**, against the model's 0.600; patterns were tuned on a seeded 20-case subsample and score **0.353** on the held-out 47, which is the number to quote. The majority-class baseline ("always `not_stated`") agrees with gold on 113 of 268 field decisions (42.2%) at recall 0. Full comparison in `docs/technique_selection.md`. |
-| Leakage reported before and after | **Outstanding.** Depends on the MTSamples set (D3), whose ALL-CAPS `ALLERGIES:`/`MEDICATIONS:` headers are the leak to strip. |
+| Leakage reported before and after | **Outstanding, but unblocked.** It depends on the MTSamples set (D3), whose ALL-CAPS `ALLERGIES:`/`MEDICATIONS:` headers are the leak to strip. Until 20 September the harness could not score a second corpus at all — the sealed path was a module constant — so the sealed-gold registry (D11) had to come first. `allergy-v1` is now a registered version that refuses with the command that would seal it. |
 | Judge calibration | **Outstanding.** Being built as a second annotator from a different model family, scored against gold-v1 *before* any adjudication, never permitted to edit a label on its own, with every adjudication resolved in the system's favour counted separately. |
 
 **D6 · Transport confirmed.** `google/gemini-2.5-flash` is live on OpenRouter through the
@@ -226,4 +226,115 @@ generates one static, script-free, CSP-locked HTML page from a finished run. Bui
 `guardrails.md`'s control S-07 (output handling, OWASP LLM10:2026) from specified into
 implemented, and the corpus made the case for itself: these notes carry literal `<PII>`
 de-identification placeholders, which naive HTML interpolation would have swallowed silently.
+
+**D10 · The prompt contradiction is fixed, and it was worth 12.5 points of medication recall.**
+Run `20260920T133717Z-gemini-2.5-flash`, `--experiment p0-prompt-fixes`, prompt fingerprint
+`a92d2abcb2af4294`, 67 live calls, $0.041221:
+
+| | `73c882d1` | `a92d2abc` | change |
+| :--- | ---: | ---: | ---: |
+| pooled recall | 0.600 | **0.645** | +4.5 pp |
+| pooled precision | 0.650 | **0.694** | +4.4 pp |
+| silent-failure rate | 0.350 | **0.308** | −4.2 pp |
+| medication recall | 0.571 | **0.696** | **+12.5 pp** |
+| dose recall | 0.543 | 0.565 | +2.2 pp |
+| frequency recall | 0.679 | 0.660 | −1.9 pp |
+| abstention rate | 0.021 | 0.027 | +0.6 pp |
+| abstention precision | 0.667 | 0.750 | +8.3 pp |
+
+Three changes, each aimed at a failure the attribution had named: the medication rule now says
+to give the product name without its strength (the two rules used to contradict each other); a
+dose value must contain a digit, so a mangled `F.milligram` becomes an honest `not_stated`; and
+`not_stated` means the empty string, never the word.
+
+**The mechanism is established; the recall gain is not, and the table above overstates it.**
+Those are two different claims and only the first is supported:
+
+- The failure category "same drug, strength appended to the name" went from **8 occurrences to
+  zero**. That is a count of a named defect disappearing, not a rate, and it is as solid as the
+  attribution that produced it.
+- The recall figures are paired over the same 155 labelled fields, so the right test is exact
+  McNemar over the fields that *changed*: **12 flipped wrong → right, 5 flipped right → wrong,
+  p = 0.14**. The 4.5-point pooled gain is **not separated** at α 0.05. Medication alone is 9
+  against 2, **p = 0.065** — suggestive and still not separated. `evals/metrics.py` reproduces
+  both.
+
+This is the discipline the A2 battery work forced: three identical runs there scored 37, 41 and
+49 of 60 with the model held fixed, a spread wider than most gaps between different models, so a
+ranking read off single runs is one sample of a noisy process. A large p-value does not say the
+two prompts are equally good; it says 155 fields cannot tell them apart, which is a fact about
+this evaluation. The remedy is a larger labelled set, which is one more reason gold-v2 matters.
+
+Frequency lost one field — a single flip, p = 1.00 — reported rather than smoothed.
+
+**Two of the three "errors to eliminate" turned out to be the guardrails working.** `case_004`
+(gold dose `half`) and `case_016` (gold dose `1 tablet`) are refused by the dose gate because
+`FIELD_RULES` states in terms that a quantity per administration is not a dose. The gate is
+right and the labels are wrong, so they belong in gold-v2; making the gate accept them would
+have bought recall by breaking the rule the project set itself. `case_046` (`F.milligram`) was a
+real prompt bug and is addressed above.
+
+**D11 · Two blockers removed, both found by red-teaming the plan rather than by hitting them.**
+
+- *The sealed-gold registry.* A live run could only ever score `gold_v1.json` from the Eka Care
+  corpus, because the sealed path and the expected dataset were module constants. gold-v2 and a
+  second corpus were therefore reachable only by editing the guard that protects the ground
+  truth. Each version now declares its path, its SHA-256 file, its corpus and the label schema
+  its file must itself declare, selected with `--gold-version`; every existing refusal is kept
+  and four new ones are added.
+- *The v4 wire-schema spike.* Before rewriting the pipeline around a medication list, one live
+  call ($0.000635) established that strict structured output still works when the schema is an
+  array of objects with `maxItems: 12`, alongside `require_parameters: true`. It was **accepted
+  on the first attempt**, so the schema change is unblocked. The same probe showed the prompt
+  returning one entry for a three-drug note, which is the next thing to change, and that
+  `provider.data_collection: "deny"` routes normally — the `allow` used for the first batch run
+  was never necessary, and every call since has used `deny`.
+
+**D12 · Financial guardrails, because "monitor the API key" is not a control.** `evals/metrics.py`
+audits every call — prompt, completion, cached and reasoning tokens, the list-price estimate
+against OpenRouter's own charge, latency, attempts, and the destination including the model
+actually served — and adds a second bound scoped to one run (`--run-cap-usd`, default $1.00,
+$0.002 for the probe) checked against worst case before each call. The $8 project ceiling still
+belongs to `extract.SpendLedger`; the run cap exists because a loop inside a single run would
+stay under the project ceiling while consuming it.
+
+Building it found a real hole: the probe calls the endpoint directly rather than through
+`call_model`, so its $0.000635 never reached the ledger that is supposed to bound total spend.
+There is now exactly one writer per call, pinned in both directions by tests, and the missing
+amount has been recorded. Lifetime spend is **$0.082276 over 136 calls** against the $8 ceiling,
+and over the 67 calls of the current run the list-price model matched the provider's charge to
+**$0.000001** in total.
+
+**D13 · A latency number in this document was resting on the wrong clock.** `within_budget` was
+computed from local elapsed time only. In a batch run the payload is built from a cached result,
+so the local clock never sees the call — and a 11,993 ms call in the current run was reported as
+inside the 3,000 ms budget. End to end now means API time plus local time. Corrected figures:
+the first run's API latency peaked at 2,442 ms and **all 67** cases finished inside the budget;
+the current run has p50 1,213 ms, p95 1,600 ms and one outlier at 11,993 ms, so **66 of 67**.
+The 3-second claim in §3 holds for the median and the 95th percentile, and there is a tail.
+
+**D14 · Measurement and enforcement are now separate modules, and one of them exists because a
+number was over-claimed.** `evals/spend_guard.py` enforces: it refuses a call that would cross
+the per-run cap and audits every call that is made. `evals/metrics.py` measures: pure functions
+over artefacts already on disk, no network, nothing written. The split is deliberate — a module
+that can refuse a call should not also be the one that scores it, or a bug in the scoring can
+silence the refusal.
+
+`metrics.py` adds three things the earlier tooling lacked. **Populations** that must sum to the
+case count, so a case whose payload was an error envelope and a case our own encoding gate
+refused to send are never read as model abstentions. **Layer ownership** for every failing field,
+because a count with no owner is an observation while a count with an owner is a work item: on
+the current run, of 57 failing fields, **38 belong to the schema** (17 to the single medication
+slot and 21 to dose and frequency cascading from that choice), **15 to the labels** (9 frequency
+labels carrying food timing the field rule excludes, 6 dose labels that are not strengths), 2 are
+disputed between labels and model, 1 to the gate — correctly, the label is the defect — and
+**1 to the model**. And **separability**, which is what caught D10's over-claim.
+
+It is built so it cannot disagree with `scores.json`: per-field precision and recall use
+`scoring.py`'s definitions, the interval is `scoring.wilson`, causes come from
+`diagnose.attribute`, and a test asserts the match against every finished run on disk. Writing
+its per-field recall independently was the first thing I tried, and it reported medication recall
+as 100% against the scorer's 69.6% — because a field that is proposed but wrong is not only a
+false positive, it is also a gold fact the physician did not get. Two implementations of one
+metric are two answers to one question.
 
