@@ -2056,28 +2056,28 @@
       "source_text": "58 year old male patient came with the complaints of fever with chills for last 5 days. On arrival, the patient has temperature of 102 \u00b0F.Patient were treated with IV antibiotics with IV injection Ceftriaxone BD for the last 5 days and injection Doxycycline 100 mg BD for last 5 days.And injection PCM and other supportive management. And repeat investigations showed sequential decrease in WBC counts.and even increase in platelet count. Patient, patient is afebrile for the last 3 days.Hence being discharged with the following advises",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Doxycycline",
+          "evidence": "Doxycycline",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "100 mg",
+          "evidence": "100 mg",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "BD",
+          "evidence": "BD",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T03:10:06+00:00",
       "notes": null
     },
     {
@@ -2085,28 +2085,28 @@
       "source_text": "Patient reported stomach pain since 3 days. He also reported severe headache, which is happening since a month. Patient in the past have had, episodes of headaches, wherein, there was a throbbing pain. I'm suspecting migraine, but, to make any decision.I advise patient to do CT MRI. Also, patient seems to be pale, so I advise him to take, complete body health checkup. I also want to analyse iron levels, so patients should do complete iron profile test.In the meanwhile, patients can take  Dolo 650 three times a day, after meals for 6 days, and patients should take Pantop DSR 40 mg tablet for, 6 days before breakfast once a day. And,  I advise patients to not have oily food, take enough rest, and,  in case of, any emergency.See, I'm giving his number to call me, and patient should come to me after 7 days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "650",
+          "evidence": "650",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "three times a day",
+          "evidence": "three times a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T03:10:52+00:00",
       "notes": null
     },
     {
@@ -2114,28 +2114,28 @@
       "source_text": "So <PII> is a 39-year-old who has come with complaints of cough going on for the last 6 weeks. He has gone to a general practitioner and taken treatment which has partially resolved his symptoms. Details of treatment are not available. The other symptoms include intermittent shortness of breath. This is impacting his life currently.He also has night symptoms which is disturbing his sleep, and he has no other issues with chronic diseases such as tuberculosis. He's young and not a hypertensive or a diabetic and he has no specific allergies. Medications include, taken so far include aB and C, odd and further details are not known. On examination, he is otherwise stable. The ENT examination shows a congested nose with the DNS to the right, and oral examination shows slightly crowded airway but with a normal oropharynx.Chest examination shows raz in the bases, which is a little unusual, and diffuse rhonchi on both lung fields. My asse. We asked for a lung function test, which shows so and so, so and so, and so and so. We also asked for a pheno which is showing an elevated value. Overall diagnosis is uncontrolled asthma. At this point, he will be treated.On a GINA 3 protocol, the treatment will include education and counselling, which is also being done with using, aids given to him, and additionally we will start inhalers on him. The inhalers include Foracort , 200 two puffs twice a day synchro breathe.Taken for a period of 4 weeks after which he's supposed to visit us, in case he becomes delayed, the treatment is to be continued. Other medications include B, C, and D. Non-medical aspects which is important is nutritional precautions which have been conveyed, lifestyle precautions which have been conveyed and given to him as an addendum. And at the same time, if this.Continues we have to get into other aspects such as, what are the precipitating factors including psychological or exercise regimens which may improve his overall condition. Preventive aspects include vaccination and the flu shot has been recommended to him, and he has been asked to follow up in 4 weeks, end of consultation.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Foracort",
+          "evidence": "Foracort",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200 two puffs",
+          "evidence": "200 two puffs",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T03:36:13+00:00",
       "notes": null
     },
     {
