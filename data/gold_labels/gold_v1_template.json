@@ -2578,28 +2578,28 @@
       "source_text": "complain of cough not better irritation throat  Treatment\nInjection TT\nstat\nTab Amoxyclav 625 twice a day for two days.  Tablet Meftal Forte twice a day for two days. Tab Para 650 once in the afternoon for two days.  Tab Levocet twice a day for two days. Capsule Ompec D M twice a day for two days before food. Tablet Clarigard.  250 milligram twice a day for 5 days. On examination, throat congestion.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Amoxyclav",
+          "evidence": "Amoxyclav",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "625",
+          "evidence": "625",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:09:39+00:00",
       "notes": null
     },
     {
@@ -2607,28 +2607,28 @@
       "source_text": "On 7th April 25 <PII> came with complaint of dribbling of urine since one day.  Treatment: injection Amikacin 1.5 ml. tablet Cefixime 200 milligram twice a day for two days.  tablet Parex paracetamol 500 three times a day for to three days.  tablet mefenamic 500  half tablet twice a day for two days. tablet pantocid 40 milligram twice a day for two days before food.  Investigation, urine routine, USG of abdomen.  Medicine Citro-Soda sachet three times a day for two days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cefixime",
+          "evidence": "Cefixime",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200 milligram",
+          "evidence": "200 milligram",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:10:13+00:00",
       "notes": null
     },
     {
@@ -2636,28 +2636,28 @@
       "source_text": "complaint of back ache, gastritis, loss of appetite, weakness.  Six fifty. Sade sahashe kar. Treatment. Injection. Injection, tablets. Vitanova. Six lakhs unit. nau kar tychamule . First dose.  Capsule Ompec D M twice a day before food for 5 days. purna ghasa kharab aahe. Investigation showing  USG: extensive gases, gallbladder polyp, simple renal cysts in both the kidneys.  X-ray of LS spine showing osteopenia, anterior  listhesis of L5 vertebra over sacral spine.  Treatment\ncapsule\nRinifol twice a day.\nho gya na aapka?\nBifilac GG sachet.  Once for for three days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Ompec D M",
+          "evidence": "Ompec D M",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day before food",
+          "evidence": "twice a day before food",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:10:57+00:00",
       "notes": null
     },
     {
@@ -2665,28 +2665,28 @@
       "source_text": "Chief complaints of right side chest pain, hemoptysis. Diagnosis light right lower zone pneumonia.  Treatment tablet Maxflox 400 once at night for two days. Tablet Cefixime 200  twice a day for two days. tablet Meftal forte, twice a day for two days. tablet Para 650, once in the afternoon for two days. tablet Deriphyllin 150.  Twice a day for two days. Capsule Ompec DM twice a day before food for two days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Maxflox",
+          "evidence": "Maxflox",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "400",
+          "evidence": "400",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "once at night",
+          "evidence": "once at night",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:12:13+00:00",
       "notes": null
     },
     {
@@ -2694,28 +2694,28 @@
       "source_text": "Chief complaints of cough. medications  Cepodem 200 twice a day for two days. tablet Azi  250 twice a day for two days. tablet Meftal Forte twice a day for two days. tablet  Dolo 650 once in the afternoon for two days. Syrup  Costus D 10 ml three times a day. Tablet Levoset once at night for two days.  Notes: patient not examined.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Cepodem",
+          "evidence": "Cepodem",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "200",
+          "evidence": "200",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:13:15+00:00",
       "notes": null
     },
     {
@@ -2723,28 +2723,28 @@
       "source_text": "Patient is experiencing cough, cold and sneezing, blocked nose for the past five days. Advisinghot water with honey along with steam three times a day, also advising Dolo 650 two times a day after breakfast after dinner",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "650",
+          "evidence": "650",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "two times a day after breakfast after dinner",
+          "evidence": "two times a day after breakfast after dinner",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:43:40+00:00",
       "notes": null
     },
     {
@@ -2752,28 +2752,28 @@
       "source_text": "Hello <PII>. How are you today? I don't feel that good. I have a blocked nose and sneezing and cold.since five days. Patient is reporting blocked nose, cold and sneezing past five days. We advised you to get honey waterHave warm water with honey three times a day. Have Dolo 650 after breakfast, after dinner, twice a day. That's all.Hope you feel better.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "650",
+          "evidence": "650",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "after breakfast, after dinner, twice a day",
+          "evidence": "after breakfast, after dinner, twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:50:26+00:00",
       "notes": null
     },
     {
@@ -2781,28 +2781,28 @@
       "source_text": "I advise the patient to take Dolo three times a day. He has  medical history of insomnia, not able to sleep properly for a couple of days, chest pain, anxiety for a few days, and palpitations in the night.Not able to breathe properly. I advise him to take Penta DSR capsule 2 times a day. Also take Dolo 650 tablet 2 times a day. Take Crocin on SOS basis and take.Gelusil when there is gastric issues and report to me with CBC test, blood test report and give information in couple of weeks.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Penta DSR",
+          "evidence": "Penta DSR",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "2 times a day",
+          "evidence": "2 times a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:50:51+00:00",
       "notes": null
     },
     {
@@ -2810,28 +2810,28 @@
       "source_text": "Tablet Moxclav 625, three times a day after meal. Capsule Bifilac after breakfastTablet Ebast DC two times a day after meal.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Moxclav",
+          "evidence": "Moxclav",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "625",
+          "evidence": "625",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "three times a day after meal",
+          "evidence": "three times a day after meal",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:51:25+00:00",
       "notes": null
     },
     {
@@ -2839,28 +2839,28 @@
       "source_text": "Tablet Moxclav 625, three times a day. Capsule Bifilac twice daily.Tablet Ebast DC twice a day. Otrivin nasal drop, 2 drop three times a day. SyrupGrinlinctus DX, 2 teaspoon, three times a day, for five days.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Moxclav",
+          "evidence": "Moxclav",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "625",
+          "evidence": "625",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "three times a day",
+          "evidence": "three times a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:52:21+00:00",
       "notes": null
     },
     {
@@ -2868,28 +2868,28 @@
       "source_text": "Tablet lactoclav 1 BD Tablet meftal spas 1 BD. Tablet Limcee 1 BDSyrup UTI and 2 TSF BD.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "lactoclav",
+          "evidence": "lactoclav",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "1",
+          "evidence": "1",
+          "status": "found"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "BD",
+          "evidence": "BD",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:52:55+00:00",
       "notes": null
     },
     {
@@ -2897,28 +2897,28 @@
       "source_text": "Patient has fever, take Dolo 650. Take Crocin tablet,  whenever there is a headache, take amoxycillin 3 times a day, 1 in the morning, 1 in the evening, and one before night.Take proper bed rest, for insomnia, giving a sedative called Zolpidem. For pain medication, take Tramadol. For any other issues, report, let's keep a follow up within the next week.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Dolo",
+          "evidence": "Dolo",
+          "status": "found"
         },
         "dose": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "650",
+          "evidence": "650",
+          "status": "found"
         },
         "frequency": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:53:31+00:00",
       "notes": null
     },
     {
@@ -2926,28 +2926,28 @@
       "source_text": "Symptoms, abdominal pain, anorectal swelling,  high fever, and knee swelling. Tablets Telma twice a day for 4 days.Enzolam tablet once in a day after breakfast for 2 days, zerodol tablet for 2 days. Advice take a rest, eat leafy vegetables, and drink plenty of water. Sit in warm water, warm.Tub of water.",
       "ground_truth": {
         "medication": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "Telma",
+          "evidence": "Telma",
+          "status": "found"
         },
         "dose": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         },
         "frequency": {
-          "value": null,
-          "evidence": null,
-          "status": null
+          "value": "twice a day",
+          "evidence": "twice a day",
+          "status": "found"
         },
         "allergy": {
           "value": null,
           "evidence": null,
-          "status": null
+          "status": "not_stated"
         }
       },
-      "labeller": null,
-      "labelled_at": null,
+      "labeller": "rohit",
+      "labelled_at": "2026-09-20T06:54:02+00:00",
       "notes": null
     }
   ]
