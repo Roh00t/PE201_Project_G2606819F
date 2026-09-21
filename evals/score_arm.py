@@ -47,6 +47,13 @@ EXIT_UNUSABLE = 2
 EXIT_INTERNAL = 6
 
 
+def _rel(path) -> str:
+    try:
+        return str(Path(path).resolve().relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
 def load_jsonl(path: Path) -> dict:
     return {rec["case_id"]: rec for rec in
             (json.loads(line) for line in
@@ -95,12 +102,21 @@ def score_arm(run_dir: Path, gold_path: Path, split: str) -> dict:
     cases = [c for c in cases if c["case_id"] in gated]
 
     scores = scoring.score(cases, gated, ungated)
-    scoring.write_rows_csv(run_dir / "rows.csv", scores["rows"])
+    # Scoring a run against a gold version other than its own must never
+    # overwrite that run's own scores.json - re-scoring the gold-v1 run against
+    # gold-v2 is a second measurement of the same outputs, not a replacement.
+    recorded = (manifest.get("gold") or {}).get("path")
+    own_gold = recorded and Path(recorded).name == gold_path.name
+    suffix = "" if own_gold or not recorded else f"-vs-{gold_path.stem}"
+    scoring.write_rows_csv(run_dir / f"rows{suffix}.csv", scores["rows"])
     stored = {k: v for k, v in scores.items() if k != "rows"}
+    stored["scored_against"] = {"gold": _rel(gold_path), "run_own_gold": recorded,
+                                "is_own_gold": bool(own_gold)}
     stored["majority_class_baseline"] = majority_class(cases)
     stored["split"] = {"which": split, "cases_scored": len(cases),
                        "held_out_from_tuning": sorted(tuning) if split == "report" else []}
-    (run_dir / "scores.json").write_text(json.dumps(stored, indent=2) + "\n", encoding="utf-8")
+    out_path = run_dir / f"scores{suffix}.json"
+    out_path.write_text(json.dumps(stored, indent=2) + "\n", encoding="utf-8")
 
     summary = {
         "run_id": manifest.get("run_id", run_dir.name),
@@ -110,7 +126,7 @@ def score_arm(run_dir: Path, gold_path: Path, split: str) -> dict:
         "cases_run": len(cases),
         "exit_counts": manifest.get("exit_counts", {}),
         "billed_this_run_usd": (manifest.get("spend") or {}).get("billed_this_run_usd", 0.0),
-        "gold": {"path": str(gold_path), "split": split},
+        "gold": {"path": str(gold_path), "split": split, "wrote": str(out_path.name)},
         "majority_class_baseline": stored["majority_class_baseline"],
         "scored": True,
         "unscored_code": None,

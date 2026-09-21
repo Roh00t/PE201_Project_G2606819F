@@ -229,12 +229,31 @@ class Batch(unittest.TestCase):
         self.assertEqual(summary["exit_counts"], {"0": 2, "1": 1})
 
     def test_a_registered_but_unsealed_version_refuses_and_says_what_to_do(self):
+        # Points at a path that does not exist rather than naming a version that
+        # happens to be unsealed today: every registered version is sealed now,
+        # and a test that relied on one not being would rot the moment it was.
+        missing = self.tmp / "never_sealed.json"
         with self.assertRaises(run_ekacare.Refused) as caught:
-            run_ekacare.load_gold(run_ekacare.BatchConfig(gold_version="gold-v2"))
+            run_ekacare.load_gold(self.config(gold_version="gold-v2",
+                                              gold_path=missing, sealed_path=missing))
         message = caught.exception.message
         self.assertEqual(caught.exception.exit_code, run_ekacare.EXIT_REFUSED)
         self.assertIn("gold-v2 is not sealed", message)
         self.assertIn("validate --seal", message)
+
+    def test_every_registered_version_that_exists_matches_its_seal(self):
+        import hashlib
+        checked = 0
+        for version, entry in run_ekacare.REGISTRY.items():
+            if not entry.path.is_file():
+                continue
+            checked += 1
+            with self.subTest(version=version):
+                self.assertTrue(entry.sha_path.is_file(), f"{version} has no hash file")
+                digest = hashlib.sha256(entry.path.read_bytes()).hexdigest()
+                self.assertEqual(digest,
+                                 entry.sha_path.read_text(encoding="utf-8").split()[0])
+        self.assertGreaterEqual(checked, 1)
 
     def test_an_unknown_gold_version_is_refused_at_configuration_time(self):
         with self.assertRaises(run_ekacare.Refused) as caught:

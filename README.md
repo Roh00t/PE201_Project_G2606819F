@@ -165,7 +165,7 @@ the label schema the file must itself declare.
 | version | cases | what it is for |
 | :--- | ---: | :--- |
 | `gold-v1` (default) | 67 | the headline. 268 hand labels, Eka Care, sealed |
-| `gold-v2` | 67 | gold-v1 with 16 rule-violating labels corrected and slice tags; **built, awaiting two signatures** (`evals/label_gold_v2.py`) |
+| `gold-v2` | 67 | gold-v1 with 18 corrections and slice tags, sealed `d5e90f5a…`. **Report it beside gold-v1, never instead of it** — see below |
 | `allergy-v1` | 20 | MTSamples notes with a positive allergy under an ALL-CAPS header. The project's only allergy positives |
 | `allergy-v1-stripped` | 20 | the same notes and the **same labels** with every header removed — the leakage report, paired against `allergy-v1` |
 
@@ -342,6 +342,29 @@ This set's medication numbers are **not** comparable with gold-v1's: it uses "th
 medication in the MEDICATIONS section", and the notes are American surgical reports rather than
 Singapore dictation.
 
+**A corrected answer key is not an improved system.** gold-v2 fixed 18 labels that broke rules the
+gold set itself states, so the score rises without the extractor changing. The three numbers that
+have to travel together:
+
+| Scored | Recall | What it is |
+| :--- | ---: | :--- |
+| gold-v1 run vs gold-v1 | 0.645 | the historical headline |
+| **the same saved outputs** vs gold-v2 | **0.723** | the label correction alone — no model call |
+| a fresh live run vs gold-v2 | 0.730 | label correction plus one more sampling |
+
+Of the 8.5-point move, **7.8 points are the labels** (8 flips, all one way, paired McNemar
+p = 0.008) and **0.7 is sampling noise** that does not separate (p = 1.000). Every label flip is in
+frequency, where the corrections were. The unpaired Fisher test on the same data gives p = 0.373 —
+it would have called the clearest signal in the project noise, which is why `metrics.py` reports
+both and labels which one applies.
+
+**What actually breaks when a header goes.** Of the five header-dependent allergy flips, **four are
+the model going silent** (`found → not_stated`), not getting it wrong. And **67 of 67** Eka Care
+notes have no ALL-CAPS header at all, so Singapore dictation is already the stripped condition:
+the header-assisted 0.900 is the number that does *not* transfer. Three of the seven failures are
+our own "first substance listed" labelling rule, which marks `Sulfa and trimethoprim` wrong for
+being more complete than the label.
+
 **Operational.** API latency p50 1,213 ms, p95 1,600 ms across the current run, with one outlier
 at 11,993 ms — so 66 of 67 finished inside the 3,000 ms verification budget, not 67. (The first
 run's maximum was 2,442 ms and all 67 were inside it.) `within_budget` now means API time plus
@@ -351,7 +374,15 @@ local time; measuring only the local clock reported that 12-second call as insid
 
 ```bash
 ./.venv/bin/python -m unittest discover -s tests
+./.venv/bin/python -O -m unittest discover -s tests       # the deployment gate
+./.venv/bin/python -m unittest tests.test_guardrails_doc  # guardrails.md checks itself
 ```
+
+`tests/test_guardrails_doc.py` is why the specification can be trusted at 2,400 lines: every
+`file:symbol` it cites must resolve, every snippet must parse and contain no `assert`, a snippet
+copied from shipped code must still match it semantically (docstrings excluded, logic and names
+not), no snippet may import a forbidden dependency, and every figure §0 quotes must equal the
+artefact it names. Each check was verified by deliberately breaking it.
 
 Offline, no API key, no spend: the live-call paths run against a fake
 client, or fail by design before any client exists. The suite also fails if

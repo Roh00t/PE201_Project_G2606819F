@@ -1,0 +1,168 @@
+{
+  "cases": 67,
+  "scored_cases": 67,
+  "errored_cases": [],
+  "coverage": 1.0,
+  "pooled": {
+    "gold_found": 148,
+    "gold_unsure": 0,
+    "proposed": 144,
+    "correct": 107,
+    "verified": 143,
+    "silent": 37,
+    "wiped": 4,
+    "wiped_would_be_wrong": 4,
+    "near_miss": 0,
+    "review": 1,
+    "forced": 0,
+    "recall": 0.723,
+    "recall_ci95": [
+      0.6459,
+      0.7887
+    ],
+    "precision": 0.7431,
+    "precision_ci95": [
+      0.666,
+      0.8075
+    ],
+    "abstention_rate": 0.027,
+    "abstention_precision": 1.0,
+    "gate_false_positive_rate": 0.0,
+    "silent_failure_rate": 0.2587,
+    "near_miss_share": 0.0
+  },
+  "per_field": {
+    "medication": {
+      "gold_found": 57,
+      "gold_unsure": 0,
+      "proposed": 57,
+      "correct": 39,
+      "verified": 56,
+      "silent": 18,
+      "wiped": 0,
+      "wiped_would_be_wrong": 0,
+      "near_miss": 0,
+      "review": 1,
+      "forced": 0,
+      "recall": 0.6842,
+      "recall_ci95": [
+        0.5552,
+        0.79
+      ],
+      "precision": 0.6842,
+      "precision_ci95": [
+        0.5552,
+        0.79
+      ],
+      "abstention_rate": 0.0,
+      "abstention_precision": null,
+      "gate_false_positive_rate": null,
+      "silent_failure_rate": 0.3214,
+      "near_miss_share": null
+    },
+    "dose": {
+      "gold_found": 38,
+      "gold_unsure": 0,
+      "proposed": 34,
+      "correct": 25,
+      "verified": 34,
+      "silent": 9,
+      "wiped": 3,
+      "wiped_would_be_wrong": 3,
+      "near_miss": 0,
+      "review": 0,
+      "forced": 0,
+      "recall": 0.6579,
+      "recall_ci95": [
+        0.4989,
+        0.7879
+      ],
+      "precision": 0.7353,
+      "precision_ci95": [
+        0.5688,
+        0.854
+      ],
+      "abstention_rate": 0.0811,
+      "abstention_precision": 1.0,
+      "gate_false_positive_rate": 0.0,
+      "silent_failure_rate": 0.2647,
+      "near_miss_share": 0.0
+    },
+    "frequency": {
+      "gold_found": 53,
+      "gold_unsure": 0,
+      "proposed": 53,
+      "correct": 43,
+      "verified": 53,
+      "silent": 10,
+      "wiped": 0,
+      "wiped_would_be_wrong": 0,
+      "near_miss": 0,
+      "review": 0,
+      "forced": 0,
+      "recall": 0.8113,
+      "recall_ci95": [
+        0.6864,
+        0.8941
+      ],
+      "precision": 0.8113,
+      "precision_ci95": [
+        0.6864,
+        0.8941
+      ],
+      "abstention_rate": 0.0,
+      "abstention_precision": null,
+      "gate_false_positive_rate": null,
+      "silent_failure_rate": 0.1887,
+      "near_miss_share": null
+    },
+    "allergy": {
+      "gold_found": 0,
+      "gold_unsure": 0,
+      "proposed": 0,
+      "correct": 0,
+      "verified": 0,
+      "silent": 0,
+      "wiped": 1,
+      "wiped_would_be_wrong": 1,
+      "near_miss": 0,
+      "review": 0,
+      "forced": 0,
+      "recall": null,
+      "recall_ci95": [
+        0.0,
+        1.0
+      ],
+      "precision": null,
+      "precision_ci95": [
+        0.0,
+        1.0
+      ],
+      "abstention_rate": 1.0,
+      "abstention_precision": 1.0,
+      "gate_false_positive_rate": 0.0,
+      "silent_failure_rate": null,
+      "near_miss_share": 0.0
+    }
+  },
+  "per_slice": {},
+  "scored_against": {
+    "gold": "data/gold_labels/gold_v2.json",
+    "run_own_gold": "data/gold_labels/gold_v1.json",
+    "is_own_gold": false
+  },
+  "majority_class_baseline": {
+    "strategy": "answer not_stated to every field",
+    "field_decisions": 268,
+    "agrees_with_gold": 120,
+    "agreement": 0.4478,
+    "recall": 0.0,
+    "gold_found": 148,
+    "proposes_nothing": true
+  },
+  "split": {
+    "which": "all",
+    "cases_scored": 67,
+    "held_out_from_tuning": []
+  }
+}

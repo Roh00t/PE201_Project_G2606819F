@@ -402,3 +402,60 @@ Slice tags are attached by recorded pattern rather than by hand, so a slice is r
 `evals/metrics.py` will pair gold-v1 against gold-v2 to separate the delta from label changes
 from the delta from system changes.
 
+**D17 · The security specification now carries a measured threat, and it checks itself.**
+`guardrails.md` grew section 0 (a two-page executive summary with a five-minute checklist mapping
+each rubric criterion to the section that answers it), section 2.3 (Agentic Readiness Thresholds:
+ASI01–ASI10 with the exact architectural change that would activate each, plus two agentic
+controls written out in full — S-17 inter-stage HMAC signing, S-18 tool-parameter access gate),
+and sections 6.6 and 6.7 for the two findings below. It stays on the **OWASP 2026 LLM** Top 10 as
+its spine, per CLAUDE.md §2.5: the model here is a component, not an actor, and the ASI material
+is cross-reference and forward planning rather than a claim of agency.
+
+**The finding that came from measurement rather than from reading a framework.** Enumerating
+G-01…G-30 and asking of each "does it fire when a stated fact is *missed*" gives the same answer
+every time: no. **Every gate in this system is a precision control; none is a recall control.**
+The evidence gate proves a quote is real, the value gate proves a value is supported, the dose
+gate proves numbers and units agree — all of them protect against invention. So removing an
+ALL-CAPS `ALLERGIES:` header is an asymmetric evasion vector: allergy recall falls 0.900 → 0.650,
+and the pipeline reports a clean run whose `not_stated` field is indistinguishable from a patient
+with no allergies.
+
+Two refinements the measurement forced, neither of which I expected:
+
+1. **Four of the five header-dependent flips are the model going silent**, not getting it wrong.
+   Removing the header does not make it inaccurate; it makes it stop answering. That is what
+   shapes S-16, whose trigger is an abstention-plus-hint recall check — the first recall control in
+   the system — and it would have caught 4 of the 5. An earlier draft also triggered on "no header
+   present"; that was measured and dropped, because it fires on **67 of 67** Eka Care notes and
+   would have doubled the cost of every call in the deployment corpus. Measured trigger rate now:
+   1 of 67 (1.5%), and that one firing is a denial phrasing the reused pattern does not yet catch.
+2. **Singapore dictation is already the stripped condition.** No Eka Care note carries an ALL-CAPS
+   header. The header-assisted 0.900 is the number that does *not* transfer to the deployment
+   target, and 0.650 is the regime the system actually operates in. That reframes the benchmark
+   from "beware tampering" to "the easy condition was never the real one".
+
+**D18 · gold-v2 scored, with the label delta separated from the system delta.** Three
+measurements, the middle one making no model call: gold-v1 outputs against gold-v1 gives 0.645;
+**the same saved outputs** against gold-v2 gives **0.723**; a fresh live run against gold-v2 gives
+0.730. So of the 8.5-point move, **7.8 points are the label corrections** (8 flips, all in
+frequency, all one direction, paired McNemar p = 0.008) and **0.7 points are sampling noise** that
+does not separate (p = 1.000). Reporting the new headline alone would have sold a corrected answer
+key as an improved extractor, which is exactly what D16 promised not to do.
+
+The same eight flips give **Fisher p = 0.373** unpaired. On identical data the wrong test calls the
+clearest signal in this project noise, which is why `evals/metrics.py` now computes both and the
+document labels which one applies. Two of the three Fisher values in the review draft were wrong
+by up to 0.06 when typed by hand; no statistic in the specification is typed by hand any more.
+
+**D19 · The specification verifies itself.** `tests/test_guardrails_doc.py` runs in the normal
+suite: required headings in order, LLM01–LLM10 each keeping their five sub-headings, ASI01–ASI10
+all present, every `file:symbol` resolving by static AST scan (never `importlib`, which cannot
+resolve `src/` and would execute module-level code), every snippet parsing, no `assert` in any
+snippet found by AST rather than by substring, no snippet importing a forbidden dependency, a
+snippet copied from shipped code still matching it semantically with docstrings excluded, and
+every figure in §0 equalling the artefact it names. Each check was confirmed by deliberately
+breaking it and watching it go red; a docstring edit was confirmed *not* to break the code-identity
+check, which is the property that makes it usable. The document had already rotted once — its
+predecessor harness lived in a scratchpad and was lost — which is why the checks now live in the
+suite.
+

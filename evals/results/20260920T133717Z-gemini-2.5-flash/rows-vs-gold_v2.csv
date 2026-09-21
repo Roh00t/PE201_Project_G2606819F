@@ -1,0 +1,269 @@
+case_id,field,code,gold_status,gold_value,value,ungated_value,correct,silent_failure
+case_001,medication,VERIFIED,found,chymoral forte,paracetamol,paracetamol,False,True
+case_001,dose,VERIFIED,not_stated,,500,500,False,True
+case_001,frequency,VERIFIED,found,three times a day,three times a day,three times a day,True,False
+case_001,allergy,NOT_STATED,not_stated,,,,False,False
+case_002,medication,VERIFIED,found,MRD,MRD,MRD,True,False
+case_002,dose,NOT_STATED,not_stated,,,,False,False
+case_002,frequency,NOT_STATED,not_stated,,,,False,False
+case_002,allergy,NOT_STATED,not_stated,,,,False,False
+case_003,medication,VERIFIED,found,Vernace,Vernace,Vernace,True,False
+case_003,dose,NOT_STATED,not_stated,,,,False,False
+case_003,frequency,VERIFIED,found,in the afternoon,one in the afternoon,one in the afternoon,False,True
+case_003,allergy,NOT_STATED,not_stated,,,,False,False
+case_004,medication,VERIFIED,found,Syndopa,Syndopa,Syndopa,True,False
+case_004,dose,ABSTAIN_NUMERIC_MISMATCH,not_stated,,,half,False,False
+case_004,frequency,VERIFIED,found,TDS,TDS,TDS,True,False
+case_004,allergy,NOT_STATED,not_stated,,,,False,False
+case_005,medication,VERIFIED,found,Gabantin GRS,Gabantin GRS,Gabantin GRS,True,False
+case_005,dose,VERIFIED,found,300 milligram,300 milligram,300 milligram,True,False
+case_005,frequency,VERIFIED,found,one at night,at night,at night,False,True
+case_005,allergy,NOT_STATED,not_stated,,,,False,False
+case_006,medication,VERIFIED,found,Ecosprin AV,Ecosprin AV,Ecosprin AV,True,False
+case_006,dose,VERIFIED,found,75 + 20,75 + 20,75 + 20,True,False
+case_006,frequency,VERIFIED,found,at night,at night,at night,True,False
+case_006,allergy,NOT_STATED,not_stated,,,,False,False
+case_007,medication,NOT_STATED,not_stated,,,,False,False
+case_007,dose,NOT_STATED,not_stated,,,,False,False
+case_007,frequency,NOT_STATED,not_stated,,,,False,False
+case_007,allergy,NOT_STATED,not_stated,,,,False,False
+case_008,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_008,dose,VERIFIED,found,650,650,650,True,False
+case_008,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_008,allergy,NOT_STATED,not_stated,,,,False,False
+case_009,medication,VERIFIED,found,Augmentin,Augmentin,Augmentin,True,False
+case_009,dose,NOT_STATED,not_stated,,,,False,False
+case_009,frequency,VERIFIED,found,Twice a day,Twice a day,Twice a day,True,False
+case_009,allergy,NOT_STATED,not_stated,,,,False,False
+case_010,medication,VERIFIED,found,augmentin,dolo,dolo,False,True
+case_010,dose,VERIFIED,not_stated,,650,650,False,True
+case_010,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_010,allergy,NOT_STATED,not_stated,,,,False,False
+case_011,medication,VERIFIED,found,Augmentin,Augmentin,Augmentin,True,False
+case_011,dose,NOT_STATED,not_stated,,,,False,False
+case_011,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_011,allergy,NOT_STATED,not_stated,,,,False,False
+case_012,medication,VERIFIED,found,Augmentin,Augmentin,Augmentin,True,False
+case_012,dose,NOT_STATED,not_stated,,,,False,False
+case_012,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_012,allergy,NOT_STATED,not_stated,,,,False,False
+case_013,medication,NOT_STATED,not_stated,,,,False,False
+case_013,dose,NOT_STATED,not_stated,,,,False,False
+case_013,frequency,NOT_STATED,not_stated,,,,False,False
+case_013,allergy,NOT_STATED,not_stated,,,,False,False
+case_014,medication,NOT_STATED,not_stated,,,,False,False
+case_014,dose,NOT_STATED,not_stated,,,,False,False
+case_014,frequency,NOT_STATED,not_stated,,,,False,False
+case_014,allergy,NOT_STATED,not_stated,,,,False,False
+case_015,medication,VERIFIED,found,Dolostat plus R,Dolostat plus R,Dolostat plus R,True,False
+case_015,dose,NOT_STATED,not_stated,,,,False,False
+case_015,frequency,VERIFIED,found,OD,OD,OD,True,False
+case_015,allergy,NOT_STATED,not_stated,,,,False,False
+case_016,medication,VERIFIED,found,Combiflam,Combiflam,Combiflam,True,False
+case_016,dose,ABSTAIN_INCOHERENT,not_stated,,,not_stated,False,False
+case_016,frequency,VERIFIED,found,TID,TID,TID,True,False
+case_016,allergy,NOT_STATED,not_stated,,,,False,False
+case_017,medication,VERIFIED,found,Deriphyllin Retard,Levopoint M,Levopoint M,False,True
+case_017,dose,ABSTAIN_INCOHERENT,found,300 milligram,,,False,False
+case_017,frequency,VERIFIED,found,twice a day,once at night,once at night,False,True
+case_017,allergy,ABSTAIN_INCOHERENT,not_stated,,,,False,False
+case_018,medication,VERIFIED,found,Acecloran MR,Pregastar D,Pregastar D,False,True
+case_018,dose,NOT_STATED,found,250 ml,,,False,False
+case_018,frequency,VERIFIED,found,Twice a day,once at night,once at night,False,True
+case_018,allergy,NOT_STATED,not_stated,,,,False,False
+case_019,medication,VERIFIED,found,Calcirix XT,Statpure F,Statpure F,False,True
+case_019,dose,NOT_STATED,not_stated,,,,False,False
+case_019,frequency,VERIFIED,found,once in the morning,once at night,once at night,False,True
+case_019,allergy,NOT_STATED,not_stated,,,,False,False
+case_020,medication,VERIFIED,found,Sensiclav ES,Sensiclav ES,Sensiclav ES,True,False
+case_020,dose,VERIFIED,found,5ml,5ml,5ml,True,False
+case_020,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_020,allergy,NOT_STATED,not_stated,,,,False,False
+case_021,medication,VERIFIED,found,Mefenamic,Mefenamic,Mefenamic,True,False
+case_021,dose,VERIFIED,found,500,500,500,True,False
+case_021,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_021,allergy,NOT_STATED,not_stated,,,,False,False
+case_022,medication,VERIFIED,found,Ondem,Mefenamic,Mefenamic,False,True
+case_022,dose,VERIFIED,found,4mg,500,500,False,True
+case_022,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_022,allergy,NOT_STATED,not_stated,,,,False,False
+case_023,medication,VERIFIED,found,Lekace,Xykaa MR,Xykaa MR,False,True
+case_023,dose,NOT_STATED,found,100 mg,,,False,False
+case_023,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_023,allergy,NOT_STATED,not_stated,,,,False,False
+case_024,medication,VERIFIED,found,Dynapar AQ,Aceclo MR,Aceclo MR,False,True
+case_024,dose,NOT_STATED,found,1 ml,,,False,False
+case_024,frequency,VERIFIED,found,stat,twice a day,twice a day,False,True
+case_024,allergy,NOT_STATED,not_stated,,,,False,False
+case_025,medication,VERIFIED,found,cefixime,cefixime,cefixime,True,False
+case_025,dose,VERIFIED,found,200 milligrams,200 milligrams,200 milligrams,True,False
+case_025,frequency,VERIFIED,found,morning and night,morning and night,morning and night,True,False
+case_025,allergy,NOT_STATED,not_stated,,,,False,False
+case_026,medication,VERIFIED,found,Clopivas AP 75 by 75,Clopivas AP,Clopivas AP,False,True
+case_026,dose,VERIFIED,found,75 by 75,75 by 75,75 by 75,True,False
+case_026,frequency,VERIFIED,found,0-1-0,0-1-0,0-1-0,True,False
+case_026,allergy,NOT_STATED,not_stated,,,,False,False
+case_027,medication,NOT_STATED,not_stated,,,,False,False
+case_027,dose,NOT_STATED,not_stated,,,,False,False
+case_027,frequency,NOT_STATED,not_stated,,,,False,False
+case_027,allergy,NOT_STATED,not_stated,,,,False,False
+case_028,medication,NOT_STATED,not_stated,,,,False,False
+case_028,dose,NOT_STATED,not_stated,,,,False,False
+case_028,frequency,NOT_STATED,not_stated,,,,False,False
+case_028,allergy,NOT_STATED,not_stated,,,,False,False
+case_029,medication,VERIFIED,found,Cilacar,Cilacar,Cilacar,True,False
+case_029,dose,VERIFIED,found,10 mg,10 mg,10 mg,True,False
+case_029,frequency,VERIFIED,found,once a day,once a day,once a day,True,False
+case_029,allergy,NOT_STATED,not_stated,,,,False,False
+case_030,medication,VERIFIED,found,Jhactions iron tonic,Jhactions iron tonic,Jhactions iron tonic,True,False
+case_030,dose,NOT_STATED,not_stated,,,,False,False
+case_030,frequency,VERIFIED,found,One time at the night,One time at the night,One time at the night,True,False
+case_030,allergy,NOT_STATED,not_stated,,,,False,False
+case_031,medication,VERIFIED,found,Pantop,Pantop,Pantop,True,False
+case_031,dose,VERIFIED,found,40 mg,40 mg,40 mg,True,False
+case_031,frequency,VERIFIED,found,once daily,once daily,once daily,True,False
+case_031,allergy,NOT_STATED,not_stated,,,,False,False
+case_032,medication,NOT_STATED,not_stated,,,,False,False
+case_032,dose,NOT_STATED,not_stated,,,,False,False
+case_032,frequency,NOT_STATED,not_stated,,,,False,False
+case_032,allergy,NOT_STATED,not_stated,,,,False,False
+case_033,medication,NOT_STATED,not_stated,,,,False,False
+case_033,dose,NOT_STATED,not_stated,,,,False,False
+case_033,frequency,NOT_STATED,not_stated,,,,False,False
+case_033,allergy,NOT_STATED,not_stated,,,,False,False
+case_034,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_034,dose,NOT_STATED,not_stated,,,,False,False
+case_034,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_034,allergy,NOT_STATED,not_stated,,,,False,False
+case_035,medication,NOT_STATED,not_stated,,,,False,False
+case_035,dose,NOT_STATED,not_stated,,,,False,False
+case_035,frequency,NOT_STATED,not_stated,,,,False,False
+case_035,allergy,NOT_STATED,not_stated,,,,False,False
+case_036,medication,NOT_STATED,not_stated,,,,False,False
+case_036,dose,NOT_STATED,not_stated,,,,False,False
+case_036,frequency,NOT_STATED,not_stated,,,,False,False
+case_036,allergy,NOT_STATED,not_stated,,,,False,False
+case_037,medication,VERIFIED,found,Doxycycline,Ceftriaxone,Ceftriaxone,False,True
+case_037,dose,NOT_STATED,found,100 mg,,,False,False
+case_037,frequency,VERIFIED,found,BD,BD,BD,True,False
+case_037,allergy,NOT_STATED,not_stated,,,,False,False
+case_038,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_038,dose,VERIFIED,found,650,650,650,True,False
+case_038,frequency,VERIFIED,found,three times a day,three times a day,three times a day,True,False
+case_038,allergy,NOT_STATED,not_stated,,,,False,False
+case_039,medication,VERIFIED,found,Foracort,Foracort,Foracort,True,False
+case_039,dose,VERIFIED,found,200 two puffs,200,200,True,False
+case_039,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_039,allergy,NOT_STATED,not_stated,,,,False,False
+case_040,medication,REVIEW_MODEL_UNSURE,found,Minoxidil,Minoxidil,Minoxidil,True,False
+case_040,dose,NOT_STATED,not_stated,,,,False,False
+case_040,frequency,NOT_STATED,not_stated,,,,False,False
+case_040,allergy,NOT_STATED,not_stated,,,,False,False
+case_041,medication,VERIFIED,found,Cepodem XP,Cepodem XP,Cepodem XP,True,False
+case_041,dose,VERIFIED,found,325 milligram,325 milligram,325 milligram,True,False
+case_041,frequency,VERIFIED,found,twice daily,twice daily,twice daily,True,False
+case_041,allergy,NOT_STATED,not_stated,,,,False,False
+case_042,medication,VERIFIED,found,Sibelium,Sibelium,Sibelium,True,False
+case_042,dose,VERIFIED,found,10 mg,10 mg,10 mg,True,False
+case_042,frequency,VERIFIED,found,at night,at night,at night,True,False
+case_042,allergy,NOT_STATED,not_stated,,,,False,False
+case_043,medication,VERIFIED,found,tendolife tablet,tendolife,tendolife,True,False
+case_043,dose,NOT_STATED,not_stated,,,,False,False
+case_043,frequency,VERIFIED,found,three times a day,three times a day,three times a day,True,False
+case_043,allergy,NOT_STATED,not_stated,,,,False,False
+case_044,medication,VERIFIED,found,Tab Dytor,Plecanatide,Plecanatide,False,True
+case_044,dose,VERIFIED,found,10mg,2 mg 3 mg,2 mg 3 mg,False,True
+case_044,frequency,VERIFIED,found,OD in the morning,in the night,in the night,False,True
+case_044,allergy,NOT_STATED,not_stated,,,,False,False
+case_045,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_045,dose,VERIFIED,found,450,450,450,True,False
+case_045,frequency,VERIFIED,found,two times a day,two times a day,two times a day,True,False
+case_045,allergy,NOT_STATED,not_stated,,,,False,False
+case_046,medication,VERIFIED,found,Tablet Ubexa,Statpure F,Statpure F,False,True
+case_046,dose,NOT_STATED,found,40,,,False,False
+case_046,frequency,VERIFIED,found,once in the morning,once at night,once at night,False,True
+case_046,allergy,NOT_STATED,not_stated,,,,False,False
+case_047,medication,VERIFIED,found,Cepodem,Mefenamic,Mefenamic,False,True
+case_047,dose,VERIFIED,found,200,500,500,False,True
+case_047,frequency,VERIFIED,found,twice a day,Twice a day,Twice a day,True,False
+case_047,allergy,NOT_STATED,not_stated,,,,False,False
+case_048,medication,VERIFIED,found,Cepodem,Zady,Zady,False,True
+case_048,dose,VERIFIED,found,200,250 milligram,250 milligram,False,True
+case_048,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_048,allergy,NOT_STATED,not_stated,,,,False,False
+case_049,medication,VERIFIED,found,Cefixime,Cefixime,Cefixime,True,False
+case_049,dose,VERIFIED,found,200,200,200,True,False
+case_049,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_049,allergy,NOT_STATED,not_stated,,,,False,False
+case_050,medication,VERIFIED,found,Lizomed,Lizomed,Lizomed,True,False
+case_050,dose,VERIFIED,found,600,600,600,True,False
+case_050,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_050,allergy,NOT_STATED,not_stated,,,,False,False
+case_051,medication,VERIFIED,found,Omez,Solopose MD,Solopose MD,False,True
+case_051,dose,NOT_STATED,not_stated,,,,False,False
+case_051,frequency,VERIFIED,found,twice a day,once at night,once at night,False,True
+case_051,allergy,NOT_STATED,not_stated,,,,False,False
+case_052,medication,NOT_STATED,not_stated,,,,False,False
+case_052,dose,NOT_STATED,not_stated,,,,False,False
+case_052,frequency,NOT_STATED,not_stated,,,,False,False
+case_052,allergy,NOT_STATED,not_stated,,,,False,False
+case_053,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_053,dose,VERIFIED,found,650,650,650,True,False
+case_053,frequency,NOT_STATED,not_stated,,,,False,False
+case_053,allergy,NOT_STATED,not_stated,,,,False,False
+case_054,medication,VERIFIED,found,Cepodem,Mefenamic,Mefenamic,False,True
+case_054,dose,VERIFIED,found,200,500,500,False,True
+case_054,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_054,allergy,NOT_STATED,not_stated,,,,False,False
+case_055,medication,VERIFIED,found,Amoxyclav,Amoxyclav,Amoxyclav,True,False
+case_055,dose,VERIFIED,found,625,625,625,True,False
+case_055,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_055,allergy,NOT_STATED,not_stated,,,,False,False
+case_056,medication,VERIFIED,found,Cefixime,Cefixime,Cefixime,True,False
+case_056,dose,VERIFIED,found,200 milligram,200 milligram,200 milligram,True,False
+case_056,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_056,allergy,NOT_STATED,not_stated,,,,False,False
+case_057,medication,VERIFIED,found,Ompec D M,Ompec D M,Ompec D M,True,False
+case_057,dose,NOT_STATED,not_stated,,,,False,False
+case_057,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_057,allergy,NOT_STATED,not_stated,,,,False,False
+case_058,medication,VERIFIED,found,Maxflox,Maxflox,Maxflox,True,False
+case_058,dose,VERIFIED,found,400,400,400,True,False
+case_058,frequency,VERIFIED,found,once at night,once at night,once at night,True,False
+case_058,allergy,NOT_STATED,not_stated,,,,False,False
+case_059,medication,VERIFIED,found,Cepodem,Dolo,Dolo,False,True
+case_059,dose,VERIFIED,found,200,650,650,False,True
+case_059,frequency,VERIFIED,found,twice a day,once in the afternoon,once in the afternoon,False,True
+case_059,allergy,NOT_STATED,not_stated,,,,False,False
+case_060,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_060,dose,VERIFIED,found,650,650,650,True,False
+case_060,frequency,VERIFIED,found,two times a day,two times a day,two times a day,True,False
+case_060,allergy,NOT_STATED,not_stated,,,,False,False
+case_061,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_061,dose,VERIFIED,found,650,650,650,True,False
+case_061,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_061,allergy,NOT_STATED,not_stated,,,,False,False
+case_062,medication,VERIFIED,found,Penta DSR,Dolo,Dolo,False,True
+case_062,dose,VERIFIED,not_stated,,650,650,False,True
+case_062,frequency,VERIFIED,found,2 times a day,2 times a day,2 times a day,True,False
+case_062,allergy,NOT_STATED,not_stated,,,,False,False
+case_063,medication,VERIFIED,found,Moxclav,Moxclav,Moxclav,True,False
+case_063,dose,VERIFIED,found,625,625,625,True,False
+case_063,frequency,VERIFIED,found,three times a day,three times a day,three times a day,True,False
+case_063,allergy,NOT_STATED,not_stated,,,,False,False
+case_064,medication,VERIFIED,found,Moxclav,Moxclav,Moxclav,True,False
+case_064,dose,VERIFIED,found,625,625,625,True,False
+case_064,frequency,VERIFIED,found,three times a day,three times a day,three times a day,True,False
+case_064,allergy,NOT_STATED,not_stated,,,,False,False
+case_065,medication,VERIFIED,found,lactoclav,lactoclav,lactoclav,True,False
+case_065,dose,NOT_STATED,found,1,,,False,False
+case_065,frequency,VERIFIED,found,BD,BD,BD,True,False
+case_065,allergy,NOT_STATED,not_stated,,,,False,False
+case_066,medication,VERIFIED,found,Dolo,Dolo,Dolo,True,False
+case_066,dose,VERIFIED,found,650,650,650,True,False
+case_066,frequency,NOT_STATED,not_stated,,,,False,False
+case_066,allergy,NOT_STATED,not_stated,,,,False,False
+case_067,medication,VERIFIED,found,Telma,Telma,Telma,True,False
+case_067,dose,NOT_STATED,not_stated,,,,False,False
+case_067,frequency,VERIFIED,found,twice a day,twice a day,twice a day,True,False
+case_067,allergy,NOT_STATED,not_stated,,,,False,False

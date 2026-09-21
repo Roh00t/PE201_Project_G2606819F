@@ -124,10 +124,10 @@ only by loosening `load_gold`.
 ./.venv/bin/python evals/label_gold_v1.py validate --seal          # seal a labelled set
 ```
 
-Registered: `gold-v1` (sealed, `1f594e46…`), `gold-v2` (16 corrections plus slice tags, built by
-`evals/label_gold_v2.py`, **awaiting two human signatures** before it seals), `allergy-v1`
-(sealed, 20 MTSamples notes with positive allergies) and `allergy-v1-stripped` (sealed, the same
-labels with every ALL-CAPS header removed — the leakage report). Adding a version means adding a
+Registered, all four sealed: `gold-v1` (`1f594e46…`), `gold-v2` (`d5e90f5a…`, 18 corrections —
+16 rule-derived and 2 signed by `rohit` — plus slice tags), `allergy-v1` (`10725be9…`, 20
+MTSamples notes with positive allergies) and `allergy-v1-stripped` (`1d02348e…`, the same labels
+with every ALL-CAPS header removed — the leakage report). Adding a version means adding a
 registry entry, and **sealing it must stamp the matching `schema_version` into the file** or
 loading is refused. `gold_v1.json` is never edited.
 
@@ -228,3 +228,24 @@ Two claims, two confidence levels, and they must not be blurred:
 
 A large p-value never means two systems are equally good. It means the evaluation is too small to
 tell, which is a fact about the evaluation.
+
+### 5.7 Scoring against a second gold version
+
+A corrected answer key raises the score without the extractor changing, so the two must be
+reported apart:
+
+```bash
+# the label correction alone - re-scores saved outputs, makes NO model call
+./.venv/bin/python evals/score_arm.py evals/results/<run> --gold data/gold_labels/gold_v2.json
+./.venv/bin/python evals/metrics.py evals/results/<run> \
+    --gold data/gold_labels/gold_v1.json --gold-b data/gold_labels/gold_v2.json
+```
+
+`score_arm.py` writes `scores-vs-<goldstem>.json` when the gold is not the run's own, so a
+cross-gold measurement can never overwrite the run's own scores. Measured for gold-v2: of the
+8.5-point move from 0.645 to 0.730, **7.8 points are the labels (p = 0.008) and 0.7 is sampling
+noise that does not separate (p = 1.000)**.
+
+`metrics.compare_golds` pairs only fields that are `found` in **both** versions; the 8 withdrawn
+and 1 added label are reported separately and never counted as flips.
+

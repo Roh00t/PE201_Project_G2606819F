@@ -85,12 +85,33 @@ class SealingDiscipline(unittest.TestCase):
         self.assertIn("requires --labeller", err.getvalue())
 
     def test_sealing_is_refused_while_a_correction_is_unsigned(self):
+        # The invariant is that a refused seal changes nothing on disk - not that
+        # gold-v2 is absent. It is present now, legitimately sealed, and a test
+        # that asserted absence was coupled to the repository's data state rather
+        # than to the behaviour it meant to pin.
+        before = (v2.V2_PATH.read_bytes() if v2.V2_PATH.exists() else None)
         out, err = StringIO(), StringIO()
         with redirect_stdout(out), redirect_stderr(err):
             code = v2.main(["validate", "--seal", "--labeller", "someone"])
         self.assertEqual(code, v2.EXIT_NOT_READY)
         self.assertIn("refusing to seal", err.getvalue())
-        self.assertFalse(v2.V2_PATH.exists(), "gold-v2 must not have been written")
+        after = (v2.V2_PATH.read_bytes() if v2.V2_PATH.exists() else None)
+        self.assertEqual(before, after, "a refused seal must not touch gold-v2")
+
+    def test_sealing_over_an_existing_version_is_refused_outright(self):
+        # Write-once. With every correction signed, the only thing standing
+        # between a rerun and a clobbered ground truth is this refusal.
+        if not v2.V2_PATH.exists():
+            self.skipTest("gold-v2 is not sealed yet")
+        before = v2.V2_PATH.read_bytes()
+        out, err = StringIO(), StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = v2.main(["validate", "--seal", "--labeller", "someone",
+                            "--confirm", "case_010.medication",
+                            "--confirm", "case_010.frequency"])
+        self.assertEqual(code, v2.EXIT_REFUSED)
+        self.assertIn("already exists", err.getvalue())
+        self.assertEqual(before, v2.V2_PATH.read_bytes())
 
 
 class WhatGoldV2Contains(unittest.TestCase):

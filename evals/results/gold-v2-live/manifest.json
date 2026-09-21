@@ -1,0 +1,47 @@
+{
+  "run_id": "gold-v2-live",
+  "started_at": "2026-09-21T13:47:21+00:00",
+  "finished_at": "2026-09-21T13:49:01+00:00",
+  "mode": "live",
+  "reportable": true,
+  "experiment": null,
+  "model": "google/gemini-2.5-flash",
+  "prompt_fingerprint": "a92d2abcb2af4294",
+  "data_collection": "deny",
+  "gold": {
+    "version": "gold-v2",
+    "dataset": "ekacare/clinical_note_generation_dataset",
+    "path": "data/gold_labels/gold_v2.json",
+    "sha256": "d5e90f5a016a542046745079766b6ef0c8cc088ee10fbb989200a05b319fa959",
+    "cases_total": 67,
+    "cases_run": 67,
+    "sealed_at": "2026-09-21T13:23:31+00:00",
+    "sealed_prompt_fingerprint": "a92d2abcb2af4294",
+    "dataset_revision": "662c58a1d03255e26461519be4c9c4e597fdd3fd"
+  },
+  "environment": {
+    "git_commit": "9cd0eae",
+    "git_dirty": true,
+    "python": "3.14.5",
+    "openai": "3.15.0",
+    "pydantic": "2.13.5"
+  },
+  "spend": {
+    "ceiling_usd": 8.0,
+    "spent_before_usd": 0.112387,
+    "billed_this_run_usd": 0.041315
+  },
+  "breaker": {
+    "halted": false,
+    "reason_code": null,
+    "reason": null,
+    "calls": 67,
+    "failures": 0
+  },
+  "errors": {},
+  "exit_counts": {
+    "0": 63,
+    "1": 4
+  },
+  "cached_cases": 0
+}

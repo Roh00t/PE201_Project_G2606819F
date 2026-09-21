@@ -1,0 +1,45 @@
+{
+  "run_id": "gold-v2-live",
+  "calls": 67,
+  "cap_usd": 0.25,
+  "ceiling_usd": 8.0,
+  "billed_usd": 0.041315,
+  "cap_used": 0.1653,
+  "cost_per_call_usd": 0.000617,
+  "tokens": {
+    "input": 57842,
+    "output": 9585,
+    "cached": 0,
+    "reasoning": 0
+  },
+  "latency_ms": {
+    "p50": 1292.6,
+    "p95": 1833.7,
+    "max": 12325.1
+  },
+  "retried_calls": 1,
+  "failed_calls": 0,
+  "price_check": {
+    "calls_with_provider_cost": 67,
+    "estimate_total_usd": 0.041314,
+    "provider_total_usd": 0.041315,
+    "drift_usd": 1e-06
+  },
+  "by_model": {
+    "google/gemini-2.5-flash": {
+      "calls": 67,
+      "billed_usd": 0.041315,
+      "input_tokens": 57842,
+      "output_tokens": 9585
+    }
+  },
+  "destinations": [
+    {
+      "endpoint": "https://openrouter.ai/api/v1",
+      "provider": "Google",
+      "model_served": "google/gemini-2.5-flash"
+    }
+  ],
+  "model_drift": [],
+  "per_call_log": "data/cache/metrics/gold-v2-live.jsonl"
+}

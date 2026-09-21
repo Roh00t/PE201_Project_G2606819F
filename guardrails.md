@@ -2,8 +2,8 @@
 
 **System:** MediExtract. It turns a dictated consult note into four schema-valid fields (medication, dose, frequency, allergy), each with a verbatim quote behind it, and a blank where no quote can be found.
 **Course:** PE6201 Emerging AI Technologies, End-of-Course Project.
-**Document status:** version 1.1, 2026-09-18 (transport moved to OpenRouter; batch loop, scoring and the gold-v1 seal built).
-**Verified against:** the working tree on top of commit `66f9247`. Uncommitted at verification time: `src/extract.py` (the single pipeline file per CLAUDE.md §1.1, now with the P0 prompt corrections and the end-to-end latency fix), `evals/` (`metrics.py`, `baseline.py`, `score_arm.py`, `diagnose.py`, the sealed-gold registry in `run_ekacare.py`, and `probes/probe_v4_schema.py`), `demo/build_review.py`, the documents under `docs/`, `README.md` and `project_proposal.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 204 tests, all passing, run offline and under `python -O`; `pyflakes` clean over `src/`, `evals/`, `evals/probes/`, `tests/`, `demo/` and `data/gazetteer/`.
+**Document status:** version 1.2, 2026-09-21 (section 0 executive summary; section 2.3 agentic readiness thresholds; sections 6.6 header leakage and 6.7 label-versus-system delta; the document now verifies itself via tests/test_guardrails_doc.py) (transport moved to OpenRouter; batch loop, scoring and the gold-v1 seal built).
+**Verified against:** the working tree on top of commit `9cd0eae`. Uncommitted at verification time: `src/extract.py` (the single pipeline file per CLAUDE.md §1.1, now with the P0 prompt corrections and the end-to-end latency fix), `evals/` (`metrics.py`, `baseline.py`, `score_arm.py`, `diagnose.py`, the sealed-gold registry in `run_ekacare.py`, and `probes/probe_v4_schema.py`), `demo/build_review.py`, the documents under `docs/`, `README.md` and `project_proposal.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 282 tests, all passing, run offline and under `python -O`; `pyflakes` clean over `src/`, `evals/`, `evals/probes/`, `tests/`, `demo/` and `data/gazetteer/`.
 
 **Live evidence behind the numbers in this document.** Two full batch runs over the sealed 67-case gold set and one schema probe, $0.081684 between them; the ledger's lifetime total is $0.082276 over 136 calls against the $8 ceiling, the difference being the single-note smoke test of 2026-09-18:
 
@@ -13,6 +13,7 @@
 | `20260920T133717Z` (`--experiment p0-prompt-fixes`) | `a92d2abcb2af4294` | recall 0.645, precision 0.694, silent-failure 0.308, abstention 0.027; 67 calls, $0.041221; API median 1,213 ms, p95 1,600 ms, one outlier at 11,993 ms |
 
 **The two batch runs are not statistically separated.** Paired over the same 155 labelled fields, 12 flipped wrong to right and 5 the other way: exact McNemar p = 0.14. The named defect the prompt fix targeted did disappear (8 occurrences to 0), but the 4.5-point recall gain is not evidence at this sample size, and no number in this document rests on it. `evals/metrics.py` reproduces the verdict.
+| `gold-v2-live` | `a92d2abcb2af4294` | recall 0.730 against the sealed gold-v2; of the 8.5-point move from 0.645, **7.8 points are the label corrections and 0.7 is sampling noise that does not separate** (§6.7) |
 | `probe-v4-…` | n/a | the v4 medication-list schema with `maxItems: 12` accepted on the first attempt, one call, $0.000635, `data_collection: deny` |
 | `leak-allergy-v1` / `-stripped` | `a92d2abcb2af4294` | the leakage report: allergy recall **0.900** with ALL-CAPS headers and **0.650** without, over 20 MTSamples notes and the same labels; 40 calls, $0.030111 |
 
@@ -55,6 +56,126 @@ The 2026 document's own summary of the moves (p. 7): Excessive Agency "climbed t
 | [PROP] | `project_proposal.md` | Persona, intended use, non-use, risk matrix, metrics |
 | [WATCH] | `project_proposal_watchouts.md` (course instructor) | Abstention and evaluation requirements; "a mitigation you only describe is not a mitigation" |
 | [C6] | Course Class 6 notes (`slides_notes.md`) | The rule that prompt instructions are not guardrails, and that defences must be Python |
+
+---
+
+## 0. Executive Summary
+
+*Two pages. Every figure below is quoted from an artefact on disk, not typed: the block at the
+end of this section names the file and key for each one, and `tests/test_guardrails_doc.py`
+fails if the document and the artefact disagree.*
+
+### The five-minute read
+
+| Rubric criterion | Where it is answered | The number or artefact | Reproduce it |
+| :--- | :--- | :--- | :--- |
+| 1 · Problem & significance | §1.1 philosophy, §1.3 boundary | one moment: a physician verifying four fields in under 3 s | — |
+| 2 · Business & technical trade-offs | §1.5 control inventory, §2.1 matrix, §2.2 agentic bound | 30 implemented controls, 18 specified, and the reason this is the LLM list and not the Agentic one | — |
+| 3 · Implementation | §3 deep dives, §6.1 battery, §6.6 leakage | recall 0.645 (gold-v1) / 0.730 (gold-v2); 267 tests green under `python -O` | `unittest discover -s tests` |
+| 3 · Evaluation honesty | §6.6 | the label delta and the sampling delta reported apart | `evals/metrics.py <run> --gold … --gold-b …` |
+| 4 · Communication & limitations | §0 here, §6.6 honesty block, §1.6 abstention | every gate is a precision control; none is a recall control | — |
+
+### What the system is
+
+A single-pass clinical extractor. One note in, one JSON object out, four fields, each carrying a
+verbatim quote from the dictation or left blank. Python 3.14.5, `google/gemini-2.5-flash` through
+OpenRouter on the stock OpenAI SDK, one file (`src/extract.py`) and no orchestration framework.
+
+Four invariants the whole specification rests on, each pinned by a test:
+
+- **No tools, no retrieval, no memory, no write-back.** A successful prompt injection cannot move
+  money, send data, run code or touch a record; its worst outcome is a wrong proposal shown beside
+  the quote it came from (`tests/test_extract_cli.py:RequestConfig.test_the_model_is_given_no_tools`).
+- **No `assert` in any runtime path**, because `python -O` strips it and would silently remove the
+  gates (§1.2; the whole suite runs twice, optimised and not).
+- **The dictation is read-only.** Hidden or look-alike characters are a forced abstention, never a
+  silent clean-up (G-26).
+- **A blank is a result.** Any field that cannot be tied to the physician's own words is shown as a
+  blank with its reason, and the payload carries `null` rather than a display string.
+
+### The threat picture in one paragraph
+
+The specification is built on the **OWASP Top 10 for LLM Applications 2026** because OWASP's own
+boundary puts it there: the LLM list owns the risk while the model is a *component*, and the
+Agentic list takes over once it becomes an *actor* with tools, memory and downstream consequences
+[OWASP-2026 p. 7]. MediExtract is a component. §2.2 therefore carries the full ASI01–ASI10
+mapping as **forward planning** — each agentic control written out, with the exact architectural
+change that would activate it — rather than as a claim of agency. Thirty controls are implemented
+and tested; eighteen are specified with build numbers, so the gap is countable rather than
+rhetorical.
+
+### The finding worth reading first
+
+The header-leakage benchmark (§6.6) removed ALL-CAPS section headers from 20 clinical notes and
+re-ran the same labels. **Allergy recall fell from 0.900 to 0.650.** Five fields changed and every
+one got worse. A quarter of that capability was reading the word `ALLERGIES:` rather than reading
+the sentence.
+
+The security consequence is structural, and it is checkable from §1.5 rather than asserted:
+the evidence gate verifies that a quoted span is genuinely **present** in the dictation, and
+nothing in G-01…G-30 fires when a stated fact is **missed**. **Every gate in this system is a
+precision control; none is a recall control.** Header suppression is therefore an asymmetric
+evasion vector — an attacker, or merely a badly formatted EHR export, can make a real allergy
+disappear from the payload without tripping anything. S-16 (§2.2, ASI06) is the first recall
+control, and it is ranked first in the build order for that reason.
+
+### What the numbers do and do not say
+
+Recall moved 0.645 → 0.730 between gold-v1 and gold-v2, and **that is almost entirely the labels,
+not the system**: re-scoring the *same saved outputs* against the corrected labels gives 0.723
+with no model call at all (8 flips, all one way, McNemar p = 0.008), while a fresh live run adds
+0.7 points that do not separate (p = 1.000). Reporting the headline without that split would sell
+a corrected answer key as an improved extractor.
+
+Two honesty notes carried in full at §6.6: the allergy corpus is 20 American surgical and progress
+notes, not Singapore dictation, and its labels were sealed by `claude-opus-5` — a different model
+family from the one under test, which is the prescribed remedy for self-grading but is not a
+clinician's hand.
+
+### Verification
+
+```bash
+./.venv/bin/python -m unittest discover -s tests          # 267 tests
+./.venv/bin/python -O -m unittest discover -s tests       # again, with assertions stripped
+./.venv/bin/python -m unittest tests.test_guardrails_doc  # this document checks itself
+```
+
+```json measured
+{
+  "gold_v1_pooled_recall": {
+    "artefact": "evals/results/20260920T133717Z-gemini-2.5-flash/scores.json",
+    "path": ["pooled", "recall"], "value": 0.6452
+  },
+  "gold_v2_label_delta_recall_same_outputs": {
+    "artefact": "evals/results/20260920T133717Z-gemini-2.5-flash/scores-vs-gold_v2.json",
+    "path": ["pooled", "recall"], "value": 0.723
+  },
+  "gold_v2_live_pooled_recall": {
+    "artefact": "evals/results/gold-v2-live/scores.json",
+    "path": ["pooled", "recall"], "value": 0.7297
+  },
+  "allergy_recall_headers_intact": {
+    "artefact": "evals/results/leak-allergy-v1/scores.json",
+    "path": ["per_field", "allergy", "recall"], "value": 0.9
+  },
+  "allergy_recall_headers_stripped": {
+    "artefact": "evals/results/leak-allergy-v1-stripped/scores.json",
+    "path": ["per_field", "allergy", "recall"], "value": 0.65
+  },
+  "leakage_pooled_intact": {
+    "artefact": "evals/results/leak-allergy-v1/scores.json",
+    "path": ["pooled", "recall"], "value": 0.6222
+  },
+  "leakage_pooled_stripped": {
+    "artefact": "evals/results/leak-allergy-v1-stripped/scores.json",
+    "path": ["pooled", "recall"], "value": 0.4889
+  },
+  "gold_v1_silent_failure_rate": {
+    "artefact": "evals/results/20260920T133717Z-gemini-2.5-flash/scores.json",
+    "path": ["pooled", "silent_failure_rate"], "value": 0.3077
+  }
+}
+```
 
 ---
 
@@ -185,6 +306,7 @@ Span containment (`evidence in source_text`) is **deterministic**: it is a subst
 | G-26 | Encoding anomalies (bidirectional controls, invisible characters, homoglyphs) → **forced safe abstention**: every field wiped, the model never called, the note never cleaned | IMPLEMENTED | src, evals | `src/extract.py:encoding_flags`, `has_homoglyph`, `wiped_extraction`, `apply_gates`; `src/extract.py:run`; `evals/run_ekacare.py:run_batch` | LLM01, LLM07 |
 | G-27 | Per-call cost audit and a second, per-run cost cap: prompt, completion, cached and reasoning tokens, list-price estimate against the provider's own charge, latency, attempts and destination, refused before the call that would cross the cap | **IMPLEMENTED** | evals | `evals/spend_guard.py:CostGuard.check_before`, `record`, `summary`; `evals/run_ekacare.py:worst_case_one` | LLM06, LLM04 |
 | G-30 | Ground-truth corrections are declared, rule-classified and signed: gold-v1 is hash-verified before it is read, each correction names the rule that requires it, and a correction that repairs an intent rather than applying a rule blocks the seal until a human signs it | **IMPLEMENTED** | evals | `evals/label_gold_v2.py:CORRECTIONS`, `apply_corrections`, `seal`; `evals/label_allergy_v1.py:build`, `validate` | LLM05 |
+| G-31 | Structural-dependency benchmark: the same notes and labels sealed twice, headers intact and stripped, scored paired, so a model reading a section header rather than a sentence is visible as a number | **IMPLEMENTED** | evals | `evals/label_allergy_v1.py:strip_headers`, `build`; `evals/metrics.py:mcnemar`, `fisher_exact` (§6.6) | LLM07, LLM05 |
 | G-29 | Measurement kept separate from enforcement, and a result reported with its separability: populations that must sum to the case count, layer ownership per failing field, cost per correct field, and an exact paired test before a change is called an improvement | **IMPLEMENTED** | evals | `evals/metrics.py:split`, `failure_taxonomy`, `compare`, `mcnemar` | LLM07 |
 | G-28 | Sealed-gold registry: each version carries its own path, SHA-256 file, expected corpus and declared label schema, and a live run accepts only the registered sealed file for the version it was asked for | **IMPLEMENTED** | evals | `evals/run_ekacare.py:SealedGold`, `REGISTRY`, `BatchConfig.__post_init__`, `load_gold` | LLM05, LLM06 |
 | S-01 | PII and credential redaction (logs always; model payload optional, with a token map) | SPECIFIED, build #6 | src | new `src/redact.py` (§5.2) | LLM02 |
@@ -193,6 +315,9 @@ Span containment (`evidence in source_text`) is **deterministic**: it is a subst
 | S-04 | Refuse non-Latin-script notes (`ERR_INPUT_UNSUPPORTED_SCRIPT`) | SPECIFIED, build #3 | src | `src/extract.py:read_note` (§3 LLM01) | LLM07 |
 | S-05 | Hash-pinned lockfile plus `pip-audit` | SPECIFIED, build #7 | repo | `requirements.lock` (§3 LLM04) | LLM04 |
 | S-06 | No-secrets-in-context test | SPECIFIED, build #8 | tests | new `tests/test_prompt.py` (§3 LLM08) | LLM08 |
+| S-16 | Triggered second pass on a suspected missed allergy - the first **recall** control in the system, since every other gate checks whether a proposed fact is real | SPECIFIED, build #13 | src | `needs_second_pass` (§6.6), reusing `data/allergy_set/fetch_mtsamples.py:DENIAL` | LLM07 |
+| S-17 | Inter-stage payload signing (HMAC, fail closed) for the moment a stage boundary leaves the process | SPECIFIED, build #14 | production | `sign_stage`, `verify_stage` (§2.3) | LLM04, LLM10 |
+| S-18 | Tool-parameter access gate: an unknown tool, an out-of-domain parameter and a role that may not call it are three distinct refusals | SPECIFIED, build #15 | production | `tool_parameter_gate` (§2.3) | LLM03, LLM06 |
 | S-07 | Review screen output handling: every interpolated string escaped, highlights built from offsets rather than substitution, no script, no form, `Content-Security-Policy: default-src 'none'` | **IMPLEMENTED** | demo | `demo/build_review.py:esc`, `highlight`, `build` | LLM10 |
 | S-08 | CSV and spreadsheet formula neutralisation in evaluation exports | **IMPLEMENTED** | evals | `evals/scoring.py:csv_safe`, `write_rows_csv` | LLM10 |
 | S-09 | Scoring: recall, precision, abstention, silent-failure rate, Wilson CIs | **IMPLEMENTED** | evals | `evals/scoring.py:score`, `wilson`, `value_matches` | LLM07 |
@@ -323,6 +448,129 @@ The Appendix A tables flattened into columns when extracted from the PDF. Check 
 **The "lethal trifecta"** [C6; OWASP-2026 p. 59] is private data access, plus untrusted content, plus an external communication capability. In production MediExtract has the first two (PHI notes and untrusted dictation) and **not the third**: the model cannot send anything anywhere. The architecture breaks the trifecta, and no filter is needed to do it.
 
 ---
+### 2.3 Agentic Readiness Thresholds, and the agentic controls written out
+
+§2.2 answers *whether* each agentic risk applies today. This answers the question a reviewer asks
+next: **what exactly would have to change for it to apply, and what is the control then?**
+
+MediExtract is a component and not an actor [OWASP-2026 p. 7], pinned by
+`tests/test_extract_cli.py:RequestConfig.test_the_model_is_given_no_tools`. Nothing below is a
+claim that the system is agentic. Each row names the architectural change that would activate the
+risk, and the control is written out in full so that the work is specified rather than deferred —
+which is what the document's **SPECIFIED** status means (§"How to read this document"): complete
+reference code, a build number, and not yet in the repository.
+
+| ASI | Agentic Readiness Threshold — the change that activates it | Control | Status |
+| --- | --- | --- | --- |
+| ASI01 Agent Goal Hijack | Already partly live: untrusted text reaches the model. Fully activates when a model output can select the *next* action rather than only a field value. | G-05 tripwire, fixed `SYSTEM_INSTRUCTION`, G-19 single rule source | IMPLEMENTED |
+| ASI02 Tool Misuse | **The first tool the model can call** — a formulary lookup is the likely first one (§6.6). | **S-18** parameter gate below | SPECIFIED #15 |
+| ASI03 Identity Abuse | The first credential or scoped token placed in the model's context, or the first per-patient authorisation decision made inside an inference. | **S-18** plus per-call statelessness, already the case | SPECIFIED #15 |
+| ASI04 Agentic Supply Chain | A dynamically loaded prompt, plugin or remote tool descriptor. Today every prompt is a literal in one file and every gold set is hash-sealed. | G-28 sealed-gold registry, G-10 unpriced-model refusal, S-05 hash-pinned lockfile | IMPLEMENTED / SPECIFIED #7 |
+| ASI05 Unexpected Code Execution | Any `eval`, `exec`, `pickle`, shell call or dynamic import on model output. None exists; output goes through `json.loads` and strict Pydantic. | G-08 fence stripping and strict schema; absence of `eval`/`exec` | IMPLEMENTED |
+| ASI06 Memory & Context Poisoning | Persistence between calls: a conversation, a cache the model writes, or retrieval over prior outputs. Today each note is a fresh context. | **S-16** recall check (§6.6) is the nearest live analogue: it defends against a *structural* shortcut rather than a poisoned memory | SPECIFIED #13 |
+| ASI07 Insecure Inter-Agent Communication | **Migration from in-process function calls to cross-process or multi-agent RPC.** Today every stage boundary is a Python call in one process. | **S-17** payload signing below | SPECIFIED #14 |
+| ASI08 Cascading Failures | A retry or planning loop whose depth is not fixed. Today: `HTTP_MAX_RETRIES = 1`, `SCHEMA_ATTEMPTS = 2`, `MAX_OUTPUT_TOKENS = 1024`, plus the batch circuit breaker and two spend ceilings. | G-07, G-09, G-27, S-10 | IMPLEMENTED |
+| ASI09 Human-Agent Trust | Live now, and the sharpest of the ten for this system: a confidently wrong dose deceives a clinician. See the note below. | G-01–G-04 grounding and hard wipe, the review screen (S-07), abstention policy §1.6 | IMPLEMENTED |
+| ASI10 Rogue Agents | Autonomy to go rogue with: a scheduler, a background worker, or any execution the physician did not initiate. | Architectural absence; no egress path | N/A by design |
+
+**ASI09 deserves a specific admission rather than a control reference.** The risk is a system
+producing plausible output that a human accepts on trust. This project contains a live instance of
+it in its own evaluation: the allergy corpus (§6.6) was labelled by `claude-opus-5` — a model —
+and those labels are what the extractor is graded against. The mitigation for grading one's own
+homework is to use a different model family, which is what was done, but the honest description is
+that a model is marking a model's work and a clinician has not seen it. It is recorded in the
+corpus provenance (`sealed_by`) so that no reader has to discover it.
+
+#### S-17 — Inter-stage payload signing (SPECIFIED, build #14)
+
+Activates on the ASI07 threshold above. Today the pipeline's stages are function calls inside one
+process, so a payload cannot be tampered with in transit without tampering with the process; the
+control exists for the moment that stops being true.
+
+```python
+# S-17. Integrity for a payload that leaves the process it was built in.
+# HMAC, not a bare hash: a hash proves only that nobody corrupted the bytes by
+# accident, while an HMAC proves they came from a holder of the key.
+import hmac
+import hashlib
+import json
+
+
+class StageIntegrityError(Exception):
+    """A stage payload did not arrive as it was sent."""
+
+
+def sign_stage(payload: dict, key: bytes) -> dict:
+    """Wrap a payload with a signature over its canonical form."""
+    body = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return {"body": payload,
+            "sig": hmac.new(key, body, hashlib.sha256).hexdigest()}
+
+
+def verify_stage(envelope: dict, key: bytes) -> dict:
+    """Return the payload, or refuse. Fail closed: an unverifiable payload is
+    not passed on with a warning, because a warning is not a control."""
+    if not isinstance(envelope, dict) or "body" not in envelope or "sig" not in envelope:
+        raise StageIntegrityError("stage envelope is malformed")
+    body = json.dumps(envelope["body"], sort_keys=True,
+                      separators=(",", ":")).encode("utf-8")
+    expected = hmac.new(key, body, hashlib.sha256).hexdigest()
+    # compare_digest, not ==: string comparison leaks position through timing.
+    if not hmac.compare_digest(expected, str(envelope["sig"])):
+        raise StageIntegrityError("stage payload signature does not verify")
+    return envelope["body"]
+```
+
+#### S-18 — Tool-parameter access gate (SPECIFIED, build #15)
+
+Activates on the ASI02/ASI03 threshold: the first tool the model can call. Written for the likely
+first one, a read-only formulary lookup, because §6.6 identifies a formulary plausibility check as
+the next deterministic guardrail this system needs.
+
+```python
+# S-18. A model naming a tool is a request, never an authorisation.
+#
+# Three separate refusals, because they fail for different reasons and a caller
+# needs to tell them apart: an unknown tool, a parameter outside its declared
+# domain, and an operation the caller's role does not hold.
+class ToolRequestRefused(Exception):
+    """A tool call was refused before it was made."""
+
+
+READ_ONLY_TOOLS = {
+    # tool name -> (allowed parameter names, the role that may call it)
+    "formulary_lookup": ({"product", "strength"}, "extractor"),
+}
+
+
+def tool_parameter_gate(tool: str, parameters: dict, role: str) -> dict:
+    """Validate a model-proposed tool call. Returns the parameters it will
+    accept; raises rather than trimming, because silently dropping a parameter
+    changes the call the model asked for without telling anyone."""
+    if tool not in READ_ONLY_TOOLS:
+        raise ToolRequestRefused(f"{tool!r} is not a tool this system exposes")
+    allowed, required_role = READ_ONLY_TOOLS[tool]
+    if role != required_role:
+        raise ToolRequestRefused(f"role {role!r} may not call {tool!r}")
+    unexpected = set(parameters) - allowed
+    if unexpected:
+        raise ToolRequestRefused(f"{tool!r} received unexpected parameters: "
+                                 f"{sorted(unexpected)}")
+    for name, value in parameters.items():
+        if not isinstance(value, str) or not value.strip():
+            raise ToolRequestRefused(f"{tool!r} parameter {name!r} must be a "
+                                     "non-empty string")
+        if len(value) > 80:
+            raise ToolRequestRefused(f"{tool!r} parameter {name!r} is too long")
+    return dict(parameters)
+```
+
+Note what neither control uses: no `assert`, because `python -O` removes it (§1.2), and no
+mutation of a refused request into an accepted one. A gate that repairs its input is a
+transformation, not a gate.
+
+---
+
 ## 3. Deep-Dive Guardrail Specifications (LLM01 to LLM10)
 
 Every deep-dive has the same five parts. Code marked **IMPLEMENTED** calls the real modules; run it from the repository root with `src/` on the path. Code marked **SPECIFIED** is complete reference code for a control not yet in the repository. All snippets were executed against test vectors on 2026-09-18 (§6.1 lists the checks).
@@ -1988,3 +2236,190 @@ The scorecard in [ASI-PAN pp. 16–19] asks ten questions. Each is answered *No*
 | 3.4 | Is quiet privilege growth detected and stopped? | Identity & Privilege Abuse | **P** | Manual token-scope review only (the over-scoped Hugging Face token was found by hand on 2026-09-16). No automated scope monitoring. |
 
 **Interpretation.** With mostly Yes answers, the scorecard would place MediExtract in its "Governor Zone" [ASI-PAN p. 21]. That reading needs a caveat. Most of the Yes answers come from **not being an agent**, not from sophisticated runtime monitoring. The architecture removes the attack surfaces the scorecard probes. The two Partial answers are the real next steps: the review screen with mandatory sign-off (S-12), and least-privilege credentials that are reviewed on a schedule rather than when something breaks.
+
+---
+
+### 6.6 Structural dependency: the ALL-CAPS header leakage benchmark
+
+**G-31 (IMPLEMENTED, measurement) · S-16 (SPECIFIED, build #13)**
+
+The question this answers is not "how accurate is the extractor" but "what is it actually
+reading". Twenty clinical notes were sealed twice — as written, and with every ALL-CAPS section
+header removed — carrying **the same case ids and the same labels**, so the two runs are paired
+and only the fields that changed carry information (`data/gold_labels/allergy_v1.json`,
+`allergy_v1_stripped.json`; built by `evals/label_allergy_v1.py`).
+
+| Scope | Headers intact | Headers stripped | Delta | Discordant (→right / →wrong) | McNemar exact | Fisher, unpaired — *not the applicable test* |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **Allergy recall** | 18/20 (90.0%) | 13/20 (65.0%) | **−25.0 pp** | 0 / 5 | **0.0625** | 0.1274 |
+| Medication recall | 5/11 (45.5%) | 4/11 (36.4%) | −9.1 pp | 1 / 2 | 1.0000 | 1.0000 |
+| Dose recall | 2/7 (28.6%) | 2/7 (28.6%) | 0.0 pp | 1 / 1 | 1.0000 | 1.0000 |
+| Frequency recall | 3/7 (42.9%) | 3/7 (42.9%) | 0.0 pp | 1 / 1 | 1.0000 | 1.0000 |
+| Pooled | 28/45 (62.2%) | 22/45 (48.9%) | −13.3 pp | 3 / 9 | 0.1460 | 0.2888 |
+
+#### Which statistical test, and why it matters here
+
+**McNemar's exact test on the discordant pairs is the applicable test.** The same twenty notes are
+evaluated under both conditions, so the observations are paired; a field both runs got right
+carries no information about which condition is better, and only the fields that *changed* do.
+Under the null hypothesis each change is a coin toss, so the exact binomial on the discordant
+count is the test, and no normal approximation is involved.
+
+Fisher's exact is tabulated beside it **because an evaluator handed two rates will compute it**,
+and it is wrong here: it treats the two columns as independent samples and throws the pairing
+away. The two columns are not a rhetorical flourish. On the gold-v2 label comparison (§6.7) the
+same data gives **McNemar p = 0.008 and Fisher p = 0.373** — the unpaired test calls the clearest
+signal in this project noise. Both columns are produced by `evals/metrics.py:mcnemar` and
+`evals/metrics.py:fisher_exact`, and `tests/test_guardrails_doc.py` compares the document's
+figures against the artefacts, because the first hand-computed version of the Fisher column in
+this table was wrong by up to 0.06.
+
+**The power floor.** Five discordant pairs all pointing one way give an exact two-sided p of
+2/2⁵ = 0.0625. That is the *minimum attainable* value at this sample size: no result on 20 cases
+can clear α = 0.05, and six one-directional flips would (2/2⁶ = 0.031). The finding is
+directionally unambiguous — nothing improved when the header was removed — and the design is
+underpowered by construction. Thirty-one further candidates sit in
+`data/allergy_set/candidates.json`, which is the only thing that would settle it.
+
+#### What actually breaks: the model goes silent
+
+Attributing all seven allergy failures separates two different problems:
+
+| | Count | What happened |
+| :--- | ---: | :--- |
+| **Header-dependent flips** | **5** | correct with the header, wrong without it |
+| — of which the model **abstained** | **4** | `Vicodin`, `ACCUTANE`, `Naprosyn`, `IODINE` all became `not_stated` |
+| — of which the model got *more* complete | 1 | `Sulfa` → `Sulfa and trimethoprim`, marked wrong by our own single-substance rule |
+| Wrong in **both** conditions | 2 | `Demerol and codeine` and `penicillin` — a substance-selection disagreement, not leakage |
+
+**Removing the header does not make the model wrong; it makes it stop answering.** Four of the
+five flips are `found → not_stated`. That is a recall failure, and it is the reason the mitigation
+below is shaped the way it is.
+
+#### The threat: an asymmetric evasion vector
+
+Enumerate G-01…G-30 and ask of each: does it fire when a stated fact is **missed**? None does.
+The evidence gate verifies that a quoted span is genuinely *present* in the dictation; the value
+gate verifies that a value is supported by its quote; the dose gate verifies numbers and units.
+Every one of them protects against a fact being *invented*.
+
+> **Every gate in this system is a precision control. None is a recall control.**
+
+So header suppression is asymmetric: it costs the attacker nothing and it trips nothing. A note
+whose `ALLERGIES:` header is renamed, lower-cased or removed — by an adversary, or by an EHR
+export quirk, or simply by being dictated rather than typed — loses a quarter of its allergy
+recall, and the pipeline reports a clean run with a `not_stated` field that looks exactly like a
+patient with no allergies. The abstention that the rest of this document treats as the safe
+outcome is, for this one failure mode, indistinguishable from the dangerous one.
+
+**And the deployment corpus is already in the stripped condition.** This is the part that matters
+most for MediExtract rather than for MTSamples: **67 of 67** Eka Care notes contain no ALL-CAPS
+section header at all (measured). Singapore polyclinic dictation *is* headerless. The benchmark's
+lesson is therefore not mainly "beware header tampering" — it is that the header-assisted 0.900 is
+the number that does **not** transfer, and the headerless 0.650 is the regime this system actually
+operates in.
+
+#### S-16: a triggered second pass (SPECIFIED, build #13)
+
+A dual pass on every note would double tokens and latency for no benefit on a corpus that has no
+headers to lean on. The trigger is therefore a **recall check**, not a header check:
+
+```python
+# S-16 trigger. A recall check, and the first one in this system: every other
+# gate asks whether a proposed fact is real, and this one asks whether a real
+# fact was missed.
+#
+# An earlier draft also triggered when a note carried no ALL-CAPS header. That
+# was measured and dropped: it fires on 67 of 67 Eka Care notes, because
+# dictation has no headers, so it would have doubled the cost of every call in
+# the deployment corpus while catching nothing the check below misses.
+import re
+
+ALLERGY_HINTS = re.compile(
+    r"\ballerg\w*|\bintoleran\w*|\breaction to\b|\bsensitivity to\b", re.I)
+
+
+def needs_second_pass(note: str, allergy_value, denial_pattern) -> bool:
+    """True when the note talks about allergies and the first pass found none.
+
+    `denial_pattern` is reused rather than rewritten: a denial is not a missed
+    allergy, and "NKDA" or "no known drug allergies" must suppress the trigger
+    instead of firing it (data/allergy_set/fetch_mtsamples.py:DENIAL).
+    """
+    if allergy_value not in (None, ""):
+        return False
+    hint = ALLERGY_HINTS.search(note)
+    if hint is None:
+        return False
+    window = note[max(0, hint.start() - 60):hint.end() + 60]
+    return denial_pattern.search(window) is None
+```
+
+**Measured trigger rate**, against corpora already on disk: **1 of 67** Eka Care notes (1.5%
+overhead) and **0 of 20** on the stripped MTSamples run. The single Eka Care firing is
+`case_039` — "he has no specific allergies" — a denial the reused pattern does not yet catch
+because an adjective sits between "no" and "allergies"; widening it to allow one intervening word
+takes the rate to 0 of 67. On the measured evidence the control would have caught **4 of the 5**
+header-dependent flips, because four of them are abstentions.
+
+On disagreement between the two passes the field is routed to **REVIEW**, never resolved in favour
+of either pass. A second opinion that silently overrides the first is not a control, it is a
+coin toss with extra steps.
+
+#### Residual risk and what this benchmark cannot tell you
+
+- **Twenty notes**, and the finding cannot reach α = 0.05 at that size (above).
+- **American surgical and progress notes**, not Singapore polyclinic dictation. The genres differ
+  in length (median 2,456 against 358 characters), register and structure.
+- **The labels are not a clinician's.** They were sealed by `claude-opus-5` — a different model
+  family from the one under test, which is the prescribed remedy for grading one's own homework,
+  but it is a model labelling data for a model.
+- **Three of the seven failures are our own labelling rule.** "The first substance where several
+  are listed" marks `Sulfa and trimethoprim` wrong for being more complete than the label. That is
+  the same single-slot defect the medication field has, and it is the first correction queued for
+  an allergy-v2.
+- The allergy field remains **unmeasurable on the deployment corpus**: gold-v1 has zero allergy
+  positives, so nothing here says what recall would be on Singapore dictation.
+
+---
+
+### 6.7 Separating a corrected answer key from an improved system
+
+gold-v2 corrected 18 labels that contradicted rules the gold set itself states
+(`evals/label_gold_v2.py`; sealed `d5e90f5a…`, 16 rule-derived and 2 human-confirmed). A corrected
+answer key raises the score without the extractor changing at all, so reporting the new headline
+alone would sell one as the other.
+
+Three measurements, and the middle one involves **no model call**:
+
+| # | What was scored | Recall | What the number is |
+| :--- | :--- | ---: | :--- |
+| A | the gold-v1 run against **gold-v1** | 100/155 = **0.645** | the historical headline |
+| B | **the same saved outputs** against **gold-v2** | 107/148 = **0.723** | the label correction, alone |
+| C | a fresh live run against **gold-v2** | 108/148 = **0.730** | label correction plus one more sampling |
+
+B is produced by re-scoring artefacts already on disk
+(`evals/score_arm.py <run> --gold data/gold_labels/gold_v2.json`, which writes
+`scores-vs-gold_v2.json` rather than overwriting the run's own scores), so it contains **zero**
+sampling noise by construction.
+
+| Comparison | Delta | Discordant (→right / →wrong) | McNemar | Fisher (unpaired) | Verdict |
+| :--- | ---: | ---: | ---: | ---: | :--- |
+| A → B, label correction only | +5.4 pp on 147 paired fields | 8 / 0 | **0.008** | 0.373 | **separated** |
+| B → C, sampling only | +0.7 pp | 2 / 1 | 1.000 | 1.000 | not separated |
+
+**So of the 8.5-point movement, 7.8 points are the labels and 0.7 are noise that does not
+separate.** Every one of the 8 label flips is in the **frequency** field (66.0% → 81.1%), which is
+exactly where the corrections were: seven frequency labels carried the meal timing that
+`FIELD_RULES` excludes. Medication and dose show **zero** flips — their corrections withdrew eight
+dose labels rather than changing any value, which is why gold-v2's denominator is 148 and not 155.
+
+Withdrawn and added labels are reported apart from the flips and never folded into them
+(`evals/metrics.py:compare_golds`): **8 withdrawn** (`case_001`, `003`, `004`, `009`, `010`,
+`015`, `016`, `034` — all `dose`, all quantities the dose rule says are not doses) and **1 added**
+(`case_010.medication`). A field whose status changed leaves the paired denominator; counting a
+withdrawn label as a system regression would invent a difference that is entirely ours.
+
+This is also the cleanest demonstration in the project of why the paired test is not a formality.
+The same eight flips give **McNemar p = 0.008** and **Fisher p = 0.373**. An evaluator reaching for
+the unpaired test would conclude there was nothing here.

@@ -348,6 +348,34 @@ def two_proportion_p(passes_a, trials_a, passes_b, trials_b):
     return (z, math.erfc(abs(z) / math.sqrt(2.0)))
 
 
+def fisher_exact(passes_a, trials_a, passes_b, trials_b):
+    """Two-sided Fisher exact p for the 2x2 table, computed not typed.
+
+    This is the **wrong** test for the leakage comparison and is reported anyway,
+    because an evaluator handed two rates will reach for it. It assumes the two
+    arms are independent samples; they are the same notes under two conditions,
+    so it discards the pairing and answers a question nobody asked. `mcnemar` is
+    the applicable test.
+
+    It exists as a function rather than as a number in a document because the
+    first hand-computed version of these values was wrong by up to 0.06 - which
+    is exactly the misreading that reporting Fisher's was meant to prevent.
+    """
+    a, b = passes_a, trials_a - passes_a
+    c, d = passes_b, trials_b - passes_b
+    if min(a, b, c, d) < 0 or (a + b) == 0 or (c + d) == 0:
+        return 1.0
+    total, row1, row2, col1 = a + b + c + d, a + b, c + d, a + c
+
+    def probability(x):
+        return (math.comb(row1, x) * math.comb(row2, col1 - x)) / math.comb(total, col1)
+
+    observed = probability(a)
+    low, high = max(0, col1 - row2), min(row1, col1)
+    return min(1.0, sum(probability(x) for x in range(low, high + 1)
+                        if probability(x) <= observed + 1e-12))
+
+
 def _binomial_two_sided(k, n):
     """Exact two-sided binomial p at p=0.5. No scipy, and honest at small n,
     where the chi-square form of McNemar is not."""
@@ -419,16 +447,88 @@ def compare(gold_cases, gated_a, gated_b, label_a="A", label_b="B"):
             "delta_pp": round(100.0 * (kb - ka) / len(keys), 1),
             "mcnemar": test,
             "separated": test["p"] < 0.05,
+            # Reported because a reader will compute it; it is not the applicable
+            # test here, because these arms are paired. See fisher_exact.
+            "fisher_unpaired_p": fisher_exact(ka, len(keys), kb, len(keys)),
             "ci95_a": wilson_interval(ka, len(keys)),
             "ci95_b": wilson_interval(kb, len(keys)),
         }
     return {"paired_fields": len(shared), "labels": [label_a, label_b], "scopes": rows}
 
 
+def compare_golds(gated, gold_a_cases, gold_b_cases, label_a="gold-a", label_b="gold-b"):
+    """One run's saved output, scored against two gold versions.
+
+    `compare` holds the gold fixed and varies the run; this holds the run fixed
+    and varies the gold, which isolates the effect of a label correction with
+    **zero sampling noise** - no model is called, so nothing here can be the
+    provider behaving differently on a second attempt.
+
+    The pairing unit is a field that is `found` in **both** versions. A field
+    whose status changed leaves the denominator rather than counting as a flip:
+    treating a withdrawn label as a system regression would invent a difference
+    that is entirely ours. Those are reported separately, and they are the whole
+    point of a correction pass - gold-v2 withdraws seven dose labels because the
+    dose rule says a quantity is not a dose.
+    """
+    a_by_id = {case["case_id"]: case for case in gold_a_cases}
+    b_by_id = {case["case_id"]: case for case in gold_b_cases}
+    rows, withdrawn, added = {}, [], []
+
+    def correct(case, field, run):
+        truth = case["ground_truth"][field]
+        codes = {g["field"]: g["code"] for g in run["gate"]}
+        code = codes[field]
+        if not (code == "VERIFIED" or code.startswith("REVIEW")):
+            return False
+        value = run["extraction"][field]["value"] or ""
+        return bool(value_matches(field, value, truth["value"] or ""))
+
+    paired = {}
+    for case_id, case_a in a_by_id.items():
+        case_b, run = b_by_id.get(case_id), gated.get(case_id)
+        if case_b is None or run is None or run.get("status") != "ok":
+            continue
+        for field in CRITICAL_FIELDS:
+            found_a = case_a["ground_truth"][field]["status"] == "found"
+            found_b = case_b["ground_truth"][field]["status"] == "found"
+            if found_a and not found_b:
+                withdrawn.append(f"{case_id}.{field}")
+            elif found_b and not found_a:
+                added.append(f"{case_id}.{field}")
+            elif found_a and found_b:
+                paired[(case_id, field)] = (correct(case_a, field, run),
+                                            correct(case_b, field, run))
+
+    for scope in ("pooled",) + tuple(CRITICAL_FIELDS):
+        keys = [k for k in paired if scope == "pooled" or k[1] == scope]
+        if not keys:
+            continue
+        ka = sum(paired[k][0] for k in keys)
+        kb = sum(paired[k][1] for k in keys)
+        to_right = sum(1 for k in keys if paired[k][1] and not paired[k][0])
+        to_wrong = sum(1 for k in keys if paired[k][0] and not paired[k][1])
+        test = mcnemar(to_right, to_wrong)
+        rows[scope] = {
+            "n": len(keys),
+            "a": frac(ka, len(keys)), "b": frac(kb, len(keys)),
+            "delta_pp": round(100.0 * (kb - ka) / len(keys), 1),
+            "mcnemar": test, "separated": test["p"] < 0.05,
+            "fisher_unpaired_p": fisher_exact(ka, len(keys), kb, len(keys)),
+        }
+    return {"labels": [label_a, label_b], "paired_fields": len(paired),
+            "labels_withdrawn": sorted(withdrawn), "labels_added": sorted(added),
+            "note": "one run, two gold versions: the delta is the label correction "
+                    "and nothing else, because no model was called",
+            "scopes": rows}
+
+
 # =====================================================================
 # ONE RUN, IN ONE DICT
 # =====================================================================
-def load_run(run_dir: Path) -> dict:
+def load_run(run_dir) -> dict:
+    run_dir = Path(run_dir)          # accept a str from a caller or a notebook
+
     def jsonl(name):
         path = run_dir / name
         if not path.is_file():
@@ -587,11 +687,48 @@ def render_comparison(result: dict) -> str:
     return "\n".join(out)
 
 
+def render_gold_comparison(result: dict) -> str:
+    label_a, label_b = result["labels"]
+    out = ["=" * 74,
+           "  SAME OUTPUT, TWO GOLD VERSIONS:  %s  ->  %s" % (label_a, label_b),
+           "=" * 74, "",
+           "  No model was called, so every difference below is the label",
+           "  correction and nothing else. %d fields are `found` in both versions"
+           % result["paired_fields"],
+           "  and are the paired unit; a field whose status changed leaves the",
+           "  denominator rather than counting as a flip.", ""]
+    out.append("    %-12s %-14s %-14s %-9s %-13s %-8s %s"
+               % ("scope", label_a[:14], label_b[:14], "delta", "flips r/w",
+                  "McNemar", "Fisher (unpaired, not applicable)"))
+    for scope, row in result["scopes"].items():
+        test = row["mcnemar"]
+        out.append("    %-12s %-14s %-14s %+8.1fpp %-13s %-8.3f %.3f%s" % (
+            scope, row["a"]["text"], row["b"]["text"], row["delta_pp"],
+            "%d / %d" % (test["flipped_to_right"], test["flipped_to_wrong"]),
+            test["p"], row["fisher_unpaired_p"],
+            "  SEPARATED" if row["separated"] else ""))
+    out.append("")
+    out.append("  labels withdrawn (found -> not_stated): %d%s"
+               % (len(result["labels_withdrawn"]),
+                  "  " + ", ".join(result["labels_withdrawn"])
+                  if result["labels_withdrawn"] else ""))
+    out.append("  labels added (not_stated -> found):     %d%s"
+               % (len(result["labels_added"]),
+                  "  " + ", ".join(result["labels_added"])
+                  if result["labels_added"] else ""))
+    out.append("")
+    return "\n".join(out)
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("run_dir", nargs="+", type=Path,
                         help="one run to describe, or two to compare")
     parser.add_argument("--gold", type=Path, default=SEALED_PATH)
+    parser.add_argument("--gold-b", type=Path, default=None,
+                        help="a second gold version: with ONE run directory this "
+                             "scores that run against both and isolates the label "
+                             "correction, with no model call and no sampling noise")
     parser.add_argument("--quiet", action="store_true", help="JSON on stdout only")
     args = parser.parse_args(argv)
 
@@ -602,6 +739,23 @@ def main(argv=None) -> int:
     if not args.gold.is_file():
         print(f"{args.gold}: not found", file=sys.stderr)
         return EXIT_UNUSABLE
+
+    if args.gold_b is not None:
+        if len(args.run_dir) != 1:
+            print("--gold-b takes exactly one run directory: it varies the gold, "
+                  "not the run", file=sys.stderr)
+            return EXIT_UNUSABLE
+        if not args.gold_b.is_file():
+            print(f"{args.gold_b}: not found", file=sys.stderr)
+            return EXIT_UNUSABLE
+        gated = load_run(args.run_dir[0])["gated"]
+        a_cases = json.loads(args.gold.read_text(encoding="utf-8"))["cases"]
+        b_cases = json.loads(args.gold_b.read_text(encoding="utf-8"))["cases"]
+        result = compare_golds(gated, a_cases, b_cases, args.gold.stem, args.gold_b.stem)
+        if not args.quiet:
+            print(render_gold_comparison(result), file=sys.stderr)
+        sys.stdout.write(json.dumps(result, indent=2, default=str) + "\n")
+        return EXIT_OK
 
     report = {"runs": [headline(path, args.gold) for path in args.run_dir]}
     if not args.quiet:
