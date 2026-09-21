@@ -1,0 +1,81 @@
+case_id,field,code,gold_status,gold_value,value,ungated_value,correct,silent_failure
+allergy_001,medication,NOT_STATED,not_stated,,,,False,False
+allergy_001,dose,NOT_STATED,not_stated,,,,False,False
+allergy_001,frequency,NOT_STATED,not_stated,,,,False,False
+allergy_001,allergy,VERIFIED,found,Penicillin,Penicillin,Penicillin,True,False
+allergy_002,medication,VERIFIED,found,Lisinopril,Lisinopril,Lisinopril,True,False
+allergy_002,dose,NOT_STATED,not_stated,,,,False,False
+allergy_002,frequency,NOT_STATED,not_stated,,,,False,False
+allergy_002,allergy,VERIFIED,found,Penicillin,Penicillin,Penicillin,True,False
+allergy_003,medication,VERIFIED,not_stated,,Levaquin,Levaquin,False,True
+allergy_003,dose,NOT_STATED,not_stated,,,,False,False
+allergy_003,frequency,VERIFIED,not_stated,,for five days,for five days,False,True
+allergy_003,allergy,VERIFIED,found,SULFA,SULFA,SULFA,True,False
+allergy_004,medication,VERIFIED,found,Ritalin,Ritalin,Ritalin,True,False
+allergy_004,dose,VERIFIED,found,50,50,50,True,False
+allergy_004,frequency,VERIFIED,found,a day,a day,a day,True,False
+allergy_004,allergy,VERIFIED,found,penicillin,penicillin,penicillin,True,False
+allergy_005,medication,VERIFIED,not_stated,,Methadone,Methadone,False,True
+allergy_005,dose,NOT_STATED,not_stated,,,,False,False
+allergy_005,frequency,NOT_STATED,not_stated,,,,False,False
+allergy_005,allergy,VERIFIED,found,PENICILLIN,PENICILLIN,PENICILLIN,True,False
+allergy_006,medication,VERIFIED,found,Synthroid,Synthroid,Synthroid,True,False
+allergy_006,dose,VERIFIED,found,0.112 mg,0.112 mg,0.112 mg,True,False
+allergy_006,frequency,VERIFIED,found,daily,daily,daily,True,False
+allergy_006,allergy,VERIFIED,found,Penicillin,Penicillin,Penicillin,True,False
+allergy_007,medication,VERIFIED,found,Levothyroxine,Vicodin,Vicodin,False,True
+allergy_007,dose,NOT_STATED,found,200 mcg,,,False,False
+allergy_007,frequency,VERIFIED,found,q.d.,q.h.s.,q.h.s.,False,True
+allergy_007,allergy,VERIFIED,found,Penicillin,Penicillin,Penicillin,True,False
+allergy_008,medication,VERIFIED,found,Levaquin,Levaquin,Levaquin,True,False
+allergy_008,dose,NOT_STATED,not_stated,,,,False,False
+allergy_008,frequency,NOT_STATED,not_stated,,,,False,False
+allergy_008,allergy,VERIFIED,found,Sulfa,Sulfa,Sulfa,True,False
+allergy_009,medication,VERIFIED,found,B12,Aricept,Aricept,False,True
+allergy_009,dose,VERIFIED,found,1000 mg,10 mg,10 mg,False,True
+allergy_009,frequency,VERIFIED,found,monthly,daily,daily,False,True
+allergy_009,allergy,VERIFIED,found,Sulfa,Sulfa,Sulfa,True,False
+allergy_010,medication,VERIFIED,found,Lotensin,Valtrex,Valtrex,False,True
+allergy_010,dose,VERIFIED,not_stated,,1 g,1 g,False,True
+allergy_010,frequency,VERIFIED,not_stated,,t.i.d.,t.i.d.,False,True
+allergy_010,allergy,VERIFIED,found,Demerol,Demerol and codeine,Demerol and codeine,False,True
+allergy_011,medication,VERIFIED,found,Prilosec,prednisone,prednisone,False,True
+allergy_011,dose,VERIFIED,found,20 mg,5 mg,5 mg,False,True
+allergy_011,frequency,VERIFIED,found,b.i.d.,every other day,every other day,False,True
+allergy_011,allergy,VERIFIED,found,Vicodin,Vicodin,Vicodin,True,False
+allergy_012,medication,VERIFIED,not_stated,,Lotrimin AF,Lotrimin AF,False,True
+allergy_012,dose,VERIFIED,not_stated,,1%,1%,False,True
+allergy_012,frequency,VERIFIED,not_stated,,qid,qid,False,True
+allergy_012,allergy,VERIFIED,found,adhesive tape,adhesive tape,adhesive tape,True,False
+allergy_013,medication,VERIFIED,not_stated,,Penlac,Penlac,False,True
+allergy_013,dose,VERIFIED,not_stated,,8%,8%,False,True
+allergy_013,frequency,NOT_STATED,not_stated,,,,False,False
+allergy_013,allergy,VERIFIED,found,dairy products,penicillin,penicillin,False,True
+allergy_014,medication,VERIFIED,found,Ancef,Ancef,Ancef,True,False
+allergy_014,dose,VERIFIED,not_stated,,2 g,2 g,False,True
+allergy_014,frequency,VERIFIED,not_stated,,every 8 hours,every 8 hours,False,True
+allergy_014,allergy,VERIFIED,found,ACCUTANE,ACCUTANE,ACCUTANE,True,False
+allergy_015,medication,VERIFIED,not_stated,,Vioxx,Vioxx,False,True
+allergy_015,dose,VERIFIED,not_stated,,12.5 mg,12.5 mg,False,True
+allergy_015,frequency,VERIFIED,not_stated,,BID,BID,False,True
+allergy_015,allergy,VERIFIED,found,aspirin,aspirin,aspirin,True,False
+allergy_016,medication,VERIFIED,found,Lisinopril/hydrochlorothiazide,Lortab,Lortab,False,True
+allergy_016,dose,VERIFIED,found,20/25 mg,7.5/500 mg,7.5/500 mg,False,True
+allergy_016,frequency,VERIFIED,found,q.d.,q 4h p.r.n.,q 4h p.r.n.,False,True
+allergy_016,allergy,VERIFIED,found,Penicillin,Penicillin,Penicillin,True,False
+allergy_017,medication,VERIFIED,found,Vioxx,Zoloft,Zoloft,False,True
+allergy_017,dose,VERIFIED,found,25 mg,100 mg,100 mg,False,True
+allergy_017,frequency,VERIFIED,found,daily,daily,daily,True,False
+allergy_017,allergy,VERIFIED,found,Naprosyn,Naprosyn,Naprosyn,True,False
+allergy_018,medication,VERIFIED,not_stated,,Wellbutrin XL,Wellbutrin XL,False,True
+allergy_018,dose,VERIFIED,not_stated,,150 mg,150 mg,False,True
+allergy_018,frequency,VERIFIED,not_stated,,daily,daily,False,True
+allergy_018,allergy,VERIFIED,found,Sulfa,Sulfa,Sulfa,True,False
+allergy_019,medication,VERIFIED,not_stated,,cephalexin,cephalexin,False,True
+allergy_019,dose,VERIFIED,not_stated,,500 mg,500 mg,False,True
+allergy_019,frequency,VERIFIED,not_stated,,three times a day,three times a day,False,True
+allergy_019,allergy,VERIFIED,found,Lortab,Lortab,Lortab,True,False
+allergy_020,medication,VERIFIED,not_stated,,penicillin,penicillin,False,True
+allergy_020,dose,NOT_STATED,not_stated,,,,False,False
+allergy_020,frequency,NOT_STATED,not_stated,,,,False,False
+allergy_020,allergy,VERIFIED,found,IODINE,IODINE,IODINE,True,False

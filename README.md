@@ -160,8 +160,14 @@ stdout is one JSON summary.
 
 **Which gold set.** `--gold-version` selects a registered, sealed set; each entry
 (`run_ekacare.py:REGISTRY`) declares its path, its SHA-256 file, the corpus it may score and
-the label schema the file must itself declare. `gold-v1` is the default; `gold-v2` and
-`allergy-v1` are registered and refuse with the command that would seal them until they exist.
+the label schema the file must itself declare.
+
+| version | cases | what it is for |
+| :--- | ---: | :--- |
+| `gold-v1` (default) | 67 | the headline. 268 hand labels, Eka Care, sealed |
+| `gold-v2` | 67 | gold-v1 with 16 rule-violating labels corrected and slice tags; **built, awaiting two signatures** (`evals/label_gold_v2.py`) |
+| `allergy-v1` | 20 | MTSamples notes with a positive allergy under an ALL-CAPS header. The project's only allergy positives |
+| `allergy-v1-stripped` | 20 | the same notes and the **same labels** with every header removed — the leakage report, paired against `allergy-v1` |
 
 A live run refuses, before any call: any gold file other than the sealed file of the requested
 version; a file whose SHA-256 no longer matches its seal; a file from another corpus or
@@ -322,6 +328,20 @@ itself states. Conditioned on the 51 notes where the labeller and the model name
 drug, dose was right 24 of 26 and frequency 30 of 30. Full attribution in
 `docs/technique_selection.md`; the cost consequence in `docs/cost_to_serve.md`.
 
+**Allergy, and the header leakage.** gold-v1 has zero allergy positives, so the field was
+unmeasured until `allergy-v1`. On its 20 positives, allergy recall is **0.900 with the ALL-CAPS
+`ALLERGIES:` header and 0.650 without it** — 5 fields changed and every one got worse, so a
+quarter of that performance was reading the header rather than the sentence. Pooled 0.622 →
+0.489. The exact paired p is 0.063, which is the *floor* for five one-directional flips
+(2/2⁵), so the design is underpowered at n = 20 rather than the finding being weak; six flips
+would clear 0.05. Reproduce with
+`evals/metrics.py evals/results/leak-allergy-v1 evals/results/leak-allergy-v1-stripped
+--gold data/gold_labels/allergy_v1.json`.
+
+This set's medication numbers are **not** comparable with gold-v1's: it uses "the first
+medication in the MEDICATIONS section", and the notes are American surgical reports rather than
+Singapore dictation.
+
 **Operational.** API latency p50 1,213 ms, p95 1,600 ms across the current run, with one outlier
 at 11,993 ms — so 66 of 67 finished inside the 3,000 ms verification budget, not 67. (The first
 run's maximum was 2,442 ms and all 67 were inside it.) `within_budget` now means API time plus
@@ -470,6 +490,8 @@ src/extract.py     the whole pipeline, one file (CLAUDE.md 1.1), in sections:
                    gates, 5 spend ledger, 6-7 pipeline and CLI
 tests/             offline unittest suite: gates, budget, CLI contract, scoring, batch loop, seal
 evals/             label_gold_v1.py (profile / template / label / validate / stats),
+                   label_gold_v2.py (declared corrections to the sealed gold-v1),
+                   label_allergy_v1.py (the allergy set + its headers-stripped twin),
                    run_ekacare.py (batch loop + the sealed-gold registry),
                    scoring.py (metrics, Wilson CIs), diagnose.py (failure
                    attribution), baseline.py (the non-AI comparator),

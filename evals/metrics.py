@@ -412,7 +412,10 @@ def compare(gold_cases, gated_a, gated_b, label_a="A", label_b="B"):
         test = mcnemar(to_right, to_wrong)
         rows[scope] = {
             "n": len(keys),
-            label_a: frac(ka, len(keys)), label_b: frac(kb, len(keys)),
+            # Keyed "a"/"b", not by label: two runs of the same prompt share a
+            # fingerprint, and a dict keyed by label then collapses to one column
+            # with the second silently overwriting the first.
+            "a": frac(ka, len(keys)), "b": frac(kb, len(keys)),
             "delta_pp": round(100.0 * (kb - ka) / len(keys), 1),
             "mcnemar": test,
             "separated": test["p"] < 0.05,
@@ -566,7 +569,7 @@ def render_comparison(result: dict) -> str:
     for scope, row in result["scopes"].items():
         test = row["mcnemar"]
         out.append("    %-12s %-14s %-14s %+7.1fpp %-14s %.3f%s" % (
-            scope, row[label_a]["text"], row[label_b]["text"], row["delta_pp"],
+            scope, row["a"]["text"], row["b"]["text"], row["delta_pp"],
             "%d / %d" % (test["flipped_to_right"], test["flipped_to_wrong"]),
             test["p"], "  SEPARATED" if row["separated"] else ""))
     out.append("")
@@ -608,6 +611,10 @@ def main(argv=None) -> int:
         gold_cases = json.loads(args.gold.read_text(encoding="utf-8"))["cases"]
         a, b = (load_run(p)["gated"] for p in args.run_dir)
         labels = [h["prompt_fingerprint"] or h["run_id"] for h in report["runs"]]
+        if labels[0] == labels[1]:
+            # Same prompt, different gold variant or different day: the run id is
+            # what actually distinguishes them.
+            labels = [h["run_id"] for h in report["runs"]]
         report["comparison"] = compare(gold_cases, a, b, labels[0], labels[1])
         if not args.quiet:
             print(render_comparison(report["comparison"]), file=sys.stderr)

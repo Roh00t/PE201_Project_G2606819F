@@ -119,11 +119,19 @@ class OneImplementationOfEachMetric(unittest.TestCase):
 
     def test_per_field_precision_and_recall_match_the_pre_registered_scorer(self):
         self.assertTrue(REAL_RUNS, "no finished run on disk to check against")
-        gold_cases = json.loads(GOLD.read_text(encoding="utf-8"))["cases"]
         for run_dir in REAL_RUNS:
             with self.subTest(run=run_dir.name):
+                run = metrics.load_run(run_dir)
+                # Each run is scored against its OWN gold version. Comparing an
+                # allergy run against gold-v1 shares no case ids, so the check
+                # would pass on emptiness rather than on agreement.
+                recorded = (run["manifest"].get("gold") or {}).get("path")
+                gold_path = (ROOT / recorded) if recorded else GOLD
+                if not gold_path.is_file():
+                    self.skipTest(f"{recorded} is not on disk")
+                gold_cases = json.loads(gold_path.read_text(encoding="utf-8"))["cases"]
                 stored = json.loads((run_dir / "scores.json").read_text())["per_field"]
-                gated = metrics.load_run(run_dir)["gated"]
+                gated = run["gated"]
                 mine = metrics.field_quality(gold_cases, gated)["per_field"]
                 for field in CRITICAL_FIELDS:
                     self.assertEqual(mine[field]["recall"]["rate"] is None,
@@ -212,8 +220,19 @@ class Comparison(unittest.TestCase):
         pooled = metrics.compare(self.cases, before, after, "old", "new")["scopes"]["pooled"]
         self.assertEqual(pooled["mcnemar"]["flipped_to_right"], 2)
         self.assertEqual(pooled["mcnemar"]["flipped_to_wrong"], 0)
-        self.assertEqual(pooled["old"]["text"], "0/3 (0.0%)")
-        self.assertEqual(pooled["new"]["text"], "2/3 (66.7%)")
+        self.assertEqual(pooled["a"]["text"], "0/3 (0.0%)")
+        self.assertEqual(pooled["b"]["text"], "2/3 (66.7%)")
+
+    def test_two_runs_of_the_same_prompt_do_not_collapse_into_one_column(self):
+        # Keying the columns by label lost one of them whenever both runs shared
+        # a prompt fingerprint, which is exactly the leakage comparison's shape.
+        before = {c["case_id"]: payload(c["case_id"]) for c in self.cases}
+        after = {c["case_id"]: payload(c["case_id"], {"medication": "Dolo"})
+                 for c in self.cases}
+        pooled = metrics.compare(self.cases, before, after, "same", "same")["scopes"]["pooled"]
+        self.assertEqual(pooled["a"]["n"], 0)
+        self.assertEqual(pooled["b"]["n"], 1)
+        self.assertEqual(pooled["delta_pp"], 33.3)
 
 
 class Ownership(unittest.TestCase):

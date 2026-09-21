@@ -118,8 +118,14 @@ REGISTRY: dict[str, SealedGold] = {
     "allergy-v1": SealedGold(
         "allergy-v1", GOLD_DIR / "allergy_v1.json", GOLD_DIR / "allergy_v1.sha256",
         MTSAMPLES, "allergy-v1",
-        "allergy-bearing notes with ALL-CAPS section headers, for the headers-intact "
-        "versus headers-stripped leakage report. Registered, not yet sealed."),
+        "20 MTSamples notes with a positive allergy under an ALL-CAPS header, sealed "
+        "2026-09-21. 20 allergy positives against gold-v1's zero."),
+    "allergy-v1-stripped": SealedGold(
+        "allergy-v1-stripped", GOLD_DIR / "allergy_v1_stripped.json",
+        GOLD_DIR / "allergy_v1_stripped.sha256", MTSAMPLES, "allergy-v1-stripped",
+        "the same 20 notes and the SAME labels with every ALL-CAPS header removed. "
+        "Paired against allergy-v1, this is the leakage report promised in "
+        "project_proposal.md section 6."),
 }
 DEFAULT_GOLD_VERSION = "gold-v1"
 

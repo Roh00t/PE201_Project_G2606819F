@@ -1,0 +1,45 @@
+{
+  "run_id": "leak-allergy-v1-stripped",
+  "calls": 20,
+  "cap_usd": 0.1,
+  "ceiling_usd": 8.0,
+  "billed_usd": 0.014826,
+  "cap_used": 0.1483,
+  "cost_per_call_usd": 0.000741,
+  "tokens": {
+    "input": 24848,
+    "output": 2949,
+    "cached": 0,
+    "reasoning": 0
+  },
+  "latency_ms": {
+    "p50": 1350.3,
+    "p95": 2230.1,
+    "max": 2230.1
+  },
+  "retried_calls": 0,
+  "failed_calls": 0,
+  "price_check": {
+    "calls_with_provider_cost": 20,
+    "estimate_total_usd": 0.014826,
+    "provider_total_usd": 0.014826,
+    "drift_usd": 0.0
+  },
+  "by_model": {
+    "google/gemini-2.5-flash": {
+      "calls": 20,
+      "billed_usd": 0.014826,
+      "input_tokens": 24848,
+      "output_tokens": 2949
+    }
+  },
+  "destinations": [
+    {
+      "endpoint": "https://openrouter.ai/api/v1",
+      "provider": "Google",
+      "model_served": "google/gemini-2.5-flash"
+    }
+  ],
+  "model_drift": [],
+  "per_call_log": "data/cache/metrics/leak-allergy-v1-stripped.jsonl"
+}

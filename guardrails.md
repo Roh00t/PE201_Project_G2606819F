@@ -14,6 +14,7 @@
 
 **The two batch runs are not statistically separated.** Paired over the same 155 labelled fields, 12 flipped wrong to right and 5 the other way: exact McNemar p = 0.14. The named defect the prompt fix targeted did disappear (8 occurrences to 0), but the 4.5-point recall gain is not evidence at this sample size, and no number in this document rests on it. `evals/metrics.py` reproduces the verdict.
 | `probe-v4-…` | n/a | the v4 medication-list schema with `maxItems: 12` accepted on the first attempt, one call, $0.000635, `data_collection: deny` |
+| `leak-allergy-v1` / `-stripped` | `a92d2abcb2af4294` | the leakage report: allergy recall **0.900** with ALL-CAPS headers and **0.650** without, over 20 MTSamples notes and the same labels; 40 calls, $0.030111 |
 
 The second run also confirms that the stricter `provider.data_collection: "deny"` routes normally, so the `allow` used for the first run was never necessary.
 
@@ -183,6 +184,7 @@ Span containment (`evidence in source_text`) is **deterministic**: it is a subst
 | G-25 | Placeholder API key refused (`OPENROUTER_API_KEY=sk-or-v1-...`) | IMPLEMENTED | src | `src/extract.py:load_api_key` | LLM02 |
 | G-26 | Encoding anomalies (bidirectional controls, invisible characters, homoglyphs) → **forced safe abstention**: every field wiped, the model never called, the note never cleaned | IMPLEMENTED | src, evals | `src/extract.py:encoding_flags`, `has_homoglyph`, `wiped_extraction`, `apply_gates`; `src/extract.py:run`; `evals/run_ekacare.py:run_batch` | LLM01, LLM07 |
 | G-27 | Per-call cost audit and a second, per-run cost cap: prompt, completion, cached and reasoning tokens, list-price estimate against the provider's own charge, latency, attempts and destination, refused before the call that would cross the cap | **IMPLEMENTED** | evals | `evals/spend_guard.py:CostGuard.check_before`, `record`, `summary`; `evals/run_ekacare.py:worst_case_one` | LLM06, LLM04 |
+| G-30 | Ground-truth corrections are declared, rule-classified and signed: gold-v1 is hash-verified before it is read, each correction names the rule that requires it, and a correction that repairs an intent rather than applying a rule blocks the seal until a human signs it | **IMPLEMENTED** | evals | `evals/label_gold_v2.py:CORRECTIONS`, `apply_corrections`, `seal`; `evals/label_allergy_v1.py:build`, `validate` | LLM05 |
 | G-29 | Measurement kept separate from enforcement, and a result reported with its separability: populations that must sum to the case count, layer ownership per failing field, cost per correct field, and an exact paired test before a change is called an improvement | **IMPLEMENTED** | evals | `evals/metrics.py:split`, `failure_taxonomy`, `compare`, `mcnemar` | LLM07 |
 | G-28 | Sealed-gold registry: each version carries its own path, SHA-256 file, expected corpus and declared label schema, and a live run accepts only the registered sealed file for the version it was asked for | **IMPLEMENTED** | evals | `evals/run_ekacare.py:SealedGold`, `REGISTRY`, `BatchConfig.__post_init__`, `load_gold` | LLM05, LLM06 |
 | S-01 | PII and credential redaction (logs always; model payload optional, with a token map) | SPECIFIED, build #6 | src | new `src/redact.py` (§5.2) | LLM02 |
@@ -883,7 +885,17 @@ if fingerprint != extract.prompt_fingerprint() or len(fingerprint) != 16:
   it. Before the registry the sealed path was a module constant, which meant gold-v2 and a
   second corpus were reachable only by editing the guard that protects the ground truth — the
   usual way a guard gets weakened under deadline pressure.
-- A label found to be wrong after sealing is fixed in `gold-v2`, never by editing `gold-v1`. Both are reported.
+- A label found to be wrong after sealing is fixed in `gold-v2`, never by editing `gold-v1`. Both
+  are reported. `evals/label_gold_v2.py` is how: it verifies gold-v1's hash before reading it,
+  applies 16 declared corrections each recorded beside the rule that requires it, and
+  distinguishes **rule** corrections (a stated field rule decides them, no judgement) from
+  **review** corrections (an intent has to be read). Sealing refuses while any review correction
+  is unsigned, and the signing name is written into the provenance of each one: a correction
+  nobody signed is a guess with better formatting.
+- A second corpus gets its own registered version rather than being folded into an existing one.
+  `allergy-v1` and `allergy-v1-stripped` (20 MTSamples notes, the same labels, headers intact and
+  removed) exist because gold-v1 has zero allergy positives, and they are sealed separately so
+  the leakage comparison is paired rather than pooled.
 - The regex baseline and the model are scored against the same gold file, on the same notes, with the same scorer (S-09), so poisoning of either comparator is visible as a disagreement.
 
 #### Abstention & Failure State Behavior

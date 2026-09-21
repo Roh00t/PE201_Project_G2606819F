@@ -191,7 +191,7 @@ measured precision — not a better model.
 | Gold set frozen first | **Done.** 67 cases, 268 labels, SHA-256 `1f594e46…`, chmod 0444, prompt fingerprint frozen into the seal, `gold-v1` tag on the commit that carries it. The harness refuses any other file, any SHA drift, any unlabelled field, and any prompt change unless the run is marked `--experiment`. |
 | Gated vs ungated abstention | **Done.** Both arms come from one cached call, so the abstention measurement costs no extra spend. Abstention rate 0.0205; all three abstentions were defensible on inspection. |
 | Committed regex baseline | **Done.** `evals/baseline.py`, scored through the same gates by `evals/score_arm.py`. Pattern-only recall **0.381** and gazetteer-assisted **0.381**, against the model's 0.600; patterns were tuned on a seeded 20-case subsample and score **0.353** on the held-out 47, which is the number to quote. The majority-class baseline ("always `not_stated`") agrees with gold on 113 of 268 field decisions (42.2%) at recall 0. Full comparison in `docs/technique_selection.md`. |
-| Leakage reported before and after | **Outstanding, but unblocked.** It depends on the MTSamples set (D3), whose ALL-CAPS `ALLERGIES:`/`MEDICATIONS:` headers are the leak to strip. Until 20 September the harness could not score a second corpus at all — the sealed path was a module constant — so the sealed-gold registry (D11) had to come first. `allergy-v1` is now a registered version that refuses with the command that would seal it. |
+| Leakage reported before and after | **Done** (D15). 20 MTSamples notes with a positive allergy under an ALL-CAPS header, sealed twice — headers intact and headers stripped, same cases, same labels — and scored paired. Allergy recall **0.900 → 0.650** when the header goes. |
 | Judge calibration | **Outstanding.** Being built as a second annotator from a different model family, scored against gold-v1 *before* any adjudication, never permitted to edit a label on its own, with every adjudication resolved in the system's favour counted separately. |
 
 **D6 · Transport confirmed.** `google/gemini-2.5-flash` is live on OpenRouter through the
@@ -337,4 +337,68 @@ its per-field recall independently was the first thing I tried, and it reported 
 as 100% against the scorer's 69.6% — because a field that is proposed but wrong is not only a
 false positive, it is also a gold fact the physician did not get. Two implementations of one
 metric are two answers to one question.
+
+**D15 · The allergy field is measured at last, and a quarter of its performance was
+the section header.** Section 6 promised a leakage report and an allergy number, and neither
+was possible on Eka Care: all 67 Latin-script notes contain one allergy mention and it is a
+denial, so gold-v1 has **zero** allergy positives. Three quarters of the schema was measured
+and one quarter was not.
+
+`data/allergy_set/fetch_mtsamples.py` pulls MTSamples through the same datasets-server API as
+the Eka Care set and keeps notes with a **positive** allergy under an ALL-CAPS header. The yield
+is the first finding: **51 usable notes out of 3,900 scanned**, because almost every note says
+"None" or "NKDA". `evals/label_allergy_v1.py` labels 20 of them and seals two variants — the
+notes as written, and the same notes with every ALL-CAPS `HEADER:` removed, carrying the *same
+case ids and the same labels*, so `evals/metrics.py` compares them paired.
+
+| scope | headers intact | headers stripped | delta | flips right/wrong | p |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| **allergy** | **18/20 (90.0%)** | **13/20 (65.0%)** | **−25.0 pp** | **0 / 5** | 0.063 |
+| medication | 5/11 (45.5%) | 4/11 (36.4%) | −9.1 pp | 1 / 2 | 1.000 |
+| dose | 2/7 (28.6%) | 2/7 (28.6%) | 0.0 pp | 1 / 1 | 1.000 |
+| frequency | 3/7 (42.9%) | 3/7 (42.9%) | 0.0 pp | 1 / 1 | 1.000 |
+| pooled | 28/45 (62.2%) | 22/45 (48.9%) | −13.3 pp | 3 / 9 | 0.146 |
+
+**Allergy recall is 0.900 with the header and 0.650 without it**, and every one of the five
+fields that changed changed in the same direction — no field got *better* when the header was
+removed. So the effect is directionally unambiguous: a quarter of the allergy performance was
+reading `ALLERGIES:` rather than reading the sentence. That is precisely the before-and-after
+the instructor asked for, and it is the argument for not quoting a header-rich corpus as
+evidence about dictation.
+
+**And the test cannot reach α 0.05, by construction.** Five discordant pairs all pointing one
+way gives an exact two-sided binomial p of 2/2⁵ = **0.0625**; there is no result at n = 20 that
+clears 0.05 here. Six one-directional flips would (2/2⁶ = 0.031). That is a power statement
+about the design, not a hedge about the finding, and the remedy is more labelled cases — 31
+more sit in the pool already.
+
+Three limitations stated rather than discovered later. The notes are **American surgical and
+progress notes**, not Singapore polyclinic dictation, so transfer to the deployment target is
+limited. The labels are **mine as the assistant, not the human labeller's** — `sealed_by:
+claude-opus-5` — which satisfies the "not the model under test" requirement (a different model
+family) but is not a clinician's hand. And medication recall here (0.455) is **not comparable
+with gold-v1's**: this set's rule is "the first medication in the MEDICATIONS section", declared
+because ranking clinical significance across surgical notes is not a judgement I can make.
+40 live calls, $0.030111.
+
+**D16 · gold-v2 is built and waits on two signatures.** `evals/label_gold_v2.py` reads the
+sealed gold-v1 read-only, verifies its hash before touching it, and applies the 16 corrections
+the audit found, each recorded beside the rule that requires it. Fourteen are **rule-derived** —
+`half` and `1 tablet` become `not_stated` because `FIELD_RULES` names them as examples of what
+is not a dose; seven frequency values lose the meal timing the same rules exclude; `case_001`'s
+medication span is repaired to the phrase its value actually names. Two are **review**
+corrections: `case_010` has a drug name in the frequency slot and a frequency in the dose slot,
+which is legible but is still an inference about intent, so sealing refuses until a human signs
+them:
+
+```
+./.venv/bin/python evals/label_gold_v2.py validate --seal --labeller rohit \
+    --confirm case_010.medication --confirm case_010.frequency
+```
+
+Slice tags are attached by recorded pattern rather than by hand, so a slice is reproducible:
+`#negation` on 15 cases, `#multidrug` on 30, `#attribution`, `#temporality` and
+`#contemplation` on one each. Once sealed, `--gold-version gold-v2` scores against it and
+`evals/metrics.py` will pair gold-v1 against gold-v2 to separate the delta from label changes
+from the delta from system changes.
 

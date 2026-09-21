@@ -124,10 +124,20 @@ only by loosening `load_gold`.
 ./.venv/bin/python evals/label_gold_v1.py validate --seal          # seal a labelled set
 ```
 
-Registered today: `gold-v1` (sealed, `1f594e46…`), `gold-v2` (the 16 corrected labels plus slice
-tags, not yet sealed), `allergy-v1` (allergy-bearing notes for the leakage report, not yet
-sealed). Adding a version means adding a registry entry, and **sealing it must stamp the
-matching `schema_version` into the file** or loading is refused. `gold_v1.json` is never edited.
+Registered: `gold-v1` (sealed, `1f594e46…`), `gold-v2` (16 corrections plus slice tags, built by
+`evals/label_gold_v2.py`, **awaiting two human signatures** before it seals), `allergy-v1`
+(sealed, 20 MTSamples notes with positive allergies) and `allergy-v1-stripped` (sealed, the same
+labels with every ALL-CAPS header removed — the leakage report). Adding a version means adding a
+registry entry, and **sealing it must stamp the matching `schema_version` into the file** or
+loading is refused. `gold_v1.json` is never edited.
+
+A `review` correction in gold-v2 repairs an *intent* rather than applying a rule, so it needs a
+name against it:
+
+```bash
+./.venv/bin/python evals/label_gold_v2.py validate --seal --labeller <name> \
+    --confirm case_010.medication --confirm case_010.frequency
+```
 
 ### 5.3 Cost control
 

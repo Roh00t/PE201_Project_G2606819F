@@ -1,0 +1,46 @@
+{
+  "run_id": "leak-allergy-v1-stripped",
+  "started_at": "2026-09-21T13:06:25+00:00",
+  "finished_at": "2026-09-21T13:06:55+00:00",
+  "mode": "live",
+  "reportable": true,
+  "experiment": null,
+  "model": "google/gemini-2.5-flash",
+  "prompt_fingerprint": "a92d2abcb2af4294",
+  "data_collection": "deny",
+  "gold": {
+    "version": "allergy-v1-stripped",
+    "dataset": "mtsamples",
+    "path": "data/gold_labels/allergy_v1_stripped.json",
+    "sha256": "1d02348ecf948304f58915d6ec848ec12a7267a29c48eda2a0a233da34cc4f3f",
+    "cases_total": 20,
+    "cases_run": 20,
+    "sealed_at": "2026-09-21T13:05:45+00:00",
+    "sealed_prompt_fingerprint": "a92d2abcb2af4294",
+    "dataset_revision": null
+  },
+  "environment": {
+    "git_commit": "2119bcd",
+    "git_dirty": true,
+    "python": "3.14.5",
+    "openai": "3.15.0",
+    "pydantic": "2.13.5"
+  },
+  "spend": {
+    "ceiling_usd": 8.0,
+    "spent_before_usd": 0.097561,
+    "billed_this_run_usd": 0.014826
+  },
+  "breaker": {
+    "halted": false,
+    "reason_code": null,
+    "reason": null,
+    "calls": 20,
+    "failures": 0
+  },
+  "errors": {},
+  "exit_counts": {
+    "0": 20
+  },
+  "cached_cases": 0
+}
