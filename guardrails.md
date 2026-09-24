@@ -135,7 +135,7 @@ clinician's hand.
 ### Verification
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests          # 267 tests
+./.venv/bin/python -m unittest discover -s tests          # 347 tests
 ./.venv/bin/python -O -m unittest discover -s tests       # again, with assertions stripped
 ./.venv/bin/python -m unittest tests.test_guardrails_doc  # this document checks itself
 ```
@@ -169,6 +169,29 @@ clinician's hand.
   "leakage_pooled_stripped": {
     "artefact": "evals/results/leak-allergy-v1-stripped/scores.json",
     "path": ["pooled", "recall"], "value": 0.4889
+  },
+  "judge_observed_agreement": {
+    "artefact": "evals/results/judge-gold-v2-live/calibration.json",
+    "path": ["calibration", "pooled", "cohens_kappa", "observed_agreement"],
+    "value": 0.8284
+  },
+  "judge_cohens_kappa": {
+    "artefact": "evals/results/judge-gold-v2-live/calibration.json",
+    "path": ["calibration", "pooled", "cohens_kappa", "kappa"], "value": 0.1967
+  },
+  "judge_gwet_ac1": {
+    "artefact": "evals/results/judge-gold-v2-live/calibration.json",
+    "path": ["calibration", "pooled", "gwet_ac1", "ac1"], "value": 0.7827
+  },
+  "judge_rubber_stamp_baseline": {
+    "artefact": "evals/results/judge-gold-v2-live/calibration.json",
+    "path": ["calibration", "rubber_stamp_baseline", "agreement", "rate"],
+    "value": 0.8396
+  },
+  "judge_false_accepts": {
+    "artefact": "evals/results/judge-gold-v2-live/calibration.json",
+    "path": ["calibration", "pooled", "confusion", "judge_wrongly_accepts"],
+    "value": 34
   },
   "gold_v1_silent_failure_rate": {
     "artefact": "evals/results/20260920T133717Z-gemini-2.5-flash/scores.json",
@@ -325,7 +348,7 @@ Span containment (`evidence in source_text`) is **deterministic**: it is a subst
 | S-11 | Prototype fixes: blank the quote; no sentinel text in data; abstention-aware scoring; model ID as configuration | SPECIFIED, build #4 | prototype | `docs/First_Version_smallest.ipynb` (§3 LLM07, LLM10) | LLM07, LLM10 |
 | S-12 | Review screen: mandatory per-field sign-off, no auto-accept, role-based access | SPECIFIED, build #13 (production) | production | review UI (§3 LLM07) | LLM07, LLM02 |
 | S-13 | Offline CI workflow running the test suite on every push | SPECIFIED, build #11 | repo | `.github/workflows/tests.yml` (§6.1) | all |
-| S-14 | LLM-as-a-judge for value equivalence (evaluation only), calibrated against hand labels | SPECIFIED, build #14 | evals | §6.1 | LLM07 |
+| S-14 | LLM-as-a-judge for value equivalence (evaluation only), calibrated against hand labels | IMPLEMENTED `evals/judge_calibration.py`, `evals/judge_rubric.py`, `tests/test_judge_calibration.py` — **calibrated and NOT adopted**: it fails the 0.90 two-class gate this document set for it (§6.8) | evals | §6.1, §6.8 | LLM07 |
 | S-15 | Cross-field proximity: dose and frequency quotes must sit next to the medication quote, otherwise REVIEW | SPECIFIED, build #3a (with S-04) | src | `src/extract.py:apply_gates` (§3 LLM07) | LLM07 |
 
 ### 1.6 Abstention policy: "I don't know" handling
@@ -2113,10 +2136,12 @@ stdout carries one JSON summary. A run is `reportable` only when it is live, not
 
 **Reading the headline honestly.** With about 54 gold medication fields, a recall of 0.85 has a 95% Wilson interval of roughly 0.73–0.92. "≥ 0.85" is **met** when the point estimate reaches it, and **demonstrated** only when the lower bound does. Both are reported. Every exported CSV passes each cell through `csv_safe` (S-08).
 
-**Layer 3: LLM-as-a-judge** (S-14, SPECIFIED; evaluation only, **never** in the runtime acceptance path).
+**Layer 3: LLM-as-a-judge** (S-14, IMPLEMENTED and **refused by its own gate**; evaluation only, **never** in the runtime acceptance path).
 - **Role:** adjudicate only the value pairs the deterministic rules call a mismatch but might be equivalent (e.g. `Pan-D` vs `pantoprazole + domperidone`).
 - **Prompt:** a binary YES/NO question with reasoning before the verdict [C6].
 - **Before use:** calibrate against a hand-adjudicated sample, and adopt the judge only if its agreement with the human reaches 0.9 or more on both classes.
+- **Outcome:** built (`evals/judge_calibration.py`) and measured against sealed gold-v2 over all 268 field decisions. The gate is **not met**: agreement is 0.9467 on the class gold calls correct and **0.2093** on the class gold calls wrong. The judge is therefore not adopted, and the sealed labels remain the only ground truth. §6.8 has the full result.
+- **Why the criterion was written as "both classes":** a single pooled agreement figure would have passed. 82.8% of decisions agree, and a judge that accepted everything would score 84.0% on this data, because 225 of 268 decisions are ones the extractor already gets right. The two-class form is what makes the criterion falsifiable, and it is the reason this layer was refused rather than shipped.
 - **Reporting:** judge-adjusted scores are reported *beside* the deterministic ones, never instead of them. "If a model judges your outputs, that judge is a component of your system, not a source of truth" [WATCH §7].
 
 ### 6.2 Red-teaming test set
@@ -2423,3 +2448,82 @@ withdrawn label as a system regression would invent a difference that is entirel
 This is also the cleanest demonstration in the project of why the paired test is not a formality.
 The same eight flips give **McNemar p = 0.008** and **Fisher p = 0.373**. An evaluator reaching for
 the unpaired test would conclude there was nothing here.
+
+### 6.8 Calibrating the LLM judge, and refusing it
+
+S-14 proposed an LLM-as-a-judge as a third evaluation layer, and §6.1 set its adoption gate
+before it was built: *adopt the judge only if its agreement with the human reaches 0.9 or more
+**on both classes***. It is now built, calibrated against sealed gold-v2, and **not adopted**.
+The gate did its job.
+
+**What was measured.** Two raters over the same 268 field decisions (67 cases × 4 fields): the
+deterministic scorer applied to sealed gold-v2, and `openai/gpt-5-mini` reading the note and the
+candidate extraction with no access to the label. The population is deliberately *every* field
+decision and not recall's 155 gold-`found` ones — a judge that cannot agree "this note says
+nothing about allergies" is useless in a clinic — so no figure here may be set beside a recall
+figure.
+
+| Measure | Value | Reading |
+| :--- | ---: | :--- |
+| Observed agreement | 0.8284 | on 268 decisions |
+| **Rubber-stamp baseline** | **0.8396** | a judge that answers "correct" to everything |
+| Cohen's κ | 0.1967 | chance term 0.7863 — see below |
+| Gwet's AC₁ | 0.7827 | chance term 0.2103 |
+| Agreement, class *gold says correct* | 0.9467 | 213/225 — gate met |
+| Agreement, class *gold says wrong* | **0.2093** | 9/43 — **gate failed** |
+
+**The judge does not beat a rubber stamp.** 82.84% against 84.0%. Its twelve false rejections
+cost more than its nine true rejections gain. This row is printed by `judge_calibration.py` for
+the same reason `score_arm.py` prints the majority-class baseline beside every recall figure, and
+it is the single most useful line in the report: without it, "83% agreement with gold" reads as a
+success.
+
+**κ and AC₁ disagree by 0.59, and the chance terms say why.** Cohen's κ discounts agreement by
+what two raters would reach by chance *given their own marginals*; both raters here say "correct"
+to about 84% of decisions, so that discount is 0.7863 and almost nothing survives it. Gwet's AC₁
+uses a chance term that shrinks as one category takes over — 0.2103 — and reports 0.7827. This
+is the κ paradox, it is a property of the statistic rather than of the raters, and
+`tests/test_judge_calibration.py:AgreementStatistics` reproduces it on a constructed table rather
+than describing it. **Neither number rescues the judge**, which is the point of reporting both:
+AC₁'s 0.78 looks adoptable until it is set beside the 0.8396 rubber stamp and the 0.2093
+class-wise agreement.
+
+**The confidence score carries no information.** Mean confidence was 4.977 when the judge agreed
+with gold and 4.978 when it did not — a separation of −0.001 across two of five scale levels used.
+The judge is not uncertain when it is wrong; it is uniformly certain.
+
+**On the rating-scale compression protocol.** The requested transform (1→2, 5→4, avoid the
+boundaries) is implemented in `judge_rubric.compress_scale`, **off by default**, and applied post
+hoc to the saved verdicts so the compressed arm is an exact paired re-read costing no calls. It
+cannot change agreement, because it changes no verdict; it can only degrade the confidence
+signal. On this run it cannot even be priced, because the raw confidence separated right from
+wrong by 0.001 of a scale point — there was nothing left to destroy. Two things follow, and the
+second is a trap worth naming: compression collapsed the scale to a single level, and the
+**point-biserial correlation did not move**, because it divides the mean gap by the standard
+deviation and compression shrinks both by the same factor. A report quoting only the correlation
+would show no damage at all. That is why the separation and the level count are printed beside it.
+
+**Bias probes, paired.** The same judge, the same cases, one thing changed.
+
+| Probe | Self-consistency | Verdict flips | Agreement with gold | McNemar exact |
+| :--- | ---: | ---: | :--- | ---: |
+| Field order reversed | 73/80 (91.2%) | 7 | 1 better / 6 worse | 0.1250 |
+| Full narrative rationales | 76/80 (95.0%) | 4 | 1 better / 3 worse | 0.6250 |
+
+Reversing the order in which four fields are presented changes 7 of 80 verdicts on identical
+evidence. Neither probe separates at α 0.05 — with 7 and 4 discordant pairs they cannot, the same
+power floor §6.6 hits — but self-consistency is a count rather than a rate, and 9% self-
+contradiction from presentation order alone is a fact about the judge that needs no p-value.
+Verbosity cost 4.4× the rationale length (median 46 → 202 characters) and bought nothing.
+
+**What this changes.** Nothing in the runtime path: S-14 was always evaluation-only and the
+verdict never touches a payload (`tests/test_judge_calibration.py:NoWriteBack`). What it changes
+is the answer to "can a judge replace hand labelling for the next prompt change": **no**. The
+sealed labels remain the only ground truth, and a prompt change is still scored against them.
+
+**Honesty block.** One judge model, one rubric, 67 cases, and a rubric written by the same person
+who wrote the extractor's `FIELD_RULES` — the criteria are restated rather than imported, which
+reduces the coupling but does not remove it. A stronger judge, a different rubric, or reasoning
+enabled might clear the gate; this measures the cheap judge that was actually tried, at $0.0696
+across all three arms. The negative result is bounded accordingly: it says *this* judge is not
+adoptable, not that no judge is.

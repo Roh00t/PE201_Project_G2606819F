@@ -400,6 +400,190 @@ def mcnemar(flips_to_right, flips_to_wrong):
             "net": b - c}
 
 
+def rater_decisions(gold_cases, gated):
+    """(case_id, field) -> was the pipeline right, over EVERY field decision.
+
+    A different population from `field_outcomes`, on purpose, and the difference
+    matters enough to say twice. `field_outcomes` keeps only the fields gold marks
+    `found`, because that is recall's denominator. Calibrating a judge needs the
+    correct negatives too: most of a judge's working day is agreeing that a note
+    says nothing about allergies, and a judge that cannot do that is useless
+    however well it scores on the fields that carry a value.
+
+    So this is 67 x 4 = 268 decisions where recall is scored on 155, and an
+    agreement figure computed here must never be set beside a recall figure
+    computed there.
+    """
+    out = {}
+    for case in gold_cases:
+        case_id = case["case_id"]
+        if case_id not in gated:
+            continue
+        extraction = gated[case_id]["extraction"]
+        for field in CRITICAL_FIELDS:
+            truth = case["ground_truth"][field]
+            value = extraction[field]["value"] or ""
+            if truth["status"] == "found":
+                out[(case_id, field)] = bool(
+                    value and value_matches(field, value, truth["value"] or ""))
+            else:
+                # Gold says nothing is there. Staying silent is the right answer;
+                # proposing anything at all is wrong.
+                out[(case_id, field)] = not value
+    return out
+
+
+def agreement_table(rater_a, rater_b):
+    """The 2x2 over the keys both raters decided. Keys only one of them covers
+    are dropped and counted, never treated as a disagreement."""
+    shared = sorted(set(rater_a) & set(rater_b), key=lambda k: (str(k[0]), str(k[1])))
+    table = {"n11": 0, "n10": 0, "n01": 0, "n00": 0}
+    for key in shared:
+        a, b = bool(rater_a[key]), bool(rater_b[key])
+        table["n11" if (a and b) else "n10" if a else "n01" if b else "n00"] += 1
+    table["n"] = len(shared)
+    table["a_only"] = len(set(rater_a) - set(rater_b))
+    table["b_only"] = len(set(rater_b) - set(rater_a))
+    return table
+
+
+def _proportions(table):
+    n = table["n"]
+    if not n:
+        return None
+    observed = (table["n11"] + table["n00"]) / n
+    p_a = (table["n11"] + table["n10"]) / n      # rater A says 1
+    p_b = (table["n11"] + table["n01"]) / n      # rater B says 1
+    return observed, p_a, p_b
+
+
+def cohens_kappa(table):
+    """Cohen's kappa on a 2x2, with the term that makes it misleading here.
+
+    kappa corrects observed agreement by the agreement two raters would reach by
+    chance *given their own marginals*, and that correction grows as the marginals
+    become lopsided. When both raters say "correct" to nearly everything - which
+    is what a working extractor and a competent judge both do - chance agreement
+    approaches the observed agreement and kappa collapses toward 0 while the
+    raters are in fact agreeing on almost every decision. That is the kappa
+    paradox, it is a property of the statistic and not of the raters, and it is
+    why `gwet_ac1` is reported beside this and not instead of it.
+
+    `chance_agreement` is returned so the collapse is visible rather than
+    inferred from a small number.
+    """
+    parts = _proportions(table)
+    if parts is None:
+        return None
+    observed, p_a, p_b = parts
+    expected = p_a * p_b + (1 - p_a) * (1 - p_b)
+    return {
+        "observed_agreement": round(observed, 4),
+        "chance_agreement": round(expected, 4),
+        "kappa": (None if expected >= 1.0
+                  else round((observed - expected) / (1 - expected), 4)),
+        "prevalence_of_correct": {"rater_a": round(p_a, 4), "rater_b": round(p_b, 4)},
+    }
+
+
+def gwet_ac1(table):
+    """Gwet's AC1: the same observed agreement against a chance term that does
+    not depend on how lopsided the marginals are.
+
+    Chance agreement is 2*pi*(1-pi) where pi is the prevalence of "correct"
+    averaged over the two raters - maximal at pi = 0.5 and approaching 0 as one
+    category takes over. Where kappa punishes a high-prevalence category, AC1
+    reports that there was little left to agree on by accident. For this project
+    it is the defensible headline and kappa is the number an evaluator will look
+    for, so both are published with the chance terms that separate them.
+    """
+    parts = _proportions(table)
+    if parts is None:
+        return None
+    observed, p_a, p_b = parts
+    pi = (p_a + p_b) / 2
+    expected = 2 * pi * (1 - pi)
+    return {
+        "observed_agreement": round(observed, 4),
+        "chance_agreement": round(expected, 4),
+        "ac1": (None if expected >= 1.0
+                else round((observed - expected) / (1 - expected), 4)),
+        "prevalence_of_correct": round(pi, 4),
+    }
+
+
+def bootstrap_interval(rater_a, rater_b, statistic, *, draws=2000, seed=0,
+                       alpha=0.05):
+    """Percentile bootstrap over the paired decisions.
+
+    kappa and AC1 have asymptotic variance formulas; resampling the pairs is
+    assumption-light, correct at n = 268, and - seeded - reproducible, which the
+    formulas typed from memory would not be. `statistic` takes a table and returns
+    a float or None.
+    """
+    import random
+    shared = sorted(set(rater_a) & set(rater_b), key=lambda k: (str(k[0]), str(k[1])))
+    if len(shared) < 2:
+        return None
+    rng = random.Random(seed)
+    values = []
+    for _ in range(draws):
+        picked = [shared[rng.randrange(len(shared))] for _ in shared]
+        # Counted by multiplicity rather than through `agreement_table`: a resample
+        # draws the same key more than once, and building it from dicts would
+        # collapse the repeats and silently shrink n.
+        table = {"n11": 0, "n10": 0, "n01": 0, "n00": 0, "n": 0,
+                 "a_only": 0, "b_only": 0}
+        for key in picked:
+            a, b = bool(rater_a[key]), bool(rater_b[key])
+            table["n11" if (a and b) else "n10" if a else "n01" if b else "n00"] += 1
+            table["n"] += 1
+        got = statistic(table)
+        if got is not None:
+            values.append(got)
+    if not values:
+        return None
+    values.sort()
+    lo = values[max(0, int(alpha / 2 * len(values)) - 1)]
+    hi = values[min(len(values) - 1, int((1 - alpha / 2) * len(values)))]
+    return (round(lo, 4), round(hi, 4))
+
+
+def confidence_separation(pairs):
+    """Does the judge's confidence track whether it was right?
+
+    `pairs` is (confidence, judge_agreed_with_gold). A calibrated judge is more
+    confident when it agrees with the labels than when it does not; the gap
+    between those two means is the whole value of asking for a confidence at all.
+    Reported as a mean difference plus the point-biserial correlation, because a
+    single correlation hides which side moved.
+    """
+    hits = [c for c, ok in pairs if ok]
+    misses = [c for c, ok in pairs if not ok]
+    if not hits or not misses:
+        return {"n": len(pairs), "mean_when_agreed": None,
+                "mean_when_disagreed": None, "separation": None,
+                "point_biserial": None, "distinct_levels_used": len({c for c, _ in pairs})}
+    mean_hit = sum(hits) / len(hits)
+    mean_miss = sum(misses) / len(misses)
+    scores = [c for c, _ in pairs]
+    n = len(scores)
+    mean_all = sum(scores) / n
+    sd = (sum((c - mean_all) ** 2 for c in scores) / n) ** 0.5
+    p = len(hits) / n
+    r_pb = (None if sd == 0 else
+            round((mean_hit - mean_miss) / sd * math.sqrt(p * (1 - p)), 4))
+    return {
+        "n": n,
+        "mean_when_agreed": round(mean_hit, 3),
+        "mean_when_disagreed": round(mean_miss, 3),
+        "separation": round(mean_hit - mean_miss, 3),
+        "point_biserial": r_pb,
+        "distinct_levels_used": len(set(scores)),
+        "sd": round(sd, 3),
+    }
+
+
 def field_outcomes(gold_cases, gated):
     """(case_id, field) -> was it correct. The unit both comparisons need."""
     out = {}

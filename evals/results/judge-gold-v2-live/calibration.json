@@ -1,0 +1,415 @@
+{
+  "at": "2026-09-24T15:28:11+00:00",
+  "judge": {
+    "model": "openai/gpt-5-mini",
+    "prices_per_mtok": [
+      0.25,
+      2.0
+    ],
+    "rubric_version": "mediextract.judge.v1",
+    "fingerprint": "ea4d7abe94448b83",
+    "different_family_from_system_under_test": true
+  },
+  "under_test": {
+    "run_id": "gold-v2-live",
+    "model": "google/gemini-2.5-flash",
+    "prompt_fingerprint": null,
+    "path": "evals/results/gold-v2-live"
+  },
+  "gold": {
+    "path": "data/gold_labels/gold_v2.json",
+    "schema_version": "gold-v2",
+    "cases_in_this_invocation": 67,
+    "cases_in_the_calibration": 67
+  },
+  "arms": {
+    "baseline": {
+      "calls": 67,
+      "asks": "the calibration arm: natural field order, terse rationales",
+      "billed_usd": 0.039559
+    },
+    "swap": {
+      "calls": 20,
+      "asks": "position-bias probe: the same decisions, fields reversed",
+      "billed_usd": 0.011112
+    },
+    "verbose": {
+      "calls": 20,
+      "asks": "verbosity probe: the same decisions, full narrative rationales",
+      "billed_usd": 0.018902
+    }
+  },
+  "calibration": {
+    "beats_rubber_stamp": false,
+    "rubber_stamp_baseline": {
+      "strategy": "answer 'correct' to every field decision",
+      "decisions": 268,
+      "agrees_with_gold": 225,
+      "agreement": {
+        "n": 225,
+        "d": 268,
+        "rate": 0.8395522388059702,
+        "text": "225/268 (84.0%)"
+      },
+      "catches_nothing": true
+    },
+    "population": "every field decision, including the correct negatives: 67 cases x 4 fields. Not recall's gold-found denominator.",
+    "cases_judged": 67,
+    "cases_unreadable": 0,
+    "pooled": {
+      "table": {
+        "n11": 213,
+        "n10": 12,
+        "n01": 34,
+        "n00": 9,
+        "n": 268,
+        "a_only": 0,
+        "b_only": 0
+      },
+      "confusion": {
+        "both_call_it_correct": 213,
+        "judge_wrongly_rejects": 12,
+        "judge_wrongly_accepts": 34,
+        "both_call_it_wrong": 9,
+        "decisions": 268,
+        "judge_false_accept_rate": {
+          "n": 34,
+          "d": 43,
+          "rate": 0.7906976744186046,
+          "text": "34/43 (79.1%)"
+        },
+        "judge_false_reject_rate": {
+          "n": 12,
+          "d": 225,
+          "rate": 0.05333333333333334,
+          "text": "12/225 (5.3%)"
+        }
+      },
+      "cohens_kappa": {
+        "observed_agreement": 0.8284,
+        "chance_agreement": 0.7863,
+        "kappa": 0.1967,
+        "prevalence_of_correct": {
+          "rater_a": 0.8396,
+          "rater_b": 0.9216
+        }
+      },
+      "gwet_ac1": {
+        "observed_agreement": 0.8284,
+        "chance_agreement": 0.2103,
+        "ac1": 0.7827,
+        "prevalence_of_correct": 0.8806
+      },
+      "cohens_kappa_ci95": [
+        0.0472,
+        0.351
+      ],
+      "gwet_ac1_ci95": [
+        0.7083,
+        0.8462
+      ]
+    },
+    "per_field": {
+      "medication": {
+        "table": {
+          "n11": 50,
+          "n10": 0,
+          "n01": 17,
+          "n00": 0,
+          "n": 67,
+          "a_only": 0,
+          "b_only": 0
+        },
+        "confusion": {
+          "both_call_it_correct": 50,
+          "judge_wrongly_rejects": 0,
+          "judge_wrongly_accepts": 17,
+          "both_call_it_wrong": 0,
+          "decisions": 67,
+          "judge_false_accept_rate": {
+            "n": 17,
+            "d": 17,
+            "rate": 1.0,
+            "text": "17/17 (100.0%)"
+          },
+          "judge_false_reject_rate": {
+            "n": 0,
+            "d": 50,
+            "rate": 0.0,
+            "text": "0/50 (0.0%)"
+          }
+        },
+        "cohens_kappa": {
+          "observed_agreement": 0.7463,
+          "chance_agreement": 0.7463,
+          "kappa": 0.0,
+          "prevalence_of_correct": {
+            "rater_a": 0.7463,
+            "rater_b": 1.0
+          }
+        },
+        "gwet_ac1": {
+          "observed_agreement": 0.7463,
+          "chance_agreement": 0.2215,
+          "ac1": 0.6741,
+          "prevalence_of_correct": 0.8731
+        }
+      },
+      "dose": {
+        "table": {
+          "n11": 43,
+          "n10": 8,
+          "n01": 8,
+          "n00": 8,
+          "n": 67,
+          "a_only": 0,
+          "b_only": 0
+        },
+        "confusion": {
+          "both_call_it_correct": 43,
+          "judge_wrongly_rejects": 8,
+          "judge_wrongly_accepts": 8,
+          "both_call_it_wrong": 8,
+          "decisions": 67,
+          "judge_false_accept_rate": {
+            "n": 8,
+            "d": 16,
+            "rate": 0.5,
+            "text": "8/16 (50.0%)"
+          },
+          "judge_false_reject_rate": {
+            "n": 8,
+            "d": 51,
+            "rate": 0.1568627450980392,
+            "text": "8/51 (15.7%)"
+          }
+        },
+        "cohens_kappa": {
+          "observed_agreement": 0.7612,
+          "chance_agreement": 0.6364,
+          "kappa": 0.3431,
+          "prevalence_of_correct": {
+            "rater_a": 0.7612,
+            "rater_b": 0.7612
+          }
+        },
+        "gwet_ac1": {
+          "observed_agreement": 0.7612,
+          "chance_agreement": 0.3636,
+          "ac1": 0.6248,
+          "prevalence_of_correct": 0.7612
+        }
+      },
+      "frequency": {
+        "table": {
+          "n11": 53,
+          "n10": 4,
+          "n01": 9,
+          "n00": 1,
+          "n": 67,
+          "a_only": 0,
+          "b_only": 0
+        },
+        "confusion": {
+          "both_call_it_correct": 53,
+          "judge_wrongly_rejects": 4,
+          "judge_wrongly_accepts": 9,
+          "both_call_it_wrong": 1,
+          "decisions": 67,
+          "judge_false_accept_rate": {
+            "n": 9,
+            "d": 10,
+            "rate": 0.9,
+            "text": "9/10 (90.0%)"
+          },
+          "judge_false_reject_rate": {
+            "n": 4,
+            "d": 57,
+            "rate": 0.07017543859649122,
+            "text": "4/57 (7.0%)"
+          }
+        },
+        "cohens_kappa": {
+          "observed_agreement": 0.806,
+          "chance_agreement": 0.7984,
+          "kappa": 0.0376,
+          "prevalence_of_correct": {
+            "rater_a": 0.8507,
+            "rater_b": 0.9254
+          }
+        },
+        "gwet_ac1": {
+          "observed_agreement": 0.806,
+          "chance_agreement": 0.1988,
+          "ac1": 0.7578,
+          "prevalence_of_correct": 0.8881
+        }
+      },
+      "allergy": {
+        "table": {
+          "n11": 67,
+          "n10": 0,
+          "n01": 0,
+          "n00": 0,
+          "n": 67,
+          "a_only": 0,
+          "b_only": 0
+        },
+        "confusion": {
+          "both_call_it_correct": 67,
+          "judge_wrongly_rejects": 0,
+          "judge_wrongly_accepts": 0,
+          "both_call_it_wrong": 0,
+          "decisions": 67,
+          "judge_false_accept_rate": {
+            "n": 0,
+            "d": 0,
+            "rate": null,
+            "text": "0/0 (n/a)"
+          },
+          "judge_false_reject_rate": {
+            "n": 0,
+            "d": 67,
+            "rate": 0.0,
+            "text": "0/67 (0.0%)"
+          }
+        },
+        "cohens_kappa": {
+          "observed_agreement": 1.0,
+          "chance_agreement": 1.0,
+          "kappa": null,
+          "prevalence_of_correct": {
+            "rater_a": 1.0,
+            "rater_b": 1.0
+          }
+        },
+        "gwet_ac1": {
+          "observed_agreement": 1.0,
+          "chance_agreement": 0.0,
+          "ac1": 1.0,
+          "prevalence_of_correct": 1.0
+        }
+      }
+    },
+    "judge_abstentions": 0,
+    "confidence": {
+      "n": 268,
+      "mean_when_agreed": 4.977,
+      "mean_when_disagreed": 4.978,
+      "separation": -0.001,
+      "point_biserial": -0.002,
+      "distinct_levels_used": 2,
+      "sd": 0.148
+    },
+    "rationale_chars": {
+      "median": 46,
+      "p90": 65,
+      "over_cap": 2,
+      "cap": 120
+    }
+  },
+  "bias_probes": [
+    {
+      "probe": "swap",
+      "asks": "position-bias probe: the same decisions, fields reversed",
+      "decisions_in_both": 80,
+      "self_consistency": {
+        "n": 73,
+        "d": 80,
+        "rate": 0.9125,
+        "text": "73/80 (91.2%)"
+      },
+      "verdict_flips": 7,
+      "flipped_fields": [
+        "case_002.dose",
+        "case_002.frequency",
+        "case_002.medication",
+        "case_003.dose",
+        "case_006.dose",
+        "case_011.dose",
+        "case_018.dose"
+      ],
+      "agreement_with_gold": {
+        "flipped_to_right": 1,
+        "flipped_to_wrong": 6,
+        "discordant": 7,
+        "p": 0.125,
+        "net": -5
+      },
+      "mean_confidence": {
+        "baseline": 4.987,
+        "swap": 4.975
+      },
+      "median_rationale_chars": {
+        "baseline": 46,
+        "swap": 47
+      },
+      "cost_usd": {
+        "baseline": 0.039559,
+        "swap": 0.011112
+      }
+    },
+    {
+      "probe": "verbose",
+      "asks": "verbosity probe: the same decisions, full narrative rationales",
+      "decisions_in_both": 80,
+      "self_consistency": {
+        "n": 76,
+        "d": 80,
+        "rate": 0.95,
+        "text": "76/80 (95.0%)"
+      },
+      "verdict_flips": 4,
+      "flipped_fields": [
+        "case_002.dose",
+        "case_003.dose",
+        "case_011.dose",
+        "case_014.medication"
+      ],
+      "agreement_with_gold": {
+        "flipped_to_right": 1,
+        "flipped_to_wrong": 3,
+        "discordant": 4,
+        "p": 0.625,
+        "net": -2
+      },
+      "mean_confidence": {
+        "baseline": 4.987,
+        "verbose": 4.975
+      },
+      "median_rationale_chars": {
+        "baseline": 46,
+        "verbose": 202
+      },
+      "cost_usd": {
+        "baseline": 0.039559,
+        "verbose": 0.018902
+      }
+    }
+  ],
+  "compression": {
+    "transform": "confidence clamped to [2, 4]; verdicts untouched",
+    "raw": {
+      "n": 268,
+      "mean_when_agreed": 4.977,
+      "mean_when_disagreed": 4.978,
+      "separation": -0.001,
+      "point_biserial": -0.002,
+      "distinct_levels_used": 2,
+      "sd": 0.148
+    },
+    "compressed": {
+      "n": 268,
+      "mean_when_agreed": 4.0,
+      "mean_when_disagreed": 4.0,
+      "separation": 0.0,
+      "point_biserial": null,
+      "distinct_levels_used": 1,
+      "sd": 0.0
+    },
+    "separation_retained": null,
+    "levels_lost": 1,
+    "measurable_on_this_run": false,
+    "reading": "Compression cannot change agreement, because it changes no verdict. It can only degrade the confidence signal - and it can only be shown to do so on a run where that signal exists. It does not here: the judge's raw confidence separated right from wrong by less than 0.1 of a scale point, so this run cannot price the transform. That is a finding about the judge, not a pass for the transform."
+  }
+}

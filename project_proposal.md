@@ -459,3 +459,33 @@ check, which is the property that makes it usable. The document had already rott
 predecessor harness lived in a scratchpad and was lost — which is why the checks now live in the
 suite.
 
+
+**D20 · The LLM judge was built, calibrated, and refused by its own gate.** `guardrails.md` §6.1
+set the adoption criterion for S-14 before the code existed: agreement with the human labels of
+0.9 or better *on both classes*. `evals/judge_calibration.py` and `evals/judge_rubric.py` now
+implement it, judged by `openai/gpt-5-mini` — a different model family from the system under
+test, because a model judging its own family reads a shared blind spot as agreement. Against
+sealed gold-v2 over all 268 field decisions: observed agreement **0.8284**, Cohen's κ **0.1967**,
+Gwet's AC₁ **0.7827**, and class-wise agreement of **0.9467** where gold says correct against
+**0.2093** where gold says wrong. The gate is failed on the second class, so the judge is not
+adopted and the sealed labels remain the only ground truth.
+
+The decisive line is the comparator, not the headline. A judge that answered "correct" to every
+decision would score **0.8396**, so the judge measured here **does not beat a rubber stamp** — its
+twelve false rejections cost more than its nine true rejections gain. This is the majority-class
+discipline of §5.5 applied to agreement rather than recall, and without it 83% agreement reads as
+a success. κ and AC₁ differ by 0.59 for a reason the report prints beside them: both raters accept
+about 84% of decisions, so κ's chance term is 0.7863 and AC₁'s is 0.2103. Neither rescues the
+judge.
+
+Three further findings. Judge confidence carried no signal — 4.977 when it agreed with gold, 4.978
+when it did not, across two of five scale levels. Reversing the order the four fields are
+presented in flipped **7 of 80 verdicts on identical evidence** (91.2% self-consistency); demanding
+full narrative rationales flipped 4 and cost 4.4× the length. Neither probe separates at α 0.05 at
+that many discordant pairs, and neither needs to: a self-contradiction count is a count. The
+requested rating-scale compression is implemented off by default and applied post hoc to saved
+verdicts, so it costs nothing and is exactly paired; on this run it cannot be priced, because the
+confidence it would have degraded was already flat. The whole suite cost **$0.0696** over 107
+calls, and 66 tests in `tests/test_judge_calibration.py` pin the four properties that make the
+instrument trustworthy — no gold in the prompt, no write-back to a payload, schema and model
+agreeing, and the statistics computed rather than asserted.

@@ -249,3 +249,37 @@ noise that does not separate (p = 1.000)**.
 `metrics.compare_golds` pairs only fields that are `found` in **both** versions; the 8 withdrawn
 and 1 added label are reported separately and never counted as flips.
 
+
+### 5.8 Judge calibration
+
+```bash
+./.venv/bin/python evals/judge_calibration.py evals/results/gold-v2-live --dry-run
+./.venv/bin/python evals/judge_calibration.py evals/results/gold-v2-live \
+    --gold data/gold_labels/gold_v2.json --arm baseline --cap-usd 0.08
+./.venv/bin/python evals/judge_calibration.py evals/results/gold-v2-live \
+    --arm swap --limit 20 --cap-usd 0.03        # position bias
+./.venv/bin/python evals/judge_calibration.py --report evals/results/judge-gold-v2-live
+```
+
+The judge is `openai/gpt-5-mini`, **a different family from the system under test**, because a
+model judging its own family reads a shared blind spot as agreement. It never sees the gold label,
+and its verdict never reaches a payload — both are tests, not conventions.
+
+`--report` **recomputes** from the saved verdicts rather than re-reading the saved summary, and it
+makes no calls. It exists because a statistic that is only ever read back cannot be checked against
+its rows: a `--arm verbose --limit 20` run had already rewritten a 268-decision headline as an
+80-decision one, silently. The calibration is now always scored over the cases the *baseline* arm
+judged, whatever the current invocation passes.
+
+**Report the rubber-stamp row or report nothing.** A judge that answers "correct" to everything
+scores 0.8396 on this data, because most extractions are already right. The measured judge scores
+0.8284, so it does not beat one. Agreement figures need a comparator for the same reason recall
+figures do (§5.5), and here the comparator is what refuses the judge.
+
+**κ and AC₁ are both reported, with their chance terms.** They differ by 0.59 here — 0.1967 against
+0.7827 — because both raters accept about 84% of decisions and Cohen's chance term is 0.7863 while
+Gwet's is 0.2103. Quoting whichever is more flattering would be the whole failure mode.
+
+The adoption gate was written in `guardrails.md` §6.1 before the code existed and is **not met**
+(0.9467 on the class gold calls correct, 0.2093 on the class it calls wrong), so the judge is not
+adopted and hand labelling still stands behind every prompt change.
