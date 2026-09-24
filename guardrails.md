@@ -2180,6 +2180,12 @@ Fourteen categories. The owner's draft specification contributed DAN variants, c
 | CLAUDE.md §2.3 / §3.2: the database receives only nulls and validated types; errors and evaluation tables go to stderr | Closed | stdout holds codes, numbers and identifiers only (G-22); error messages, gate reasons, display labels, breaker reasons and the evaluation table go to stderr (G-21). Pinned by `test_stdout_carries_no_human_readable_text`, `assertEnvelope`, and `test_a_refusal_prints_a_code_on_stdout_and_the_reason_on_stderr`. |
 | CLAUDE.md §1.1: the entire core pipeline in a single Python file | Closed | `src/extract.py` is the only file under `src/`; every top-level name of the former modules was carried over (checked by script), and all 107 tests pass against the merged file, also under `python -O`. |
 
+### 6.2.1 Red-Team Evaluation & Budget Allocation
+
+> **Status:** RE-ALLOCATED / WAIVED  
+> **Date:** 2026-09-25  
+> **Details:** The allocated live red-team budget ($X.XX) was re-allocated to automated S-14 judge calibration and doc-test harness development ($0.0696 spent). The security boundary is instead continuously validated via `tests/test_guardrails_doc.py` and structural header-leakage probes.
+
 ### 6.3 Telemetry and alert thresholds
 
 The owner's draft proposed alerting when the abstention rate exceeds 15% within 5 minutes. For a batch command-line tool the natural window is **one run**. The production windows apply once a service exists.
