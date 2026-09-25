@@ -189,5 +189,5 @@ measurement supports that claim alone.
 | :--- | :--- | :--- |
 | The labelling narrative — gold-v1 was hand-labelled, the allergy set machine-labelled; "LLM then human" describes neither | B | **Open** — a wording correction, not an engineering task |
 | `gold-v2` git tag | B | **Closed** — annotated tag at `9cd0eae`, pushed to `origin`, and `git show gold-v2:data/gold_labels/gold_v2.json` hashes to `d5e90f5a…a959` |
-| `gold-v1` tag is local-only | B | **Open** — the tag §1.3 calls strictly immutable is absent from `origin`; `git push origin --tags` closes it |
+| `gold-v1` tag is local-only | B | **Closed** 25 Sep 2026 — pushed to `origin`; all three tags now verify, with `git show <tag>:…` matching each committed `.sha256` |
 | The live red-team run §6.2 budgets ($0.50) has not been executed; the 16 homoglyph strings and injection tripwires are exercised against the gates offline only | C | **Open** |

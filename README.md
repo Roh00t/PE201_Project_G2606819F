@@ -156,26 +156,32 @@ git status --short && git diff --cached --name-only | grep -E '^\.env|api[_-]?ke
 # 3. commit
 git add -A && git commit
 
-# 4. tag the sealed corpora. gold-v1 and gold-v2 are already tagged (annotated);
-#    paraphrase-v1 cannot be tagged until step 3 puts its file in a commit.
-git tag -l                                     # expect: gold-v1, gold-v2
-git tag -a paraphrase-v1 -m "paraphrase-v1 sealed fa3fa8bf...5642b — near-distribution arm"
+# 4. tag any newly sealed corpus. A tag names a COMMIT, so the file must be
+#    committed (step 3) before it can be tagged.
+git tag -l                          # gold-v1, gold-v2, paraphrase-v1 are already tagged
+# git tag -a <version> -m "<version> sealed <sha256 prefix> — <what it is>"
 
-# 5. push commits AND tags — `git push` alone pushes NEITHER tag.
-#    gold-v1 is currently tagged locally only, which is why --tags matters here.
+# 5. push commits AND tags. `git push` alone pushes NO tags, which is how
+#    gold-v1 sat untagged on the remote for four days without anyone noticing.
 git push origin main
 git push origin --tags
 
-# 6. verify on the remote, and verify the tag really holds the sealed bytes
-git ls-remote --tags origin                    # expect gold-v1, gold-v2, paraphrase-v1
-git show gold-v2:data/gold_labels/gold_v2.json | shasum -a 256   # d5e90f5a...a959
+# 6. verify on the remote, and verify each tag really holds the sealed bytes.
+#    A tag points at a commit, not a file, so presence on origin proves nothing
+#    on its own - extract the file AT the tag and hash it.
+git ls-remote --tags origin
+for t in gold-v1 gold-v2 paraphrase-v1; do
+  f=$(echo $t | tr - _)
+  echo "$t  $(git show $t:data/gold_labels/${f}.json | shasum -a 256 | cut -c1-16)"
+done
+# expect 1f594e46bb9bee88, d5e90f5a016a5420, fa3fa8bf46fe8b8f
 ```
 
 | Check | Why |
 | :--- | :--- |
 | `gold-v1` tag unchanged | `CLAUDE.md` §1.3: immutable, no history rewrites, no force-push |
-| `gold-v1` tag reaches the remote | it is annotated locally but **absent from `origin`**, so the immutability §1.3 claims is currently unenforced for anyone else |
-| `paraphrase-v1` tagged | a tag names a commit, so its file must be committed first |
+| every tag reaches the remote | `git push` pushes no tags; a tag that never left the laptop enforces nothing for anyone who clones |
+| each tag's file hashes to its `.sha256` | a tag names a commit, not a file — presence on `origin` is not proof the seal is intact |
 | `guardrails.md` pushed with the artefacts it cites | `tests/test_guardrails_doc.py` fails on the remote otherwise |
 | `.env` absent from the diff | it is gitignored; check anyway |
 | all five `.sha256` files pushed | the seals are unverifiable without them |
