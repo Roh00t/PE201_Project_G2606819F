@@ -1,0 +1,47 @@
+{
+  "run_id": "20260924T170607Z-gemini-2.5-flash",
+  "started_at": "2026-09-24T17:06:07+00:00",
+  "finished_at": "2026-09-24T17:07:46+00:00",
+  "mode": "live",
+  "reportable": true,
+  "experiment": "near-distribution-paraphrase",
+  "model": "google/gemini-2.5-flash",
+  "prompt_fingerprint": "a92d2abcb2af4294",
+  "data_collection": "deny",
+  "gold": {
+    "version": "paraphrase-v1",
+    "dataset": "ekacare/clinical_note_generation_dataset",
+    "path": "data/gold_labels/paraphrase_v1.json",
+    "sha256": "fa3fa8bf46fe8b8f41bbb757bdcdca5a0685aa21140630f6dc04f841bbc5642b",
+    "cases_total": 67,
+    "cases_run": 67,
+    "sealed_at": "2026-09-24T17:05:20+00:00",
+    "sealed_prompt_fingerprint": "a92d2abcb2af4294",
+    "dataset_revision": null
+  },
+  "environment": {
+    "git_commit": "8d10328",
+    "git_dirty": true,
+    "python": "3.14.5",
+    "openai": "3.15.0",
+    "pydantic": "2.13.5"
+  },
+  "spend": {
+    "ceiling_usd": 8.0,
+    "spent_before_usd": 0.223275,
+    "billed_this_run_usd": 0.041194
+  },
+  "breaker": {
+    "halted": false,
+    "reason_code": null,
+    "reason": null,
+    "calls": 67,
+    "failures": 0
+  },
+  "errors": {},
+  "exit_counts": {
+    "0": 66,
+    "1": 1
+  },
+  "cached_cases": 0
+}

@@ -170,6 +170,14 @@ clinician's hand.
     "artefact": "evals/results/leak-allergy-v1-stripped/scores.json",
     "path": ["pooled", "recall"], "value": 0.4889
   },
+  "paraphrase_pooled_recall": {
+    "artefact": "evals/results/paraphrase-v1-live/scores.json",
+    "path": ["pooled", "recall"], "value": 0.75
+  },
+  "paraphrase_medication_recall": {
+    "artefact": "evals/results/paraphrase-v1-live/scores.json",
+    "path": ["per_field", "medication", "recall"], "value": 0.7193
+  },
   "judge_observed_agreement": {
     "artefact": "evals/results/judge-gold-v2-live/calibration.json",
     "path": ["calibration", "pooled", "cohens_kappa", "observed_agreement"],
@@ -2533,3 +2541,51 @@ reduces the coupling but does not remove it. A stronger judge, a different rubri
 enabled might clear the gate; this measures the cheap judge that was actually tried, at $0.0696
 across all three arms. The negative result is bounded accordingly: it says *this* judge is not
 adoptable, not that no judge is.
+
+### 6.9 The near-distribution arm: the same consults, dictated differently
+
+§6.6 measured what happens when a *structural* cue is removed. This measures what happens when
+the prose around the facts changes while the facts stay in the same words — the shift a system
+reading dictated speech meets every day, and the half of the adversarial-testing claim that
+`docs/forensic_audit.md` §3.2 graded missing.
+
+**Construction.** `evals/paraphrase.py` re-dictates all 67 Eka Care consults with six named
+transforms, each modelling one way dictation varies: the dosage-form cue dropped (`Tablet
+paracetamol` → `paracetamol`), meal timing rephrased (`after food` → `post meals`), plan verbs
+rewritten, hesitation fillers inserted, punctuation drift, and inconsistent capitalisation. Every
+transform acts **strictly outside the spans carrying a gold value**, so the value labels are
+byte-identical to gold-v2 and the two sets are paired field for field. 66 of 67 cases changed;
+`case_036` carries no gold value and matches no trigger, so it cannot vary. Sealed
+`paraphrase-v1`, `fa3fa8bf…5642b`, deterministic at seed 42, no model in the label path.
+
+| Scope | Intact (gold-v2) | Re-dictated | Δ | Flips right/wrong | McNemar exact | Fisher (unpaired — not the applicable test) |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Pooled | 108/148 (73.0%) | 111/148 (75.0%) | +2.0 pp | 9 / 6 | **0.6072** | 0.7911 |
+| Medication | 40/57 (70.2%) | 41/57 (71.9%) | +1.8 pp | 4 / 3 | 1.0000 | 1.0000 |
+| Dose | 25/38 (65.8%) | 27/38 (71.1%) | +5.3 pp | 4 / 2 | 0.6875 | 0.8054 |
+| Frequency | 43/53 (81.1%) | 43/53 (81.1%) | 0.0 pp | 1 / 1 | 1.0000 | 1.0000 |
+
+**The finding, stated against §6.6 rather than alone.** Surface re-dictation costs nothing
+measurable; removing a structural header costs 25 points of allergy recall. The crutch this model
+leans on is **not prose formatting in general — it is specifically the ALL-CAPS section header**.
+Dropping the word `Tablet` before 43 drug names, rephrasing meal timing on 30 notes and adding
+dictation fillers to 56 changed 15 field decisions in total, 9 of them for the better. That is a
+sharper claim than either measurement makes on its own, and it is only available because the two
+perturbations were built to the same standard and scored the same way.
+
+**What the large p-value does and does not say.** It does not say the two conditions are
+equivalent. With 15 discordant pairs the evaluation cannot resolve an effect smaller than roughly
+8 points either way, so a modest degradation remains consistent with this data. What can be said
+without a test is the count: **no named defect appeared** that was absent from the intact run, and
+the failure taxonomy is unchanged — the medication slot still explains the residual.
+
+**The +2.0 pp is not an improvement.** 9 flips one way against 6 is noise, and reporting it as a
+gain would be the exact error §5.6 of `CLAUDE.md` exists to prevent. It is recorded here because
+suppressing a direction one does not like is worse than reporting a null.
+
+**Honesty block.** The facts are stated in the *same words* by construction — this measures
+robustness to surrounding prose, not to semantic paraphrase, and a set that also re-worded the
+values would no longer be strictly paired. It does not model code-switched dictation (case_004 is
+romanised Hindi and was re-dictated only in its English portions) and it is not Singapore
+polyclinic phrasing. Six transforms are not the space of dictation variation; they are six
+plausible directions in it, chosen before the run and named so a failure attributes.

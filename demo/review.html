@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
-<title>MediExtract review &mdash; 20260920T133717Z-gemini-2.5-flash</title>
+<title>MediExtract review &mdash; 20260924T170607Z-gemini-2.5-flash</title>
 <style>
 :root { --ink:#16191d; --muted:#5b6672; --line:#d8dee6; --bg:#fbfcfd; --panel:#fff;
         --ok:#0a6b3d; --ok-bg:#e6f4ec; --held:#8a4b00; --held-bg:#fdf1e2;
@@ -209,19 +209,19 @@ footer { padding:0 24px 40px; color:var(--muted); font-size:12px; max-width:88ch
 
 <header>
   <h1>MediExtract &mdash; verification screen</h1>
-  <p class="sub">Run 20260920T133717Z-gemini-2.5-flash &middot; google/gemini-2.5-flash
+  <p class="sub">Run 20260924T170607Z-gemini-2.5-flash &middot; google/gemini-2.5-flash
      &middot; live &middot; prompt
      a92d2abcb2af4294
-     &middot; experiment p0-prompt-fixes</p>
+     &middot; experiment near-distribution-paraphrase</p>
   <div class="tiles"><div class="tile"><span class="k">notes</span><span class="v">67</span></div>
-<div class="tile"><span class="k">median answer</span><span class="v">1213 ms</span></div>
-<div class="tile"><span class="k">slowest</span><span class="v">11993 ms</span></div>
+<div class="tile"><span class="k">median answer</span><span class="v">1266 ms</span></div>
+<div class="tile"><span class="k">slowest</span><span class="v">12163 ms</span></div>
 <div class="tile"><span class="k">cost for the batch</span><span class="v">$0.0412</span></div>
 <div class="tile"><span class="k">cost per note</span><span class="v">$0.000615</span></div>
-<div class="tile"><span class="k">recall</span><span class="v">0.6452</span></div>
-<div class="tile"><span class="k">precision</span><span class="v">0.6944</span></div>
-<div class="tile"><span class="k">abstention rate</span><span class="v">0.027</span></div>
-<div class="tile"><span class="k">silent-failure rate</span><span class="v">0.3077</span></div></div>
+<div class="tile"><span class="k">recall</span><span class="v">0.75</span></div>
+<div class="tile"><span class="k">precision</span><span class="v">0.7551</span></div>
+<div class="tile"><span class="k">abstention rate</span><span class="v">0.0068</span></div>
+<div class="tile"><span class="k">silent-failure rate</span><span class="v">0.2466</span></div></div>
   <p class="caveat">Recall and the other rates come from this run's
      <code>scores.json</code> against the sealed gold set, and are the
      pre-registered numbers, not a re-scoring. Every field below is the gated
@@ -296,7 +296,7 @@ footer { padding:0 24px 40px; color:var(--muted); font-size:12px; max-width:88ch
 <input type="radio" name="case" id="r-case_066">
 <input type="radio" name="case" id="r-case_067">
 <nav><label for="r-case_001">case_001<span class="badge">3 ok</span></label>
-<label for="r-case_002">case_002<span class="badge">1 ok</span></label>
+<label for="r-case_002">case_002<span class="badge">nothing stated</span></label>
 <label for="r-case_003">case_003<span class="badge">2 ok</span></label>
 <label for="r-case_004">case_004<span class="badge">1 held</span></label>
 <label for="r-case_005">case_005<span class="badge">3 ok</span></label>
@@ -304,20 +304,20 @@ footer { padding:0 24px 40px; color:var(--muted); font-size:12px; max-width:88ch
 <label for="r-case_007">case_007<span class="badge">nothing stated</span></label>
 <label for="r-case_008">case_008<span class="badge">3 ok</span></label>
 <label for="r-case_009">case_009<span class="badge">2 ok</span></label>
-<label for="r-case_010">case_010<span class="badge">3 ok</span></label>
+<label for="r-case_010">case_010<span class="badge">2 ok</span></label>
 <label for="r-case_011">case_011<span class="badge">2 ok</span></label>
 <label for="r-case_012">case_012<span class="badge">2 ok</span></label>
 <label for="r-case_013">case_013<span class="badge">nothing stated</span></label>
 <label for="r-case_014">case_014<span class="badge">nothing stated</span></label>
 <label for="r-case_015">case_015<span class="badge">2 ok</span></label>
-<label for="r-case_016">case_016<span class="badge">1 held</span></label>
-<label for="r-case_017">case_017<span class="badge">2 held</span></label>
+<label for="r-case_016">case_016<span class="badge">3 ok</span></label>
+<label for="r-case_017">case_017<span class="badge">3 ok</span></label>
 <label for="r-case_018">case_018<span class="badge">2 ok</span></label>
-<label for="r-case_019">case_019<span class="badge">2 ok</span></label>
+<label for="r-case_019">case_019<span class="badge">3 ok</span></label>
 <label for="r-case_020">case_020<span class="badge">3 ok</span></label>
 <label for="r-case_021">case_021<span class="badge">3 ok</span></label>
 <label for="r-case_022">case_022<span class="badge">3 ok</span></label>
-<label for="r-case_023">case_023<span class="badge">2 ok</span></label>
+<label for="r-case_023">case_023<span class="badge">3 ok</span></label>
 <label for="r-case_024">case_024<span class="badge">2 ok</span></label>
 <label for="r-case_025">case_025<span class="badge">3 ok</span></label>
 <label for="r-case_026">case_026<span class="badge">3 ok</span></label>
@@ -331,7 +331,7 @@ footer { padding:0 24px 40px; color:var(--muted); font-size:12px; max-width:88ch
 <label for="r-case_034">case_034<span class="badge">2 ok</span></label>
 <label for="r-case_035">case_035<span class="badge">nothing stated</span></label>
 <label for="r-case_036">case_036<span class="badge">nothing stated</span></label>
-<label for="r-case_037">case_037<span class="badge">2 ok</span></label>
+<label for="r-case_037">case_037<span class="badge">3 ok</span></label>
 <label for="r-case_038">case_038<span class="badge">3 ok</span></label>
 <label for="r-case_039">case_039<span class="badge">3 ok</span></label>
 <label for="r-case_040">case_040<span class="badge">1 held</span></label>
@@ -382,11 +382,11 @@ footer { padding:0 24px 40px; color:var(--muted); font-size:12px; max-width:88ch
     </tbody>
   </table>
   <p class="meta">
-    2099 ms to answer
+    1927 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000605 billed
-    &middot; 791 in / 147 out
+    &middot; $0.000604 billed
+    &middot; 787 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -396,25 +396,25 @@ footer { padding:0 24px 40px; color:var(--muted); font-size:12px; max-width:88ch
   <h2>case_002</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">Complaint of pain abdomen. Vomiting, fever since 3 days.  On examination afebrile.  cvs normal, rs normal. Abdomen tenderness on the rif  Diagnosis looked like Acute appendicitis. Advices <mark class="q-medication" title="medication">Tab MRD</mark>  </p>
+    <p class="note">Complaint of pain abdomen. Vomiting, fever since 3 days.  On examination afebrile.  cvs normal, rs normal. Abdomen tenderness on the rif  Diagnosis looked like Acute appendicitis. Advices Tab MRD  </p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>MRD</strong></td><td><q>Tab MRD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>medication</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1229 ms to answer
+    1142 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000573 billed
-    &middot; 801 in / 133 out
+    &middot; $0.000561 billed
+    &middot; 796 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -439,11 +439,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1187 ms to answer
+    1255 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000621 billed
-    &middot; 894 in / 141 out
+    &middot; $0.000620 billed
+    &middot; 890 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -461,17 +461,17 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     <th>Status and what to do</th></tr></thead>
     <tbody>
 <tr class="ok"><th>medication</th><td><strong>Syndopa</strong></td><td><q>Syndopa</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="held"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span><div class="rejected"><span class="tag">engineering detail, not clinical data</span> the model proposed <code>half</code> and the gate refused it</div></td><td><span class="blank">no quote</span></td><td class="status">BLANK (Abstained: Number differs from dictation)<br><span class="action">Left blank on purpose. Type it in yourself if the dictation says it.</span></td></tr>
+<tr class="held"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span><div class="rejected"><span class="tag">engineering detail, not clinical data</span> the model proposed <code>not_stated</code> and the gate refused it</div></td><td><span class="blank">no quote</span></td><td class="status">BLANK (Abstained: Number differs from dictation)<br><span class="action">Left blank on purpose. Type it in yourself if the dictation says it.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>TDS</strong></td><td><q>TDS</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1194 ms to answer
+    1289 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000632 billed
-    &middot; 930 in / 141 out
+    &middot; $0.000635 billed
+    &middot; 925 in / 143 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -495,11 +495,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1116 ms to answer
+    1317 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000631 billed
-    &middot; 844 in / 151 out
+    &middot; $0.000630 billed
+    &middot; 842 in / 151 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -523,11 +523,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1257 ms to answer
+    1099 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000661 billed
-    &middot; 927 in / 153 out
+    &middot; $0.000658 billed
+    &middot; 917 in / 153 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -551,7 +551,7 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1107 ms to answer
+    1487 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000570 billed
@@ -565,25 +565,25 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
   <h2>case_008</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">Symptoms are fever, cold, cough. diagnosis: viral fever, URTI . medicines.<mark class="q-medication" title="medication">Dolo</mark> <mark class="q-dose" title="dose">650</mark>,  <mark class="q-frequency" title="frequency">twice a day</mark>. After meals, 7 days. Augmentin.One dosage at a time, twice a day, after meal for 7 days. Test prescribed,  CBC, lipid profile, HbA1C. Follow-up visit after 7 days.advices: daily walk for 30 minutes, avoid oily and cold</p>
+    <p class="note">Symptoms are fever, cold, cough. diagnosis: viral fever, URTI . medicines.<mark class="q-medication" title="medication">Dolo </mark><mark class="q-dose q-medication" title="dose, medication">650</mark>,  <mark class="q-frequency" title="frequency">twice a day</mark>. After meals, 7 days. Augmentin.One dosage at a time, twice a day, after meal for 7 days. Test prescribed,  CBC, lipid profile, HbA1C. Follow-up visit after 7 days.advices: daily walk for 30 minutes, avoid oily and cold</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo 650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>650</strong></td><td><q>650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1325 ms to answer
+    1202 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000617 billed
-    &middot; 849 in / 145 out
+    &middot; $0.000627 billed
+    &middot; 847 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -607,11 +607,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1264 ms to answer
+    1262 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000593 billed
-    &middot; 785 in / 143 out
+    &middot; 784 in / 143 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -621,25 +621,25 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
   <h2>case_010</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">symptoms are fever, cold, cough. diagnosis: viral fever and urti. medicine prescribed augmentin <mark class="q-frequency" title="frequency">twice a day</mark> after meal, <mark class="q-medication" title="medication">dolo </mark><mark class="q-dose q-medication" title="dose, medication">650</mark> twice a day after meal for 7 daystest prescribed: cbc, hba1c, lipid profile. Advices areEat healthy, walk for 30 minutes daily. Avoid, avoid oily food and cold food and follow up  after 7 days.</p>
+    <p class="note">symptoms are fever, cold, cough. diagnosis: viral fever and urti. medicine prescribed <mark class="q-medication" title="medication">augmentin</mark> <mark class="q-frequency" title="frequency">twice a day</mark> after meal, dolo 650 twice a day after meal for 7 daystest prescribed: cbc, hba1c, lipid profile. Advices areEat healthy, walk for 30 minutes daily. Avoid, avoid oily food and cold food and follow up  after 7 days.</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>dolo</strong></td><td><q>dolo 650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="ok"><th>dose</th><td><strong>650</strong></td><td><q>650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>augmentin</strong></td><td><q>augmentin</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1156 ms to answer
+    1230 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000620 billed
-    &middot; 840 in / 147 out
+    &middot; $0.000599 billed
+    &middot; 837 in / 139 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -663,11 +663,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1208 ms to answer
+    1279 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000600 billed
-    &middot; 825 in / 141 out
+    &middot; 826 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -691,11 +691,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1247 ms to answer
+    1239 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000592 billed
-    &middot; 799 in / 141 out
+    &middot; $0.000593 billed
+    &middot; 800 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -719,11 +719,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1218 ms to answer
+    1126 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000573 billed
-    &middot; 834 in / 129 out
+    &middot; 835 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -747,11 +747,11 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     </tbody>
   </table>
   <p class="meta">
-    1627 ms to answer
+    1116 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000576 billed
-    &middot; 845 in / 129 out
+    &middot; 844 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -770,16 +770,16 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     <tbody>
 <tr class="ok"><th>medication</th><td><strong>Dolostat plus R</strong></td><td><q>Dolostat plus R</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
-<tr class="ok"><th>frequency</th><td><strong>OD</strong></td><td><q>one OD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>one OD</strong></td><td><q>one OD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1120 ms to answer
+    1185 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000590 billed
-    &middot; 799 in / 140 out
+    &middot; $0.000591 billed
+    &middot; 796 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -789,25 +789,25 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
   <h2>case_016</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">This patient has fever since the last 4 days. He is also suffering from headache. Kindly prescribe him tablet <mark class="q-medication" title="medication">Combiflam</mark>, 1 tablet <mark class="q-frequency" title="frequency">TID</mark> after meal for 3 days. Tablet Pan D, 1 tablet in the morning, empty stomach for 3 days.And tablet Vomikind  MD 4 mg one tablet three times a day after food, OK.</p>
-    
+    <p class="note">This patient has fever since the last 4 days. He is also suffering from headache. Kindly prescribe him tablet <mark class="q-medication" title="medication">Combiflam</mark>, <mark class="q-dose" title="dose">1</mark> tablet <mark class="q-frequency" title="frequency">TID</mark> after meal for 3 days. Tablet Pan D, 1 tablet in the morning, empty stomach for 3 days.And tablet Vomikind  MD 4 mg one tablet three times a day after food, OK.</p>
+    <p class="caveat">Quote occurs more than once: dose (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
 <tr class="ok"><th>medication</th><td><strong>Combiflam</strong></td><td><q>Combiflam</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="held"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span><div class="rejected"><span class="tag">engineering detail, not clinical data</span> the model proposed <code>not_stated</code> and the gate refused it</div></td><td><span class="blank">no quote</span></td><td class="status">BLANK (Abstained: Contradictory output)<br><span class="action">Left blank on purpose. Type it in yourself if the dictation says it.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>1</strong></td><td><q>1</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>TID</strong></td><td><q>TID</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1213 ms to answer
+    1147 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000616 billed
-    &middot; 829 in / 147 out
+    &middot; $0.000599 billed
+    &middot; 823 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -817,25 +817,25 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
   <h2>case_017</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">Complain of cough, dyspnea. Treatment injection Dexa.Tablet CP CV twice a day for two days. Tablet Wysolone three times a day for two days. Tablet Costus Advance three times a day for two days.Tablet Deriphyllin Retard 300 milligram twice a day for two days. Tablet <mark class="q-medication" title="medication">Levopoint M</mark> <mark class="q-frequency" title="frequency">once at night</mark> for 10 days.Capsule Ompec DM twice a day before food for two days.</p>
-    
+    <p class="note">Complain of cough, dyspnea. Treatment injection Dexa.Tablet CP CV <mark class="q-frequency" title="frequency">twice a day</mark> for two days. Tablet Wysolone three times a day for two days. Tablet Costus Advance three times a day for two days.Tablet <mark class="q-medication" title="medication">Deriphyllin Retard</mark> <mark class="q-dose" title="dose">300 milligram</mark> twice a day for two days. Tablet Levopoint M once at night for 10 days.Capsule Ompec DM twice a day before food for two days.</p>
+    <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Levopoint M</strong></td><td><q>Levopoint M</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="held"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">BLANK (Abstained: Contradictory output)<br><span class="action">Left blank on purpose. Type it in yourself if the dictation says it.</span></td></tr>
-<tr class="ok"><th>frequency</th><td><strong>once at night</strong></td><td><q>once at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="held"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">BLANK (Abstained: Contradictory output)<br><span class="action">Left blank on purpose. Type it in yourself if the dictation says it.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Deriphyllin Retard</strong></td><td><q>Deriphyllin Retard</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>300 milligram</strong></td><td><q>300 milligram</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1180 ms to answer
+    1403 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000632 billed
-    &middot; 848 in / 151 out
+    &middot; $0.000644 billed
+    &middot; 840 in / 157 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -848,25 +848,25 @@ Her treatment will include capsule <mark class="q-medication" title="medication"
     <p class="note">complain of knee pain, leg painsTreatment injection Vitanova first dose, IV NS250 ml 2 units .Injection Cyanocal,
 Injection B Complex,
 Tablet Acecloran MR
-Twice a day after food for 5 days.<mark class="q-medication" title="medication">Tab Pregastar D</mark> <mark class="q-frequency" title="frequency">once at night</mark> for 10 days.</p>
+Twice a day after food for 5 days.Tab <mark class="q-medication" title="medication">Pregastar D</mark> <mark class="q-frequency" title="frequency">once at night</mark> for 10 days.</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Pregastar D</strong></td><td><q>Tab Pregastar D</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Pregastar D</strong></td><td><q>Pregastar D</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>once at night</strong></td><td><q>once at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    852 ms to answer
+    1271 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000601 billed
-    &middot; 819 in / 142 out
+    &middot; $0.000597 billed
+    &middot; 814 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -876,25 +876,25 @@ Twice a day after food for 5 days.<mark class="q-medication" title="medication">
   <h2>case_019</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">&lt;PII&gt; came with reports, showing hemoglobin lowVitamin D was low. Cholesterol was high. SGOT SGPT raised. Vitamin B12 118 low.Treatment Injection Cynocal First doseinjection Nana Nova 6 lakhs units first dose . tablet Calcirix XT once in the morning forone month . tablet Zolfer XT <mark class="q-frequency" title="frequency">once at night</mark> for 30 days . tablet <mark class="q-medication" title="medication">Statpure F</mark> once at nightfor three months.  tablet liveril forte once in the morning for six weeksNotes: This is visit of 14th April.</p>
-    <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
+    <p class="note">&lt;PII&gt; came with reports, showing hemoglobin lowVitamin D was low. Cholesterol was high. SGOT SGPT raised. Vitamin B12 118 low.Treatment Injection <mark class="q-medication" title="medication">Cynocal</mark> <mark class="q-frequency" title="frequency">First dose</mark>injection Nana Nova <mark class="q-dose" title="dose">6 lakhs units</mark> first dose . tablet Calcirix XT once in the morning forone month . tablet Zolfer XT once at night for 30 days . tablet Statpure F once at nightfor three months.  tablet liveril forte once in the morning for six weeksNotes: This is visit of 14th April.</p>
+    
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Statpure F</strong></td><td><q>Statpure F</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
-<tr class="ok"><th>frequency</th><td><strong>once at night</strong></td><td><q>once at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Cynocal</strong></td><td><q>Cynocal</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>6 lakhs units</strong></td><td><q>6 lakhs units</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>First dose</strong></td><td><q>First dose</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1483 ms to answer
+    1266 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000612 billed
-    &middot; 866 in / 141 out
+    &middot; $0.000620 billed
+    &middot; 860 in / 145 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -918,11 +918,11 @@ Twice a day after food for 5 days.<mark class="q-medication" title="medication">
     </tbody>
   </table>
   <p class="meta">
-    1028 ms to answer
+    1220 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000618 billed
-    &middot; 836 in / 147 out
+    &middot; $0.000617 billed
+    &middot; 831 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -946,11 +946,11 @@ Twice a day after food for 5 days.<mark class="q-medication" title="medication">
     </tbody>
   </table>
   <p class="meta">
-    1176 ms to answer
+    1162 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000633 billed
-    &middot; 868 in / 149 out
+    &middot; $0.000632 billed
+    &middot; 865 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -960,7 +960,7 @@ Twice a day after food for 5 days.<mark class="q-medication" title="medication">
   <h2>case_022</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">Complain of epigastric pain since morning. On examination, tenderness epigastric region.Treatment  Injection Pan IV Injection, Injection Spasmonorm.  Capsule Omez <mark class="q-frequency" title="frequency">twice a day</mark> before food for two days. Five capsules.Tablet Ondem 4mg twice a day before food for two days. Tablet Para dicyclomine three times a day for two days. <mark class="q-medication" title="medication">Tablet Mefenamic</mark> <mark class="q-dose" title="dose">500</mark>twice a day for two days.
+    <p class="note">Complain of epigastric pain since morning. On examination, tenderness epigastric region.Treatment  Injection Pan IV Injection, Injection Spasmonorm.  Capsule Omez <mark class="q-frequency" title="frequency">twice a day</mark> before food for two days. Five capsules.Tablet Ondem 4mg twice a day before food for two days. Tablet Para dicyclomine three times a day for two days. Tablet <mark class="q-medication" title="medication">Mefenamic</mark> <mark class="q-dose" title="dose">500</mark>twice a day for two days.
 Syrup Antolix O 10 ml three times a day.</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
@@ -968,18 +968,18 @@ Syrup Antolix O 10 ml three times a day.</p>
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Mefenamic</strong></td><td><q>Tablet Mefenamic</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Mefenamic</strong></td><td><q>Mefenamic</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>500</strong></td><td><q>500</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1600 ms to answer
+    1300 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000634 billed
-    &middot; 863 in / 150 out
+    &middot; $0.000629 billed
+    &middot; 854 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -989,26 +989,26 @@ Syrup Antolix O 10 ml three times a day.</p>
   <h2>case_023</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">&lt;PII&gt; to kuch nahi hai. X-ray of LS spine showing reversal of lumbar lordosis.diagnosis reversal of lumbar lordosis.  treatment injection Vitanova 6 lakhs unit first dose<mark class="q-medication" title="medication">Tablet Xykaa MR</mark> <mark class="q-frequency" title="frequency">twice a day</mark> for 5 days.
-Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before food for five days.</p>
+    <p class="note">&lt;PII&gt; to kuch nahi hai. X-ray of LS spine showing reversal of lumbar lordosis.diagnosis reversal of lumbar lordosis.  treatment injection Vitanova 6 lakhs unit first doseTablet Xykaa MR <mark class="q-frequency" title="frequency">twice a day</mark> for 5 days.
+Tablet <mark class="q-medication" title="medication">Lekace</mark> <mark class="q-dose" title="dose">100 mg</mark> twice a day for 5 days.Tablet Pantocid twice a day before food for five days.</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Xykaa MR</strong></td><td><q>Tablet Xykaa MR</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Lekace</strong></td><td><q>Lekace</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>100 mg</strong></td><td><q>100 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1276 ms to answer
+    1332 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000611 billed
-    &middot; 837 in / 144 out
+    &middot; $0.000622 billed
+    &middot; 832 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1032,11 +1032,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    997 ms to answer
+    1261 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000597 billed
-    &middot; 815 in / 141 out
+    &middot; 814 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1060,11 +1060,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    1227 ms to answer
+    1242 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000650 billed
-    &middot; 926 in / 149 out
+    &middot; 924 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1088,11 +1088,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    1441 ms to answer
+    1545 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000657 billed
-    &middot; 864 in / 159 out
+    &middot; $0.000655 billed
+    &middot; 859 in / 159 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1116,11 +1116,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    1128 ms to answer
+    1271 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000629 billed
-    &middot; 1020 in / 129 out
+    &middot; $0.000627 billed
+    &middot; 1014 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1144,11 +1144,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    1245 ms to answer
+    1202 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000553 billed
-    &middot; 769 in / 129 out
+    &middot; 768 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1172,11 +1172,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    1159 ms to answer
+    1237 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000618 billed
-    &middot; 834 in / 147 out
+    &middot; $0.000617 billed
+    &middot; 833 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1200,11 +1200,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    1167 ms to answer
+    1281 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000628 billed
-    &middot; 853 in / 149 out
+    &middot; $0.000627 billed
+    &middot; 849 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1214,25 +1214,25 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
   <h2>case_031</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">consultation, and we can just say. So doctor i have a stomach pain, for the last. How many days? Last 3 days . Where is the pain exactly?Upper abdomen near rib cage. Do you have any vomiting with the pain?  No vomiting. How is your appetite? low, less appetite. Do you have any fever?Low grade. I had, I took, I had fever. I took crocin. How many times have you passed urine in the last 24 hours? 2 - 3 times. Urine is white or yellow in colour?Yellow. How about the stools, are normal? Yeah, stools are normal. Any history of outside food 2 days, 3 days back, any outside food. party or travel? Yeah, I had biryani 2 days ago.OK, can I check you out? Yeah,right. Record ? Yeah it&#x27;s recording and you can say. yeah, abdomenNormal, Soft. Tongue is slightly moist, coated tongue. Temperature 99 degrees. On auscultationEverything is normal. Heart sounds and lungs are clinically OK. Abdomen, mild tenderness, guarding present in the epigastric area.And the diagnosis acute gastritis. query, may be due to food poisoning. And treatment is <mark class="q-medication" title="medication">Tablet Pantop</mark> <mark class="q-dose" title="dose">40 mg</mark> <mark class="q-frequency" title="frequency">once daily</mark> for 7 days on empty stomach.Tablet Taxim O 100 mg twice daily for 5 days after food. Tablet Drotin, one tablet SOS if the pain is unbearable.</p>
+    <p class="note">consultation, and we can just say. So doctor i have a stomach pain, for the last. How many days? Last 3 days . Where is the pain exactly?Upper abdomen near rib cage. Do you have any vomiting with the pain?  No vomiting. How is your appetite? low, less appetite. Do you have any fever?Low grade. I had, I took, I had fever. I took crocin. How many times have you passed urine in the last 24 hours? 2 - 3 times. Urine is white or yellow in colour?Yellow. How about the stools, are normal? Yeah, stools are normal. Any history of outside food 2 days, 3 days back, any outside food. party or travel? Yeah, I had biryani 2 days ago.OK, can I check you out? Yeah,right. Record ? Yeah it&#x27;s recording and you can say. yeah, abdomenNormal, Soft. Tongue is slightly moist, coated tongue. Temperature 99 degrees. On auscultationEverything is normal. Heart sounds and lungs are clinically OK. Abdomen, mild tenderness, guarding present in the epigastric area.And the diagnosis acute gastritis. query, may be due to food poisoning. And treatment is Tablet <mark class="q-medication" title="medication">Pantop</mark> <mark class="q-dose" title="dose">40 mg</mark> <mark class="q-frequency" title="frequency">once daily</mark> for 7 days on empty stomach.Tablet Taxim O 100 mg twice daily for 5 days after food. Tablet Drotin, one tablet SOS if the pain is unbearable.</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Pantop</strong></td><td><q>Tablet Pantop</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Pantop</strong></td><td><q>Pantop</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>40 mg</strong></td><td><q>40 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>once daily</strong></td><td><q>once daily</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1320 ms to answer
+    1414 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000679 billed
-    &middot; 1064 in / 144 out
+    &middot; $0.000678 billed
+    &middot; 1070 in / 143 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1256,11 +1256,11 @@ Tablet Lekace 100 mg twice a day for 5 days.Tablet Pantocid twice a day before f
     </tbody>
   </table>
   <p class="meta">
-    1183 ms to answer
+    1146 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000562 billed
-    &middot; 798 in / 129 out
+    &middot; 797 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1288,11 +1288,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1050 ms to answer
+    12163 ms to answer
     (budget 3000 ms)
-    &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000560 billed
-    &middot; 792 in / 129 out
+    &middot; <span class="held-tag">over budget</span>
+    &middot; $0.000558 billed
+    &middot; 792 in / 128 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1316,11 +1316,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1220 ms to answer
+    1302 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000606 billed
-    &middot; 863 in / 139 out
+    &middot; 860 in / 139 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1344,11 +1344,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    810 ms to answer
+    1164 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000580 billed
-    &middot; 859 in / 129 out
+    &middot; 860 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1372,11 +1372,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    11993 ms to answer
+    1239 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000430 billed
-    &middot; 782 in / 78 out
+    &middot; $0.000557 billed
+    &middot; 782 in / 129 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1386,25 +1386,25 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
   <h2>case_037</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">58 year old male patient came with the complaints of fever with chills for last 5 days. On arrival, the patient has temperature of 102 °F.Patient were treated with IV antibiotics with IV injection <mark class="q-medication" title="medication">Ceftriaxone</mark> <mark class="q-frequency" title="frequency">BD</mark> for the last 5 days and injection Doxycycline 100 mg BD for last 5 days.And injection PCM and other supportive management. And repeat investigations showed sequential decrease in WBC counts.and even increase in platelet count. Patient, patient is afebrile for the last 3 days.Hence being discharged with the following advises</p>
+    <p class="note">58 year old male patient came with the complaints of fever with chills for last 5 days. On arrival, the patient has temperature of 102 °F.Patient were treated with IV antibiotics with IV injection Ceftriaxone <mark class="q-frequency" title="frequency">BD</mark> for the last 5 days and injection <mark class="q-medication" title="medication">Doxycycline</mark> <mark class="q-dose" title="dose">100 mg</mark> BD for last 5 days.And injection PCM and other supportive management. And repeat investigations showed sequential decrease in WBC counts.and even increase in platelet count. Patient, patient is afebrile for the last 3 days.Hence being discharged with the following advises</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Ceftriaxone</strong></td><td><q>Ceftriaxone</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Doxycycline</strong></td><td><q>Doxycycline</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>100 mg</strong></td><td><q>100 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>BD</strong></td><td><q>BD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1503 ms to answer
+    1259 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000614 billed
-    &middot; 872 in / 141 out
+    &middot; $0.000624 billed
+    &middot; 870 in / 145 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1428,11 +1428,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1155 ms to answer
+    1232 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000654 billed
-    &middot; 954 in / 147 out
+    &middot; $0.000653 billed
+    &middot; 951 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1456,11 +1456,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1380 ms to answer
+    1226 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000728 billed
-    &middot; 1203 in / 147 out
+    &middot; $0.000730 billed
+    &middot; 1207 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1484,11 +1484,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1352 ms to answer
+    1356 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000629 billed
-    &middot; 913 in / 142 out
+    &middot; $0.000630 billed
+    &middot; 917 in / 142 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1512,11 +1512,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1464 ms to answer
+    1220 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000635 billed
-    &middot; 874 in / 149 out
+    &middot; $0.000634 billed
+    &middot; 871 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1540,11 +1540,11 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1243 ms to answer
+    1269 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000616 billed
-    &middot; 845 in / 145 out
+    &middot; 844 in / 145 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1568,7 +1568,7 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     </tbody>
   </table>
   <p class="meta">
-    1114 ms to answer
+    1141 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000605 billed
@@ -1584,7 +1584,7 @@ Mild MR, mild TRNo clot, no pericardial effusion.</p>
     <h3>The dictation, as recorded</h3>
     <p class="note">Patient came with the complaint of breathlessness, cough, fever for the last one week.On arrival patient saturation is SPO2 is 88 , 87% on room air. Patient got started on IV antibiotics in view of increased CRP.and CBC showed neutrophilic leukocytosis with AKI picture with serum creat of 1.3, and patient  IV antibiotics and IV supplementary treatment.and serial CRP and CBC were in decreasing trend and patient had no further fever spikes.for four days patient was in oxygen support with maximum requirement of four to five liters. Later on patientmaintained his saturation in room air for the last six days. Patient got mobilized with the help of physiotherapy. Active physiotherapy was done for about six days.Patient currently requires minimal support for walking and patient had no other complaints. Patient got started on plecanatidein view of his IBS with constipation and patient well responded to plecanatide and patient daily passes the motionAnd currently patient condition is stable with BP maintained around 130 to 140 mm of Hg.Saturation 97 on room air. No tachypnea, no fever. And patient hence patient being discharged with thefollowing advices. Advice include Budecort nebulization SOS, Duolin BD, Asthalin.BD bar SOS
 Tab Deriphyllin Retard 150 mg
-SOSTab Dytor 10mg OD in the morning and Tab Neurokind LC in the afternoon.Tab Shelcal XT in the morning 1-0-0. Tab Normaxin RT 1-0-0.<mark class="q-medication" title="medication">Tablet Plecanatide</mark> <mark class="q-dose" title="dose">2 mg 3 mg</mark> <mark class="q-frequency" title="frequency">in the night</mark>.
+SOSTab Dytor 10mg OD in the morning and Tab Neurokind LC in the afternoon.Tab Shelcal XT in the morning 1-0-0. Tab Normaxin RT 1-0-0.Tablet <mark class="q-medication" title="medication">Plecanatide</mark> <mark class="q-dose" title="dose">2 mg 3 mg</mark> <mark class="q-frequency" title="frequency">in the night</mark>.
 Tablet Mirabegron 50 mg.in the morning. Tab Tamvas T 0-0-1 in the night. Tab Dolo SOS</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 2x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
@@ -1592,18 +1592,18 @@ Tablet Mirabegron 50 mg.in the morning. Tab Tamvas T 0-0-1 in the night. Tab Dol
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Plecanatide</strong></td><td><q>Tablet Plecanatide</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Plecanatide</strong></td><td><q>Plecanatide</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>2 mg 3 mg</strong></td><td><q>2 mg 3 mg</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>in the night</strong></td><td><q>in the night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1121 ms to answer
+    2935 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000723 billed
-    &middot; 1125 in / 154 out
+    &middot; $0.000718 billed
+    &middot; 1120 in / 153 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1627,11 +1627,11 @@ Tablet Mirabegron 50 mg.in the morning. Tab Tamvas T 0-0-1 in the night. Tab Dol
     </tbody>
   </table>
   <p class="meta">
-    1312 ms to answer
+    1662 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000633 billed
-    &middot; 853 in / 151 out
+    &middot; $0.000458 billed
+    &middot; 851 in / 151 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1642,25 +1642,25 @@ Tablet Mirabegron 50 mg.in the morning. Tab Tamvas T 0-0-1 in the night. Tab Dol
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
     <p class="note">&lt;PII&gt; came on 14th of April with complaints, with the reports of raised total cholesterol.raised LDL cholesterol, low vitamin D, raised uric acid, HbA1c raised.Fasting blood sugar of 120.
-Total IGE 2107.examination, blood pressure was 137 by 81, pulse of 71.complaint of dyspnea on exertion, joint pains. treatment givenInjection Vitanova first dose. Tablet Calcirix XT once in the morning for 15 days. Tablet Levopoint M.at night for 10 days. Tablet Ubexa 40 once in the morning for 10 days. Tablet <mark class="q-medication" title="medication">Statpure F</mark>.milligram <mark class="q-frequency" title="frequency">once at night</mark> for three months.</p>
+Total IGE 2107.examination, blood pressure was 137 by 81, pulse of 71.complaint of dyspnea on exertion, joint pains. treatment givenInjection Vitanova first dose. Tablet Calcirix XT once in the morning for 15 days. Tablet Levopoint M.at night for 10 days. Tablet Ubexa 40 once in the morning for 10 days. Tablet <mark class="q-medication" title="medication">Statpure F.</mark>milligram <mark class="q-frequency" title="frequency">once at night</mark> for three months.</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Statpure F</strong></td><td><q>Statpure F</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Statpure F</strong></td><td><q>Statpure F.</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>once at night</strong></td><td><q>once at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1033 ms to answer
+    1406 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000627 billed
-    &middot; 914 in / 141 out
+    &middot; $0.000626 billed
+    &middot; 912 in / 141 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1672,7 +1672,7 @@ Total IGE 2107.examination, blood pressure was 137 by 81, pulse of 71.complaint 
     <h3>The dictation, as recorded</h3>
     <p class="note">complain of headache, not better. giddiness  On examination blood pressure 136 systolic and 88 diastolic.  On examination sinuses were tender. Treatment: tablet Cepodem  200 twice a day for two days. Injection Diclofenac 2 ml stat. Tablet Zady 250 twice a day for two days.  Tablet Colday
 Three times a day for two days
-<mark class="q-medication" title="medication">Tablet Mefenamic</mark> <mark class="q-dose" title="dose">500</mark>
+Tablet <mark class="q-medication" title="medication">Mefenamic</mark> <mark class="q-dose" title="dose">500</mark>
 <mark class="q-frequency" title="frequency">Twice a day</mark> for two days
 Tablet Levocet once at night for two days  Tablet Solopose MD once at night for two days. Diagnosis sinusitis.  Tension headache</p>
     
@@ -1681,18 +1681,18 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Mefenamic</strong></td><td><q>Tablet Mefenamic</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Mefenamic</strong></td><td><q>Mefenamic</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>500</strong></td><td><q>500</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>Twice a day</strong></td><td><q>Twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1213 ms to answer
+    1266 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000646 billed
-    &middot; 888 in / 152 out
+    &middot; $0.000640 billed
+    &middot; 876 in / 151 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1702,25 +1702,25 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
   <h2>case_048</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">complain of cough, dry cough. On examination  Temperature normal 97 degree Fahrenheit. BP 116 by 71.  Pulse 74 per minute  Treatment tablet Cepodem 200 <mark class="q-frequency" title="frequency">twice a day</mark> for two days.  tablet <mark class="q-medication" title="medication">Zady</mark>  <mark class="q-dose" title="dose">250 milligram</mark> twice a day for two days. Tablet Costus Advance three times a day for two days. Tablet Mefenamic 500  twice a day for two days. Tablet C-Poff, three times a day for two days.</p>
+    <p class="note">complain of cough, dry cough. On examination  Temperature normal 97 degree Fahrenheit. BP 116 by 71.  Pulse 74 per minute  Treatment tablet Cepodem 200 <mark class="q-frequency" title="frequency">twice a day</mark> for two days.  tablet Zady  250 milligram twice a day for two days. Tablet Costus Advance three times a day for two days. Tablet <mark class="q-medication" title="medication">Mefenamic</mark> <mark class="q-dose" title="dose">500</mark>  twice a day for two days. Tablet C-Poff, three times a day for two days.</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 3x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Zady</strong></td><td><q>Zady</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="ok"><th>dose</th><td><strong>250 milligram</strong></td><td><q>250 milligram</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Mefenamic</strong></td><td><q>Mefenamic</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>500</strong></td><td><q>500</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1150 ms to answer
+    1166 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000632 billed
-    &middot; 865 in / 149 out
+    &middot; $0.000629 billed
+    &middot; 856 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1744,11 +1744,11 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
     </tbody>
   </table>
   <p class="meta">
-    1088 ms to answer
+    1246 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000638 billed
-    &middot; 884 in / 149 out
+    &middot; $0.000634 billed
+    &middot; 873 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1772,11 +1772,11 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
     </tbody>
   </table>
   <p class="meta">
-    810 ms to answer
+    1192 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000613 billed
-    &middot; 834 in / 145 out
+    &middot; $0.000610 billed
+    &middot; 824 in / 145 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1786,25 +1786,25 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
   <h2>case_051</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">complaint of headache, nausea, ghabrahat since one day. On examination, BP 135 by 92.  pulse 80 per minute.  history of panic disorders,  past history of panic disorders.  Treatment: Injection Cynocal First.  Injection Vitanova first dose. Tab Tablet Calcirix XT once in the morning for 15 days. Capsule Omez twice a day for one day. Tablet Meftal Forte  twice a day for one day. Tablet Ondem MD twice a day for one day. <mark class="q-medication" title="medication">Tablet Solopose MD</mark> <mark class="q-frequency" title="frequency">once at night</mark>.  for two days.  Diagnosis anxiety disorder</p>
+    <p class="note">complaint of headache, nausea, ghabrahat since one day. On examination, BP 135 by 92.  pulse 80 per minute.  history of panic disorders,  past history of panic disorders.  Treatment: Injection Cynocal First.  Injection Vitanova first dose. Tab Tablet Calcirix XT once in the morning for 15 days. Capsule Omez twice a day for one day. Tablet Meftal Forte  twice a day for one day. Tablet Ondem MD twice a day for one day. Tablet <mark class="q-medication" title="medication">Solopose MD</mark> <mark class="q-frequency" title="frequency">once at night</mark>.  for two days.  Diagnosis anxiety disorder</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Solopose MD</strong></td><td><q>Tablet Solopose MD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Solopose MD</strong></td><td><q>Solopose MD</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>once at night</strong></td><td><q>once at night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1471 ms to answer
+    1285 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000626 billed
-    &middot; 886 in / 144 out
+    &middot; $0.000619 billed
+    &middot; 870 in / 143 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1828,7 +1828,7 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
     </tbody>
   </table>
   <p class="meta">
-    706 ms to answer
+    1287 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000568 billed
@@ -1842,25 +1842,25 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
   <h2>case_053</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">&lt;PII&gt;, patient,  38 years old, male, came with complaints ofLoose motions, elevated temperature, and chest pain, for the last three days, has been taking <mark class="q-medication" title="medication">Dolo</mark> <mark class="q-dose" title="dose">650</mark>,  to manage the pain.has been taking Sinarest and Pantop. Heart rate is normal at 77 beats per minute. Blood pressure is normal, 120 over 80.And pulse, pulse ox , pulse saturation is good at 99%.</p>
+    <p class="note">&lt;PII&gt;, patient,  38 years old, male, came with complaints ofLoose motions, elevated temperature, and chest pain, for the last three days, has been taking <mark class="q-medication" title="medication">Dolo </mark><mark class="q-dose q-medication" title="dose, medication">650</mark>,  to manage the pain.has been taking Sinarest and Pantop. Heart rate is normal at 77 beats per minute. Blood pressure is normal, 120 over 80.And pulse, pulse ox , pulse saturation is good at 99%.</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo 650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>650</strong></td><td><q>650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1141 ms to answer
+    1142 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000603 billed
-    &middot; 853 in / 139 out
+    &middot; $0.000613 billed
+    &middot; 852 in / 143 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1870,8 +1870,8 @@ Tablet Levocet once at night for two days  Tablet Solopose MD once at night for 
   <h2>case_054</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">complain of headache, nausea, cold, cough, body ache.  Diagnosis migraine, URTI. On examination anemia.  treatment: Injection orofer S  Tablet Cepodem 200 <mark class="q-frequency" title="frequency">twice a day</mark> for two days.
-Tablet Zady.  250 twice a day for two days. Tablet Colday thrice a day for two days. Tablet <mark class="q-medication" title="medication">Mefenamic</mark> <mark class="q-dose" title="dose">500</mark> twice a day for two days.  Tablet Levocet once at night for two days.
+    <p class="note">complain of headache, nausea, cold, cough, body ache.  Diagnosis migraine, URTI. On examination anemia.  treatment: Injection orofer S  Tablet <mark class="q-medication" title="medication">Cepodem</mark> <mark class="q-dose" title="dose">200</mark> <mark class="q-frequency" title="frequency">twice a day</mark> for two days.
+Tablet Zady.  250 twice a day for two days. Tablet Colday thrice a day for two days. Tablet Mefenamic 500 twice a day for two days.  Tablet Levocet once at night for two days.
 Capsule Ompec DM twice a day before food for five days.  Tablet Meftal Forte twice a day for five days,  to start after two days.</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 5x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
@@ -1879,18 +1879,18 @@ Capsule Ompec DM twice a day before food for five days.  Tablet Meftal Forte twi
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Mefenamic</strong></td><td><q>Mefenamic</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="ok"><th>dose</th><td><strong>500</strong></td><td><q>500</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Cepodem</strong></td><td><q>Cepodem</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>200</strong></td><td><q>200</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1134 ms to answer
+    1334 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000639 billed
-    &middot; 889 in / 149 out
+    &middot; $0.000624 billed
+    &middot; 873 in / 145 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1903,25 +1903,25 @@ Capsule Ompec DM twice a day before food for five days.  Tablet Meftal Forte twi
     <p class="note">complain of cough not better irritation throat  Treatment
 Injection TT
 stat
-Tab <mark class="q-medication" title="medication">Amoxyclav</mark> <mark class="q-dose" title="dose">625</mark> <mark class="q-frequency" title="frequency">twice a day</mark> for two days.  Tablet Meftal Forte twice a day for two days. Tab Para 650 once in the afternoon for two days.  Tab Levocet twice a day for two days. Capsule Ompec D M twice a day for two days before food. Tablet Clarigard.  250 milligram twice a day for 5 days. On examination, throat congestion.</p>
+Tab Amoxyclav 625 <mark class="q-frequency" title="frequency">twice a day</mark> for two days.  Tablet Meftal Forte twice a day for two days. Tab Para 650 once in the afternoon for two days.  Tab Levocet twice a day for two days. Capsule Ompec D M twice a day for two days before food. Tablet <mark class="q-medication" title="medication">Clarigard</mark>.  <mark class="q-dose" title="dose">250 milligram</mark> twice a day for 5 days. On examination, throat congestion.</p>
     <p class="caveat">Quote occurs more than once: frequency (appears 5x). The gate checks that the quote is in the note, not which occurrence it came from.</p>
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Amoxyclav</strong></td><td><q>Amoxyclav</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="ok"><th>dose</th><td><strong>625</strong></td><td><q>625</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Clarigard</strong></td><td><q>Clarigard</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>dose</th><td><strong>250 milligram</strong></td><td><q>250 milligram</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>twice a day</strong></td><td><q>twice a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1217 ms to answer
+    1324 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000626 billed
-    &middot; 862 in / 147 out
+    &middot; $0.000633 billed
+    &middot; 853 in / 151 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1945,11 +1945,11 @@ Tab <mark class="q-medication" title="medication">Amoxyclav</mark> <mark class="
     </tbody>
   </table>
   <p class="meta">
-    1535 ms to answer
+    1306 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000650 billed
-    &middot; 890 in / 153 out
+    &middot; $0.000646 billed
+    &middot; 878 in / 153 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -1977,11 +1977,11 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    1198 ms to answer
+    1199 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000630 billed
-    &middot; 910 in / 143 out
+    &middot; $0.000627 billed
+    &middot; 899 in / 143 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2005,11 +2005,11 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    729 ms to answer
+    1252 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000622 billed
-    &middot; 865 in / 145 out
+    &middot; $0.000619 billed
+    &middot; 856 in / 145 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2019,25 +2019,25 @@ Bifilac GG sachet.  Once for for three days.</p>
   <h2>case_059</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">Chief complaints of cough. medications  Cepodem 200 twice a day for two days. tablet Azi  250 twice a day for two days. tablet Meftal Forte twice a day for two days. tablet  <mark class="q-medication" title="medication">Dolo </mark><mark class="q-dose q-medication" title="dose, medication">650</mark> <mark class="q-frequency" title="frequency">once in the afternoon</mark> for two days. Syrup  Costus D 10 ml three times a day. Tablet Levoset once at night for two days.  Notes: patient not examined.</p>
+    <p class="note">Chief complaints of cough. medications  Cepodem 200 twice a day for two days. tablet Azi  250 twice a day for two days. tablet Meftal Forte twice a day for two days. tablet  <mark class="q-medication" title="medication">Dolo</mark> <mark class="q-dose" title="dose">650</mark> <mark class="q-frequency" title="frequency">once in the afternoon</mark> for two days. Syrup  Costus D 10 ml three times a day. Tablet Levoset once at night for two days.  Notes: patient not examined.</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo 650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>650</strong></td><td><q>650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>once in the afternoon</strong></td><td><q>once in the afternoon</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1239 ms to answer
+    1199 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000631 billed
-    &middot; 846 in / 151 out
+    &middot; $0.000619 billed
+    &middot; 838 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2047,25 +2047,25 @@ Bifilac GG sachet.  Once for for three days.</p>
   <h2>case_060</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">Patient is experiencing cough, cold and sneezing, blocked nose for the past five days. Advisinghot water with honey along with steam three times a day, also advising <mark class="q-medication" title="medication">Dolo </mark><mark class="q-dose q-medication" title="dose, medication">650</mark> <mark class="q-frequency" title="frequency">two times a day</mark> after breakfast after dinner</p>
+    <p class="note">Patient is experiencing cough, cold and sneezing, blocked nose for the past five days. Advisinghot water with honey along with steam three times a day, also advising <mark class="q-medication" title="medication">Dolo</mark> <mark class="q-dose" title="dose">650</mark> <mark class="q-frequency" title="frequency">two times a day</mark> after breakfast after dinner</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo 650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>dose</th><td><strong>650</strong></td><td><q>650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="ok"><th>frequency</th><td><strong>two times a day</strong></td><td><q>two times a day</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    1305 ms to answer
+    1511 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000617 billed
-    &middot; 800 in / 151 out
+    &middot; $0.000607 billed
+    &middot; 800 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2089,11 +2089,11 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    978 ms to answer
+    1185 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000625 billed
-    &middot; 842 in / 149 out
+    &middot; $0.000626 billed
+    &middot; 844 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2117,11 +2117,11 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    911 ms to answer
+    1371 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000629 billed
-    &middot; 872 in / 147 out
+    &middot; 870 in / 147 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2145,7 +2145,7 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    1258 ms to answer
+    1316 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000608 billed
@@ -2173,11 +2173,11 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    1221 ms to answer
+    1326 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000617 billed
-    &middot; 815 in / 149 out
+    &middot; $0.000616 billed
+    &middot; 813 in / 149 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2201,11 +2201,11 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    1424 ms to answer
+    1292 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000578 billed
-    &middot; 785 in / 137 out
+    &middot; $0.000577 billed
+    &middot; 781 in / 137 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2215,25 +2215,25 @@ Bifilac GG sachet.  Once for for three days.</p>
   <h2>case_066</h2>
   <div class="dictation">
     <h3>The dictation, as recorded</h3>
-    <p class="note">Patient has fever, take <mark class="q-medication" title="medication">Dolo</mark> <mark class="q-dose" title="dose">650</mark>. Take Crocin tablet,  whenever there is a headache, take amoxycillin 3 times a day, 1 in the morning, 1 in the evening, and one before night.Take proper bed rest, for insomnia, giving a sedative called Zolpidem. For pain medication, take Tramadol. For any other issues, report, let&#x27;s keep a follow up within the next week.</p>
+    <p class="note">Patient has fever, take Dolo 650. Take Crocin tablet,  whenever there is a headache, take <mark class="q-medication" title="medication">amoxycillin</mark> <mark class="q-frequency" title="frequency">3 times a day, 1 in the morning, 1 in the evening, and one before night</mark>.Take proper bed rest, for insomnia, giving a sedative called Zolpidem. For pain medication, take Tramadol. For any other issues, report, let&#x27;s keep a follow up within the next week.</p>
     
   </div>
   <table class="fields">
     <thead><tr><th>Field</th><th>Value</th><th>Quote from your dictation</th>
     <th>Status and what to do</th></tr></thead>
     <tbody>
-<tr class="ok"><th>medication</th><td><strong>Dolo</strong></td><td><q>Dolo</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="ok"><th>dose</th><td><strong>650</strong></td><td><q>650</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
-<tr class="none"><th>frequency</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>medication</th><td><strong>amoxycillin</strong></td><td><q>amoxycillin</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
+<tr class="none"><th>dose</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
+<tr class="ok"><th>frequency</th><td><strong>3 times a day, 1 in the morning, 1 in the evening, and one before night</strong></td><td><q>3 times a day, 1 in the morning, 1 in the evening, and one before night</q></td><td class="status">VERIFIED<br><span class="action">Check it against the quote and accept.</span></td></tr>
 <tr class="none"><th>allergy</th><td><span class="blank">&mdash; blank &mdash;</span></td><td><span class="blank">no quote</span></td><td class="status">Not stated<br><span class="action">Nothing was dictated for this field.</span></td></tr>
     </tbody>
   </table>
   <p class="meta">
-    714 ms to answer
+    1444 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
-    &middot; $0.000602 billed
-    &middot; 848 in / 139 out
+    &middot; $0.000702 billed
+    &middot; 847 in / 179 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2257,11 +2257,11 @@ Bifilac GG sachet.  Once for for three days.</p>
     </tbody>
   </table>
   <p class="meta">
-    1221 ms to answer
+    1420 ms to answer
     (budget 3000 ms)
     &middot; <span class="ok-tag">inside budget</span>
     &middot; $0.000597 billed
-    &middot; 831 in / 139 out
+    &middot; 830 in / 139 out
     &middot; served by google/gemini-2.5-flash
     
   </p>
@@ -2270,7 +2270,7 @@ Bifilac GG sachet.  Once for for three days.</p>
 </div>
 <footer>
   <p>Generated by <code>demo/build_review.py</code> from
-     <code>20260920T133717Z-gemini-2.5-flash</code> and <code>gold_v1.json</code>. Static,
+     <code>paraphrase-v1-live</code> and <code>gold_v1.json</code>. Static,
      offline, no script: the case selector is CSS only and the page declares
      <code>default-src 'none'</code>, so it cannot reach the network. Every value shown is
      escaped, which is why the corpus's <code>&lt;PII&gt;</code> placeholders appear as text.</p>

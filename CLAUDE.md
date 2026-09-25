@@ -283,3 +283,25 @@ Gwet's is 0.2103. Quoting whichever is more flattering would be the whole failur
 The adoption gate was written in `guardrails.md` §6.1 before the code existed and is **not met**
 (0.9467 on the class gold calls correct, 0.2093 on the class it calls wrong), so the judge is not
 adopted and hand labelling still stands behind every prompt change.
+
+### 5.9 The near-distribution arm
+
+```bash
+./.venv/bin/python evals/paraphrase.py report                    # what would change, no writes
+./.venv/bin/python evals/paraphrase.py validate --seal --labeller <name>
+./.venv/bin/python evals/run_ekacare.py --gold-version paraphrase-v1 \
+    --experiment near-distribution-paraphrase --run-cap-usd 0.10
+./.venv/bin/python evals/metrics.py evals/results/gold-v2-live \
+    evals/results/paraphrase-v1-live --gold data/gold_labels/gold_v2.json
+```
+
+Six named transforms re-dictate the prose and **never touch a gold value span**. That invariant is
+what makes the arm worth running: the value labels stay byte-identical to gold-v2, so the McNemar
+against the gold-v2 live run is exact rather than approximate. `refuse_if_value_lost` blocks a
+build that drops a label, and `refuse_if_corpus_barely_moved` blocks one where under 80% of cases
+changed — a corpus that barely moved is gold-v2 wearing a different name.
+
+Pair it with §6.6 or do not report it. Alone, "recall unchanged under paraphrase" is a shrug;
+beside "recall falls 25 points when an ALL-CAPS header is removed" it localises the dependency to
+the header rather than to formatting in general. **The p-value is 0.6072 and that is a null, not
+an equivalence** — 15 discordant pairs cannot resolve an effect under about 8 points.

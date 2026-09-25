@@ -1,0 +1,1993 @@
+{
+ "schema_version": "paraphrase-v1",
+ "provenance": {
+  "dataset": "ekacare/clinical_note_generation_dataset",
+  "derived_from": {
+   "version": "gold-v2",
+   "sha256": "d5e90f5a016a542046745079766b6ef0c8cc088ee10fbb989200a05b319fa959"
+  },
+  "arm": "near-distribution surface variation",
+  "answers": "docs/forensic_audit.md section 3.2 - the near-distribution half of the adversarial-testing claim, which did not exist",
+  "seed": 42,
+  "transforms": [
+   "drop_dosage_form",
+   "rephrase_meal_timing",
+   "rephrase_plan_verbs",
+   "insert_filler",
+   "punctuation_drift",
+   "lowercase_drift"
+  ],
+  "transform_case_counts": {
+   "drop_dosage_form": 43,
+   "rephrase_meal_timing": 30,
+   "insert_filler": 56,
+   "punctuation_drift": 58,
+   "rephrase_plan_verbs": 31,
+   "lowercase_drift": 37
+  },
+  "cases_unchanged": [
+   "case_036"
+  ],
+  "invariant": "every transform acts strictly outside the spans carrying a gold value, so the value labels are byte-identical to gold-v2 and the two sets are paired field for field",
+  "labelling_rules": {
+   "values": "unchanged from gold-v2, by construction",
+   "evidence": "gold-v2's span where it survived the re-dictation, the value itself otherwise; scoring compares values, so this choice cannot move a score"
+  },
+  "measures": [
+   "recall under near-distribution surface variation, paired against the gold-v2 live run"
+  ],
+  "does_not_measure": [
+   "semantic paraphrase (the facts are stated in the same words)",
+   "code-switched or non-Latin dictation",
+   "Singapore polyclinic phrasing specifically"
+  ],
+  "sealed_at": "2026-09-24T17:05:20+00:00",
+  "sealed_by": "rohit",
+  "prompt_fingerprint": "a92d2abcb2af4294"
+ },
+ "cases": [
+  {
+   "case_id": "case_001",
+   "source_text": "paracetamol 500 three times a day post meals chymoral forte three times a day post meals right, pan d pre meals, three times a day ",
+   "ground_truth": {
+    "medication": {
+     "value": "chymoral forte",
+     "evidence": "chymoral forte",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "three times a day",
+     "evidence": "three times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:20:56+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_002",
+   "source_text": "Complains of pain abdomen okay so Vomiting, fever since 3 days. on exam afebrile cvs normal, rs normal. abdomen tenderness on the rif Impression was Acute appendicitis so Advised MRD ",
+   "ground_truth": {
+    "medication": {
+     "value": "MRD",
+     "evidence": "MRD",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:23:43+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_003",
+   "source_text": "25 year old female yeah She had progressive difficulty in upsquatting and difficulty in climbing stairs since last four to five years and the complaints are progressively worsening okay so examination showed significant proximal lower girdle weakness. there is no family history of similar disorder. Her total CPK level is normal. MRI spine which was done in the past was normal. genetic testing has not been done uh, EMG, NCV study has not been done. Impression is degenerative muscular dystrophy, possibly limb-girdle type so Her treatment will include Vernace okay so one in the afternoon, Shelcal one in the morning for a duration of one month along with physiotherapy for a duration of one month.",
+   "ground_truth": {
+    "medication": {
+     "value": "Vernace",
+     "evidence": "Vernace",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "in the afternoon",
+     "evidence": "in the afternoon",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:25:37+00:00",
+   "notes": "#attribution #negation #paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_004",
+   "source_text": "Kya ho raha hai doctor saab, teen din ho gaye. Hann right, ek side so jaati hai, to aise ghumta ghumta hai. Okay. pt has predominant complaints of giddiness. she feels in unsteadiness while walking. she has been started on anti-parkinsonian treatment in the form of Syndopa half TDS, but still the clinical picture is not convincing for Parkinson's disease but she has orofacial dyskinesias we need to consider or confirm whether she really has Parkinson's disease. so it is suggested that we should taper off her dose of Syndopa for the time being and once she is off Syndopa, we will see her after 15 days for features of Parkinson's disease. she looks little bit anxious also overall and anxiety looks to be an important part of her clinical syndrome.",
+   "ground_truth": {
+    "medication": {
+     "value": "Syndopa",
+     "evidence": "Syndopa",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "TDS",
+     "evidence": "TDS",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:28:39+00:00",
+   "notes": "#contemplation #negation #paraphrase transforms=rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_005",
+   "source_text": "Pt has diabetes mellitus since last four to five years right, Her present complaints are tingling numbness in both feet throughout day and night since last few months. Impression is diabetes mellitus related painful peripheral neuropathy. investigation suggested is NCV study right, Treatment Gabantin GRS 300 milligram right, at night. Symbal 20 milligram half at night for three days, followed by one at night to be continued for one month.",
+   "ground_truth": {
+    "medication": {
+     "value": "Gabantin GRS",
+     "evidence": "Gabantin GRS",
+     "status": "found"
+    },
+    "dose": {
+     "value": "300 milligram",
+     "evidence": "300 milligram",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "one at night",
+     "evidence": "one at night",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:30:30+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_006",
+   "source_text": "75 year old lady hypertension and diabetes as risk factor presented with acute onset left sided weakness on 17th April 2025 was admitted in <PII> hospital so MRI brain showed right MCA territory ischemic stroke. Started on dual antiplatelet treatment, is improving. Present complaint is abdominal pain, loss of appetite and nausea vomiting and sleep disturbances at night. the present prescription should include Ecosprin AV 75 + 20 at night. Then Met XL 25 milligram twice daily. Cilacar T 40 + 10 once in the night. Vilda M 50 + 500 twice daily. rexipra LS once at night and Pan D once in the afternoon uh, All this treatment to be continued for a duration of one month.",
+   "ground_truth": {
+    "medication": {
+     "value": "Ecosprin AV",
+     "evidence": "Ecosprin AV",
+     "status": "found"
+    },
+    "dose": {
+     "value": "75 + 20",
+     "evidence": "75 + 20",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "at night",
+     "evidence": "at night",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:34:36+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_007",
+   "source_text": "So, yeah, doctor, I have a problem in my chest. I'm not able to breathe properly and I have a very high fever also from the last two days. Do you have any cough? yeah, little bit of cough I have okay so Fever? yeah yeah, fever from last two days I am facing fever also. No other complaints, any",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:39:16+00:00",
+   "notes": "#negation #paraphrase transforms=insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_008",
+   "source_text": "Symptoms are fever, cold, cough diagnosis: viral fever, URTI  medicines.Dolo 650, twice a day post food, 7 days so Augmentin.One dosage at a time, twice a day, post food for 7 days uh, Test prescribed, CBC, lipid profile, HbA1C. follow-up visit after 7 days.advices: daily walk for 30 minutes, avoid oily and cold",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": "650",
+     "evidence": "650",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:41:04+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_009",
+   "source_text": "Symptoms: cough, fever, cold so Diagnosis: viral fever. Augmentin, one doseTwice a day, post food for 7 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Augmentin",
+     "evidence": "Augmentin",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "Twice a day",
+     "evidence": "Twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:42:14+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_010",
+   "source_text": "symptoms are fever, cold, cough diagnosis: viral fever and urti medicine prescribed augmentin twice a day post food, dolo 650 twice a day post food for 7 daystest prescribed: cbc, hba1c, lipid profile. Advised areEat healthy, walk for 30 minutes daily yeah Avoid, avoid oily food and cold food and follow up after 7 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "augmentin",
+     "evidence": "augmentin",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:52:12+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_011",
+   "source_text": "post food for 7 days uh, Augmentin twice a day, post food for 7 days. Test prescribed CBC, HbA1C.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.advices: avoid oily and cold food, eat healthy vegetables, and follow up after 7 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Augmentin",
+     "evidence": "Augmentin",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T11:58:15+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_012",
+   "source_text": "Augmentin, twice a day post food for 3 days right, Test prescribed CBC, HBA1C.Advised: avoid processed food, eat healthy, avoid cold and oily food so Follow up after 7 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Augmentin",
+     "evidence": "Augmentin",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T12:01:36+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_013",
+   "source_text": "Patient name is <PII>Age 27 female, she's a case of ankle pain and stiffness uh, History of ankle fracture three months ago. She's having difficulty in stair climbing. Examination finding tenderness grade one, swelling grade one yeah She's having tight calf and hamstring muscles.Full ankle range of motion, painful inversion.Diagnosis : known case of lateral malleolus fracture left side",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T12:05:33+00:00",
+   "notes": "#paraphrase transforms=insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_014",
+   "source_text": "OK, so Pt has come with a Complains of backache right, I plan to prescribe HSCRP. TFT vitamin B12 FBS PPBS. LFT KFT lipid profile CBC right, Also 25 hydroxy vitamin D. The vitals were captured, body height is 175 centimetres, blood pressure is 110 by 80. I want a follow-up to be done on December 12th.",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T12:07:27+00:00",
+   "notes": "While the doctor says \"prescribe\", the items listed like HSCRP, TFT, vitamin B12, FBS, PPBS, LFT, KFT, CBC, and 25 hydroxy vitamin D are all diagnostic blood tests/investigations, not therapeutic medications #paraphrase transforms=rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_015",
+   "source_text": "Give this patient Dolostat plus R one OD for 10 days bac Gabamax gold one HS at night for 10 days right, Pan DIn the morning, empty stomach for 10 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolostat plus R",
+     "evidence": "Dolostat plus R",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "OD",
+     "evidence": "OD",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:07:07+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_016",
+   "source_text": "This Pt has fever since the last 4 days. He is also suffering from headache right, Kindly prescribe him Combiflam, 1 TID post food for 3 days. Pan D, 1 in the morning, empty stomach for 3 days.And Vomikind MD 4 mg one three times a day post meals, OK.",
+   "ground_truth": {
+    "medication": {
+     "value": "Combiflam",
+     "evidence": "Combiflam",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "TID",
+     "evidence": "TID",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:08:06+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_017",
+   "source_text": "Complain of cough, dyspnea yeah Treatment Dexa.CP CV twice a day for two days. Wysolone three times a day for two days so Costus Advance three times a day for two days.Deriphyllin Retard 300 milligram twice a day for two days. Levopoint M once at night for 10 days.Ompec DM twice a day pre meals for two days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Deriphyllin Retard",
+     "evidence": "Deriphyllin Retard",
+     "status": "found"
+    },
+    "dose": {
+     "value": "300 milligram",
+     "evidence": "300 milligram",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:10:10+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_018",
+   "source_text": "complain of knee pain, leg painsTreatment Vitanova first dose, IV NS250 ml 2 units .Cyanocal,\nB Complex,\nAcecloran MR\nTwice a day post meals for 5 days.Pregastar D once at night for 10 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Acecloran MR",
+     "evidence": "Acecloran MR",
+     "status": "found"
+    },
+    "dose": {
+     "value": "250 ml",
+     "evidence": "250 ml",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "Twice a day",
+     "evidence": "Twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:13:37+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing"
+  },
+  {
+   "case_id": "case_019",
+   "source_text": "<PII> came with reports, showing hemoglobin lowVitamin D was low so Cholesterol was high. SGOT SGPT raised yeah Vitamin B12 118 low.Treatment Cynocal First doseinjection Nana Nova 6 lakhs units first dose . Calcirix XT once in the morning forone month . Zolfer XT once at night for 30 days  yeah Statpure F once at nightfor three months liveril forte once in the morning for six weeksNotes: This is visit of 14th April.",
+   "ground_truth": {
+    "medication": {
+     "value": "Calcirix XT",
+     "evidence": "Calcirix XT",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "once in the morning",
+     "evidence": "once in the morning",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:38:28+00:00",
+   "notes": "Alternative valid options include Nana Nova [dose: 6 lakhs units], Zolfer XT [frequency: once at night], Statpure F [frequency: once at night], or liveril forte [frequency: once in the morning] #multidrug #paraphrase transforms=drop_dosage_form+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_020",
+   "source_text": "Complain of throat pain, cough, fever. On examinationPus on left tonsil. Treatment oxy plus dexa 1, 1 ml.Sensiclav ES 5ml twice a day. mefkind DS 5ml three times a day. cogof 5ml three times a day.Diagnosis septic tonsillitisNotes: visit of 14th April",
+   "ground_truth": {
+    "medication": {
+     "value": "Sensiclav ES",
+     "evidence": "Sensiclav ES",
+     "status": "found"
+    },
+    "dose": {
+     "value": "5ml",
+     "evidence": "5ml",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:39:56+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+lowercase_drift"
+  },
+  {
+   "case_id": "case_021",
+   "source_text": "complain of epigastric pain, severe yeah nausea, backache .Treatment pan IV stat okay so spasmonormstat uh, Omez twice a day pre meals for two days uh, Five capsules. Ondem MD twice a day pre meals for two days okay so Para Dicyclomine.three times a day for two days so Mefenamic 500 twice a day for two days okay so Antolix O 10 ml three times a day post meals.Investigation: USG of abdomenUSG of abdomen report normal",
+   "ground_truth": {
+    "medication": {
+     "value": "Mefenamic",
+     "evidence": "Mefenamic",
+     "status": "found"
+    },
+    "dose": {
+     "value": "500",
+     "evidence": "500",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:41:20+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_022",
+   "source_text": "Complain of epigastric pain since morning. On exam, tenderness epigastric region.Treatment Pan IV Injection, Spasmonorm. Omez twice a day pre meals for two days so Five capsules.Ondem 4mg twice a day pre meals for two days. Para dicyclomine three times a day for two days uh, Mefenamic 500twice a day for two days.\nantolix O 10 ml three times a day.",
+   "ground_truth": {
+    "medication": {
+     "value": "Ondem",
+     "evidence": "Ondem",
+     "status": "found"
+    },
+    "dose": {
+     "value": "4mg",
+     "evidence": "4mg",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:42:27+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_023",
+   "source_text": "<PII> to kuch nahi hai. X-ray of LS spine showing reversal of lumbar lordosis.diagnosis reversal of lumbar lordosis treatment Vitanova 6 lakhs unit first doseTablet Xykaa MR twice a day for 5 days right, Lekace 100 mg twice a day for 5 days.Pantocid twice a day pre meals for five days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Lekace",
+     "evidence": "Lekace",
+     "status": "found"
+    },
+    "dose": {
+     "value": "100 mg",
+     "evidence": "100 mg",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:43:33+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_024",
+   "source_text": "Complains of backache since two days, severe treatmentInjection Dynapar AQ 1 ml stat okay so Aceclo MR twice a day for 3 days so TabletPara 650 once in the afternoon for three days okay so Shelong once in the morning post breakfast for 15 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Dynapar AQ",
+     "evidence": "Dynapar AQ",
+     "status": "found"
+    },
+    "dose": {
+     "value": "1 ml",
+     "evidence": "1 ml",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "stat",
+     "evidence": "stat",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:44:29+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_025",
+   "source_text": "So this patient came in with the complaints of ear pain in the right ear since two days, previously taken tablet, Augmentin, 625 milligrams morning and night.For 5 days and some painkiller, or exact details of the previous prescription are not available okay so On exam, there was congestion of the right uh tympanic membrane and all other system examinations were within normal limits.The patient was prescribed cefixime 200 milligrams morning and night for 5 days diclomol SP morning and night for 3 days, tablet.Sompraz D one in the morning pre meals for 3 days along with advice to keep the ears completely dry for the next 5 days.The Pt has been asked for a follow-up after one week and has been asked to avoid lifting heavy weights and avoidBlowing nose hard",
+   "ground_truth": {
+    "medication": {
+     "value": "cefixime",
+     "evidence": "cefixime",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200 milligrams",
+     "evidence": "200 milligrams",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "morning and night",
+     "evidence": "morning and night",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:45:22+00:00",
+   "notes": "#negation #temporality #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_026",
+   "source_text": "Write prescription for <PII>, 30 year old male, diagnosis stroke in young yeah He has hyperhomocysteinemia on evaluation yeah Vasculitis evaluation is normal. now the prescription Best CZD 0-1-0.For 15 days Cogre P forte 1-0-1. Clopivas AP 75 by 75,0-1-0. Avas 40, 0-0-1. homocheck 1-0-1.",
+   "ground_truth": {
+    "medication": {
+     "value": "Clopivas AP 75 by 75",
+     "evidence": "Clopivas AP 75 by 75",
+     "status": "found"
+    },
+    "dose": {
+     "value": "75 by 75",
+     "evidence": "75 by 75",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "0-1-0",
+     "evidence": "0-1-0",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:46:23+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_027",
+   "source_text": "So, I want to create a Plan for my patient. The patient name is <PII> so And the plan for the patient is for 3 months, weight loss due to obese so So, weight loss program for obesity so And the treatment will include two massages per week, deep tissue massage With sauna or steam yeah 3 times a week acupuncture session. for 20 minutes each The deep tissue massage would be for 1 hour, that is 60 minutes. followed by steam and sauna or sauna , steam or sauna  okay so And Kansa would be. Again, 3 times a week. And Diet consultation. Diet follow-up. diet chart will be prepared yeah And shared with the patient. And frequent follow-up. Also, Nadi Parika using Nadi Tarangini will be done. also Body composition will be checked yeah And 3 months later again body composition and Nadi Tarangini will be checked to  okay so Check the performance of the treatment uh, Also, hydrotherapy session would be once a week. which will include, include hydrojets uh, And Chromotherapy in warm water. Then sitz bath jacuzzi would be twice a week, With spinal spray. And this would, this alltreatment would be for the next 3 months",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:46:42+00:00",
+   "notes": "#paraphrase transforms=insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_028",
+   "source_text": "The Pt has diarrhea, problem listening, erratic temper Note this down please ",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:47:21+00:00",
+   "notes": "#paraphrase transforms=rephrase_plan_verbs+punctuation_drift"
+  },
+  {
+   "case_id": "case_029",
+   "source_text": "My patient came for fitness for cataract surgery. Patient complained of giddiness while standing. On exam, his pulse is 80 beats per minute yeah Blood pressure is 150 by 90 mm of Hg, on systemic examination.Chest clear, CVS normal, on treatment, patient started on Cilacar 10 mg once a day in the morning for 15 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Cilacar",
+     "evidence": "Cilacar",
+     "status": "found"
+    },
+    "dose": {
+     "value": "10 mg",
+     "evidence": "10 mg",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "once a day",
+     "evidence": "once a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-19T16:48:06+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_030",
+   "source_text": "The patient is suffering from toothache laterally right okay so Since 5 days, severity is severe type of pain is cramping pain. impression is dental cavity right, gum ulceration hey bro, this went off bro, open this The tablets suggested are: Jhactions iron tonic, One time at the night with empty stomach, 5 days from day one. Limcee chewable tablet, two tablets at a time, in the afternoon post food, five days from day one.",
+   "ground_truth": {
+    "medication": {
+     "value": "Jhactions iron tonic",
+     "evidence": "Jhactions iron tonic",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "One time at the night",
+     "evidence": "One time at the night",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T02:22:32+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_031",
+   "source_text": "consultation, and we can just say. so doctor i have a stomach pain, for the last. How many days? Last 3 days . Where is the pain exactly?Upper abdomen near rib cage yeah Do you have any vomiting with the pain? uh, No vomiting. how is your appetite? uh, low, less appetite. Do you have any fever?Low grade. I had, I took, I had fever right, I took crocin. How many times have you passed urine in the last 24 hours? 2 - 3 times right, Urine is white or yellow in colour?Yellow. How about the stools, are normal? uh, Yeah, stools are normal so Any history of outside food 2 days, 3 days back, any outside food party or travel? right, Yeah, I had biryani 2 days ago.OK, can I check you out? Yeah,right. Record ? so Yeah it's recording and you can say yeah, abdomenNormal, Soft. Tongue is slightly moist, coated tongue uh, Temperature 99 degrees. On auscultationEverything is normal. Heart sounds and lungs are clinically OK uh, Abdomen, mild tenderness, guarding present in the epigastric area.And the diagnosis acute gastritis query, may be due to food poisoning. And treatment is Pantop 40 mg once daily for 7 days on empty stomach.Taxim O 100 mg twice daily for 5 days post meals okay so Drotin, one SOS if the pain is unbearable.",
+   "ground_truth": {
+    "medication": {
+     "value": "Pantop",
+     "evidence": "Pantop",
+     "status": "found"
+    },
+    "dose": {
+     "value": "40 mg",
+     "evidence": "40 mg",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "once daily",
+     "evidence": "once daily",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T02:23:23+00:00",
+   "notes": "#multidrug #negation #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_032",
+   "source_text": "So patient Mr okay so XYZ, has a complaint in the knee andrequires an MRI to be done he has a anterior drawer grade 2 tenderness on the medialcompartment and difficulty in walking and pain in the knee.",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T02:23:59+00:00",
+   "notes": "#paraphrase transforms=insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_033",
+   "source_text": "2 D Echo report2D Echo Report\nPatient Name: <PII>\nConclusion:\nNormal LV systolic function.\nmild MR, mild TRNo clot, no pericardial effusion.",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T02:24:31+00:00",
+   "notes": "This is a diagnostic imaging (2D Echo) report detailing echocardiographic findings such as LV function and valve regurgitation. No pharmaceutical medications, dosages, frequencies, or allergies are documented in this text #negation #paraphrase transforms=lowercase_drift"
+  },
+  {
+   "case_id": "case_034",
+   "source_text": "Advising  patient is facing cough, fever, cold for the past three days so I advise the patient to take Dolo twice a day post breakfast, after dinner.also advising patient for warm water gargles three times a day along with this honey, honitus , Dabur Honitus cough twice a day also just warm water gargles three times a day andfollow the course of medicines for the next five days and we'll do a checkup after that uh, This was a doctor simulating this. this doctor app.",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T02:26:00+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_035",
+   "source_text": "Patient complaining ofNose blocks since one week, left ear pain since yesterday night, unable to sleep.On exam, deviated nasal septum was found to the left side with right inferior turbinate enlarged,Mucopus both nasal cavities. left eardrum was found congested and bulging, right TM was normal.Hearing test, Rinne's both positive, Weber's towards left side so Oral cavity normal.Lungs are clear okay so Diagnosis: deviated septum to left, right inferior turbinate enlarged, acute sinusitiswith left ASOM",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T02:26:54+00:00",
+   "notes": "#paraphrase transforms=rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_036",
+   "source_text": "Fever for the last 5 days, breathlessness for the last 6 days.Chest pain for the last five, five 5 days",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T02:27:07+00:00",
+   "notes": "This text documents presenting complaints and symptoms such as fever, breathlessness, and chest pain. No pharmaceutical medications, dosages, administration schedules, or drug allergies are documented in this note #paraphrase transforms=none"
+  },
+  {
+   "case_id": "case_037",
+   "source_text": "58 year old male patient came with the complaints of fever with chills for last 5 days. On arrival, the Pt has temperature of 102 °F.Patient were treated with IV antibiotics with IV Ceftriaxone BD for the last 5 days and Doxycycline 100 mg BD for last 5 days.And PCM and other supportive management. and repeat investigations showed sequential decrease in WBC counts.and even increase in platelet count uh, Patient, patient is afebrile for the last 3 days.Hence being discharged with the following advises",
+   "ground_truth": {
+    "medication": {
+     "value": "Doxycycline",
+     "evidence": "Doxycycline",
+     "status": "found"
+    },
+    "dose": {
+     "value": "100 mg",
+     "evidence": "100 mg",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "BD",
+     "evidence": "BD",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T03:10:06+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_038",
+   "source_text": "Patient reported stomach pain since 3 days. he also reported severe headache, which is happening since a month. Patient in the past have had, episodes of headaches, wherein, there was a throbbing pain. I'm suspecting migraine, but, to make any decision.I advise patient to do CT MRI. also, patient seems to be pale, so I advise him to take, complete body health checkup. I also want to analyse iron levels, so patients should do complete iron profile test.In the meanwhile, patients can take Dolo 650 three times a day, post food for 6 days, and patients should take Pantop DSR 40 mg for, 6 days before breakfast once a day right, And, I advise patients to not have oily food, take enough rest, and, in case of, any emergency.See, I'm giving his number to call me, and patient should come to me after 7 days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": "650",
+     "evidence": "650",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "three times a day",
+     "evidence": "three times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T03:10:52+00:00",
+   "notes": "#negation #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_039",
+   "source_text": "So <PII> is a 39-year-old who has come with complaints of cough going on for the last 6 weeks so He has gone to a general practitioner and taken treatment which has partially resolved his symptoms right, Details of treatment are not available. The other symptoms include intermittent shortness of breath. This is impacting his life currently.He also has night symptoms which is disturbing his sleep, and he has no other issues with chronic diseases such as tuberculosis yeah He's young and not a hypertensive or a diabetic and he has no specific allergies uh, Medications include, taken so far include aB and C, odd and further details are not known. On exam, he is otherwise stable yeah The ENT examination shows a congested nose with the DNS to the right, and oral examination shows slightly crowded airway but with a normal oropharynx.Chest examination shows raz in the bases, which is a little unusual, and diffuse rhonchi on both lung fields. my asse. We asked for a lung function test, which shows so and so, so and so, and so and so. We also asked for a pheno which is showing an elevated value so Overall Impression is uncontrolled asthma right, At this point, he will be treated.On a GINA 3 protocol, the treatment will include education and counselling, which is also being done with using, aids given to him, and additionally we will start inhalers on him. The inhalers include Foracort , 200 two puffs twice a day synchro breathe.Taken for a period of 4 weeks after which he's supposed to visit us, in case he becomes delayed, the treatment is to be continued. other medications include B, C, and D right, Non-medical aspects which is important is nutritional precautions which have been conveyed, lifestyle precautions which have been conveyed and given to him as an addendum. And at the same time, if this.Continues we have to get into other aspects such as, what are the precipitating factors including psychological or exercise regimens which may improve his overall condition. Preventive aspects include vaccination and the flu shot has been recommended to him, and he has been asked to follow up in 4 weeks, end of consultation.",
+   "ground_truth": {
+    "medication": {
+     "value": "Foracort",
+     "evidence": "Foracort",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200 two puffs",
+     "evidence": "200 two puffs",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T03:36:13+00:00",
+   "notes": "#negation #paraphrase transforms=rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_040",
+   "source_text": "Yes <PII>, what do you have? I have nausea okay so Nausea. OK. So from how long are you experience this the problem? From about two days. OK. And do you have any history of any, you know, past complaints or any kind of things that you have been? so not such Not as of now OK. And are you on any medication right now? Yeah. what medication? for alopecia, for alopecia yeah So what are you using currently? okay so Sorry?, what are you currently using? Minoxidil Finasteride and multivitamins, OK okay so Fine, so uh, I think That is for now so I will send you the prescription. I will send you the drugs. You can go to the pharmacy and you can buy. OK,OK, OK.",
+   "ground_truth": {
+    "medication": {
+     "value": "Minoxidil",
+     "evidence": "Minoxidil",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:29:33+00:00",
+   "notes": "Alternative valid options include Finasteride or multivitamins. These represent the patient's currently active medications for alopecia. While the doctor mentions sending a new prescription to the pharmacy for the nausea, no specific new drug names, doses, or frequencies are explicitly stated in the text, so the system correctly abstains from guessing #negation #paraphrase transforms=insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_041",
+   "source_text": "deviated septum to left sideRight inferior turbinate enlarged, both tympanic membrane intact, normal. Post-nasal discharge present, greenish yellow in colorRest of the oral cavity normal. lungs clear. Impression is deviated septum to right, left HITacute URTI or sinusitisPut on medication, Cepodem XP 325 milligram twice daily into one weekTablet Alaspan AM twice daily for a week, Nasivion nasal drops for a week, twice dailyDolonim P twice daily for 2 days, and review one week with a CT scan of the nose and sinuses",
+   "ground_truth": {
+    "medication": {
+     "value": "Cepodem XP",
+     "evidence": "Cepodem XP",
+     "status": "found"
+    },
+    "dose": {
+     "value": "325 milligram",
+     "evidence": "325 milligram",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice daily",
+     "evidence": "twice daily",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:33:30+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+lowercase_drift"
+  },
+  {
+   "case_id": "case_042",
+   "source_text": "Patient complained of severe headache on left side, intermittent since one month. On vital examination, pulse is 90 beats per minutes. blood pressure is 130 by 80 mm of Hg. on systemic examination, respiratory system, clear, CVS normal, RS normal.CNS normal on treatment, start patient on Sibelium 10 mg at night for 1 month and Naxdom 500 mg SOS for headache.",
+   "ground_truth": {
+    "medication": {
+     "value": "Sibelium",
+     "evidence": "Sibelium",
+     "status": "found"
+    },
+    "dose": {
+     "value": "10 mg",
+     "evidence": "10 mg",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "at night",
+     "evidence": "at night",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:37:11+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+lowercase_drift"
+  },
+  {
+   "case_id": "case_043",
+   "source_text": "Pt has stomach pain, headache, leg pain, wherein leg pain is, flowing through his back of the thigh. Pt has had history of spondylolisthesis . Currently it's recuperated. Patient also has an ACL of the left knee so I recommend patient taking tendolife tablet for.three times a day for twelve days and show me after one week",
+   "ground_truth": {
+    "medication": {
+     "value": "tendolife tablet",
+     "evidence": "tendolife tablet",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "three times a day",
+     "evidence": "three times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:38:44+00:00",
+   "notes": "#paraphrase transforms=rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_044",
+   "source_text": "Patient came with the Complains of breathlessness, cough, fever for the last one week.On arrival patient saturation is SPO2 is 88 , 87% on room air. Patient got started on IV antibiotics in view of increased CRP.and CBC showed neutrophilic leukocytosis with AKI picture with serum creat of 1.3, and patient IV antibiotics and IV supplementary treatment.and serial CRP and CBC were in decreasing trend and patient had no further fever spikes.for four days patient was in oxygen support with maximum requirement of four to five liters. Later on patientmaintained his saturation in room air for the last six days. patient got mobilized with the help of physiotherapy. active physiotherapy was done for about six days.Patient currently requires minimal support for walking and patient had no other complaints. Patient got started on plecanatidein view of his IBS with constipation and patient well responded to plecanatide and patient daily passes the motionAnd currently patient condition is stable with BP maintained around 130 to 140 mm of Hg.Saturation 97 on room air okay so No tachypnea, no fever. And patient hence patient being discharged with thefollowing advices yeah Advised include Budecort nebulization SOS, Duolin BD, Asthalin.BD bar SOS\nDeriphyllin Retard 150 mg\nSOSTab Dytor 10mg OD in the morning and Neurokind LC in the afternoon.Shelcal XT in the morning 1-0-0. normaxin RT 1-0-0.Plecanatide 2 mg 3 mg in the night so Mirabegron 50 mg.in the morning right, Tamvas T 0-0-1 in the night right, Dolo SOS",
+   "ground_truth": {
+    "medication": {
+     "value": "Tab Dytor",
+     "evidence": "Tab Dytor",
+     "status": "found"
+    },
+    "dose": {
+     "value": "10mg",
+     "evidence": "10mg",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "OD in the morning",
+     "evidence": "OD in the morning",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:39:53+00:00",
+   "notes": "#multidrug #negation #paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_045",
+   "source_text": "is a dictation mode. Hi, I've just met my patient <PII> and she is feeling symptoms of cough, cold and fever for the past three days.advising hot water gargles three times a day, honey and water three times a day, and Dolo 450 post breakfast and dinner.two times a day. Also advising a nutritious diet, like you know full of carrots and vitamin C.That's about it thank you so So",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": "450",
+     "evidence": "450",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "two times a day",
+     "evidence": "two times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:42:01+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_046",
+   "source_text": "<PII> came on 14th of April with complaints, with the reports of raised total cholesterol.raised LDL cholesterol, low vitamin D, raised uric acid, HbA1c raised.Fasting blood sugar of 120.\nTotal IGE 2107.examination, blood pressure was 137 by 81, pulse of 71.Complains of dyspnea on exertion, joint pains yeah treatment givenInjection Vitanova first dose. Calcirix XT once in the morning for 15 days right, Levopoint M.at night for 10 days so Tablet Ubexa 40 once in the morning for 10 days. Statpure F.milligram once at night for three months.",
+   "ground_truth": {
+    "medication": {
+     "value": "Tablet Ubexa",
+     "evidence": "Tablet Ubexa",
+     "status": "found"
+    },
+    "dose": {
+     "value": "40",
+     "evidence": "40",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "once in the morning",
+     "evidence": "once in the morning",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:43:47+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_047",
+   "source_text": "complain of headache, not better giddiness On exam blood pressure 136 systolic and 88 diastolic. On exam sinuses were tender okay so Treatment: Cepodem 200 twice a day for two days so Diclofenac 2 ml stat right, Zady 250 twice a day for two days. Colday\nThree times a day for two days\nMefenamic 500\nTwice a day for two days\nLevocet once at night for two days Solopose MD once at night for two days. Diagnosis sinusitis. Tension headache",
+   "ground_truth": {
+    "medication": {
+     "value": "Cepodem",
+     "evidence": "Cepodem",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200",
+     "evidence": "200",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:45:25+00:00",
+   "notes": "#multidrug #negation #paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_048",
+   "source_text": "complain of cough, dry cough. on exam Temperature normal 97 degree Fahrenheit. BP 116 by 71. Pulse 74 per minute Treatment Cepodem 200 twice a day for two days so Zady 250 milligram twice a day for two days so Costus Advance three times a day for two days right, Mefenamic 500 twice a day for two days. C-Poff, three times a day for two days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Cepodem",
+     "evidence": "Cepodem",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200",
+     "evidence": "200",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:53:47+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_049",
+   "source_text": "Complains of diarrhea, pain in abdomen. BP 115 by 70, pulse 64 per minute. Diagnosis gastroenteritis. Treatment Amikacin first dose. Cefixime 200 twice a day for two days uh, Metrogyl 400 three times a day for two days. Para Dicyclomine three times a day for two days right, Omez 20 milligram twice a day pre meals for two days uh, Lomofen three times a day for one day. vital EZ sachet twice a day for one day.",
+   "ground_truth": {
+    "medication": {
+     "value": "Cefixime",
+     "evidence": "Cefixime",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200",
+     "evidence": "200",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:54:40+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_050",
+   "source_text": "Notes: follow up of injury with stitches Stitches removed today okay so Pus from wound so Treatment : Lizomed 600 twice a day post meals for two days. visnac SP twice a day for two days Para 500 once in the afternoon for two days right, BC Once at night for two days. Cleaning and dressing done.",
+   "ground_truth": {
+    "medication": {
+     "value": "Lizomed",
+     "evidence": "Lizomed",
+     "status": "found"
+    },
+    "dose": {
+     "value": "600",
+     "evidence": "600",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:55:20+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_051",
+   "source_text": "Complains of headache, nausea, ghabrahat since one day. on exam, BP 135 by 92 okay so pulse 80 per minute history of panic disorders, past history of panic disorders uh, Treatment: Cynocal First. Vitanova first dose. Calcirix XT once in the morning for 15 days. Omez twice a day for one day. Meftal Forte twice a day for one day. ondem MD twice a day for one day yeah Solopose MD once at night for two days. Diagnosis anxiety disorder",
+   "ground_truth": {
+    "medication": {
+     "value": "Omez",
+     "evidence": "Omez",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:57:28+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_052",
+   "source_text": "Complaining of throat pain since one day, with minimal phlegm. has cold since last 15 daysThere is no history of fever so There is no history of body pains.There is no history of headaches. Cough is more in the mornings, dry in consistency.Not a known diabetic, hypertensive or asthmatic.",
+   "ground_truth": {
+    "medication": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:57:46+00:00",
+   "notes": "This transcript only contains the patient's presenting complaints, symptoms, and medical history. No medications, dosages, or frequencies were prescribed or documented #negation #paraphrase transforms=insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_053",
+   "source_text": "<PII>, patient, 38 years old, male, came with complaints ofLoose motions, elevated temperature, and chest pain, for the last three days, has been taking Dolo 650, to manage the pain.has been taking Sinarest and Pantop so Heart rate is normal at 77 beats per minute. blood pressure is normal, 120 over 80.And pulse, pulse ox , pulse saturation is good at 99%.",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": "650",
+     "evidence": "650",
+     "status": "found"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T05:59:03+00:00",
+   "notes": "Alternative valid options include Sinarest or Pantop. The transcript notes medications the patient has been taking prior to the visit, but no specific frequency is documented for any of them #paraphrase transforms=insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_054",
+   "source_text": "complain of headache, nausea, cold, cough, body ache. Diagnosis migraine, URTI. On exam anemia treatment: orofer S Cepodem 200 twice a day for two days.\nZady. 250 twice a day for two days. colday thrice a day for two days. Mefenamic 500 twice a day for two days yeah Levocet once at night for two days.\nompec DM twice a day pre meals for five days. Meftal Forte twice a day for five days, to start after two days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Cepodem",
+     "evidence": "Cepodem",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200",
+     "evidence": "200",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:01:09+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_055",
+   "source_text": "complain of cough not better irritation throat Treatment\nTT\nstat\nAmoxyclav 625 twice a day for two days. meftal Forte twice a day for two days. para 650 once in the afternoon for two days. Levocet twice a day for two days so Ompec D M twice a day for two days pre meals. Clarigard okay so 250 milligram twice a day for 5 days. On exam, throat congestion.",
+   "ground_truth": {
+    "medication": {
+     "value": "Amoxyclav",
+     "evidence": "Amoxyclav",
+     "status": "found"
+    },
+    "dose": {
+     "value": "625",
+     "evidence": "625",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:09:39+00:00",
+   "notes": "#multidrug #negation #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_056",
+   "source_text": "On 7th April 25 <PII> came with Complains of dribbling of urine since one day. Treatment: Amikacin 1.5 ml okay so Cefixime 200 milligram twice a day for two days. Parex paracetamol 500 three times a day for to three days mefenamic 500 half twice a day for two days pantocid 40 milligram twice a day for two days pre meals. investigation, urine routine, USG of abdomen. medicine Citro-Soda sachet three times a day for two days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Cefixime",
+     "evidence": "Cefixime",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200 milligram",
+     "evidence": "200 milligram",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:10:13+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_057",
+   "source_text": "Complains of back ache, gastritis, loss of appetite, weakness. six fifty yeah Sade sahashe kar. Treatment. Injection yeah Injection, tablets so Vitanova right, Six lakhs unit okay so nau kar tychamule  yeah First dose. Ompec D M twice a day pre meals for 5 days purna ghasa kharab aahe so Investigation showing USG: extensive gases, gallbladder polyp, simple renal cysts in both the kidneys yeah X-ray of LS spine showing osteopenia, anterior listhesis of L5 vertebra over sacral spine. Treatment\nRinifol twice a day ho gya na aapka?\nuh, Bifilac GG sachet. once for for three days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Ompec D M",
+     "evidence": "Ompec D M",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:10:57+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_058",
+   "source_text": "Chief complaints of right side chest pain, hemoptysis uh, Diagnosis light right lower zone pneumonia. treatment Maxflox 400 once at night for two days. cefixime 200 twice a day for two days so Meftal forte, twice a day for two days uh, Para 650, once in the afternoon for two days. Deriphyllin 150. Twice a day for two days. Ompec DM twice a day pre meals for two days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Maxflox",
+     "evidence": "Maxflox",
+     "status": "found"
+    },
+    "dose": {
+     "value": "400",
+     "evidence": "400",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "once at night",
+     "evidence": "once at night",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:12:13+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_059",
+   "source_text": "Chief complaints of cough medications Cepodem 200 twice a day for two days uh, Azi 250 twice a day for two days yeah Meftal Forte twice a day for two days. Dolo 650 once in the afternoon for two days okay so Costus D 10 ml three times a day so Levoset once at night for two days. notes: patient not examined.",
+   "ground_truth": {
+    "medication": {
+     "value": "Cepodem",
+     "evidence": "Cepodem",
+     "status": "found"
+    },
+    "dose": {
+     "value": "200",
+     "evidence": "200",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:13:15+00:00",
+   "notes": "#multidrug #negation #paraphrase transforms=drop_dosage_form+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_060",
+   "source_text": "Patient is experiencing cough, cold and sneezing, blocked nose for the past five days. Advisinghot water with honey along with steam three times a day, also advising Dolo 650 two times a day post breakfast after dinner",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": "650",
+     "evidence": "650",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "two times a day",
+     "evidence": "two times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:43:40+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing"
+  },
+  {
+   "case_id": "case_061",
+   "source_text": "Hello <PII>. how are you today? I don't feel that good. I have a blocked nose and sneezing and cold.since five days yeah Patient is reporting blocked nose, cold and sneezing past five days uh, We advised you to get honey waterHave warm water with honey three times a day. have Dolo 650 post breakfast, after dinner, twice a day okay so That's all.Hope you feel better.",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": "650",
+     "evidence": "650",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:50:26+00:00",
+   "notes": "#paraphrase transforms=rephrase_meal_timing+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_062",
+   "source_text": "I advise the patient to take Dolo three times a day yeah He has medical history of insomnia, not able to sleep properly for a couple of days, chest pain, anxiety for a few days, and palpitations in the night.Not able to breathe properly uh, I advise him to take Penta DSR 2 times a day. Also take Dolo 650 2 times a day. take Crocin on SOS basis and take.Gelusil when there is gastric issues and report to me with CBC test, blood test report and give information in couple of weeks.",
+   "ground_truth": {
+    "medication": {
+     "value": "Penta DSR",
+     "evidence": "Penta DSR",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "2 times a day",
+     "evidence": "2 times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:50:51+00:00",
+   "notes": "#negation #paraphrase transforms=drop_dosage_form+insert_filler+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_063",
+   "source_text": "Moxclav 625, three times a day post food right, Bifilac after breakfastTablet Ebast DC two times a day post food.",
+   "ground_truth": {
+    "medication": {
+     "value": "Moxclav",
+     "evidence": "Moxclav",
+     "status": "found"
+    },
+    "dose": {
+     "value": "625",
+     "evidence": "625",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "three times a day",
+     "evidence": "three times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:51:25+00:00",
+   "notes": "#paraphrase transforms=drop_dosage_form+rephrase_meal_timing+insert_filler+punctuation_drift"
+  },
+  {
+   "case_id": "case_064",
+   "source_text": "Moxclav 625, three times a day. Bifilac twice daily.Ebast DC twice a day. Otrivin nasal drop, 2 drop three times a day. SyrupGrinlinctus DX, 2 teaspoon, three times a day, for five days.",
+   "ground_truth": {
+    "medication": {
+     "value": "Moxclav",
+     "evidence": "Moxclav",
+     "status": "found"
+    },
+    "dose": {
+     "value": "625",
+     "evidence": "625",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "three times a day",
+     "evidence": "three times a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:52:21+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form"
+  },
+  {
+   "case_id": "case_065",
+   "source_text": "lactoclav 1 BD meftal spas 1 BD. Limcee 1 BDUTI and 2 TSF BD.",
+   "ground_truth": {
+    "medication": {
+     "value": "lactoclav",
+     "evidence": "lactoclav",
+     "status": "found"
+    },
+    "dose": {
+     "value": "1",
+     "evidence": "1",
+     "status": "found"
+    },
+    "frequency": {
+     "value": "BD",
+     "evidence": "BD",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:52:55+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form"
+  },
+  {
+   "case_id": "case_066",
+   "source_text": "Pt has fever, take Dolo 650. Take Crocin tablet, whenever there is a headache, take amoxycillin 3 times a day, 1 in the morning, 1 in the evening, and one before night.Take proper bed rest, for insomnia, giving a sedative called Zolpidem. For pain medication, take Tramadol. for any other issues, report, let's keep a follow up within the next week.",
+   "ground_truth": {
+    "medication": {
+     "value": "Dolo",
+     "evidence": "Dolo",
+     "status": "found"
+    },
+    "dose": {
+     "value": "650",
+     "evidence": "650",
+     "status": "found"
+    },
+    "frequency": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:53:31+00:00",
+   "notes": "#paraphrase transforms=rephrase_plan_verbs+punctuation_drift+lowercase_drift"
+  },
+  {
+   "case_id": "case_067",
+   "source_text": "Symptoms, abdominal pain, anorectal swelling, high fever, and knee swelling right, Tablets Telma twice a day for 4 days.Enzolam once in a day post breakfast for 2 days, zerodol for 2 days. Advised take a rest, eat leafy vegetables, and drink plenty of water. Sit in warm water, warm.Tub of water.",
+   "ground_truth": {
+    "medication": {
+     "value": "Telma",
+     "evidence": "Telma",
+     "status": "found"
+    },
+    "dose": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    },
+    "frequency": {
+     "value": "twice a day",
+     "evidence": "twice a day",
+     "status": "found"
+    },
+    "allergy": {
+     "value": null,
+     "evidence": null,
+     "status": "not_stated"
+    }
+   },
+   "labeller": "rohit",
+   "labelled_at": "2026-09-20T06:54:02+00:00",
+   "notes": "#multidrug #paraphrase transforms=drop_dosage_form+rephrase_meal_timing+rephrase_plan_verbs+insert_filler+punctuation_drift"
+  }
+ ]
+}

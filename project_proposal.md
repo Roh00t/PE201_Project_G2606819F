@@ -489,3 +489,24 @@ confidence it would have degraded was already flat. The whole suite cost **$0.06
 calls, and 66 tests in `tests/test_judge_calibration.py` pin the four properties that make the
 instrument trustworthy — no gold in the prompt, no write-back to a payload, schema and model
 agreeing, and the statistics computed rather than asserted.
+
+**D21 · The near-distribution arm exists, and it turns the leakage finding into a sharper claim.**
+`docs/forensic_audit.md` §3.2 graded the adversarial-testing claim **Partial**: the
+far-distribution half (ALL-CAPS header stripping) was built and measured, the near-distribution
+half did not exist anywhere in the codebase. `evals/paraphrase.py` builds it — all 67 consults
+re-dictated by six named transforms acting **strictly outside the gold value spans**, so the value
+labels are byte-identical to gold-v2 and the comparison is paired field for field. Sealed
+`paraphrase-v1` (`fa3fa8bf…5642b`), deterministic at seed 42, no model in the label path, 27 tests.
+
+Pooled recall 73.0% → **75.0%**, 9 flips right against 6 wrong, **McNemar p = 0.6072**. That is a
+null result and it is reported as one: the +2.0 pp is noise, not a gain. Set against §6.6's
+0.900 → 0.650 under header stripping, the pair says something neither says alone — **the crutch is
+not prose formatting in general, it is specifically the ALL-CAPS section header.** Dropping
+`Tablet` before 43 drug names, rephrasing meal timing on 30 notes and adding dictation fillers to
+56 moved 15 field decisions, 9 of them for the better. With 15 discordant pairs the evaluation
+cannot resolve an effect below roughly 8 points, so this rules out a large degradation rather than
+proving equivalence — but no named defect appeared that the intact run did not already have.
+
+This is also the operationally reassuring half of the two. The deployment corpus is dictated
+speech with no headers at all (67/67 Eka Care notes are headerless), so §6.6 measures a condition
+the system is already in, and §6.9 measures the variation it will actually meet.

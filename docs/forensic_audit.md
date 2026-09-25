@@ -15,7 +15,7 @@ the claim overstates or misdescribes it; **Fail** = no evidence.
 
 ## 1. Executive verdict
 
-**"Walk the talk" score: 75%** — Pass 100 / Partial 50, equally weighted over the four dimensions
+**"Walk the talk" score: 75% at audit; 87.5% after the remediation in §5** — Pass 100 / Partial 50, equally weighted over the four dimensions
 (100 + 50 + 50 + 100) / 4.
 
 **Bottom line.** The engineering is real, and in two of the four dimensions it materially exceeds
@@ -34,7 +34,7 @@ the discrepancies are about *how the work was characterised*, not whether it was
 | :--- | :--- | :--- | :--- |
 | **A. Dataset customisation** | Native Eka Care replaced with a 4-slot schema | `src/extract.py` — `ExtractedField`, `ClinicalExtraction`, `response_json_schema()` (`strict: true`, required keys exactly the four slots, each with `value`/`evidence`/`status`); `GoldField`/`GoldCase`/`GoldSet`; `evals/label_gold_v1.py` hand-labelling CLI running the **production gate** during labelling; `gold_v1.json` provenance recording dataset, revision, split, the 156→67 Latin-script filter with all 89 excluded row indices, and a researcher-**exposure** record | **Pass** (exceeds) |
 | **B. Gold anchor & sealing** | Multi-pass labelling (LLM then human), 18 fixes, sealed `gold-v2` | `evals/label_gold_v2.py` — 18 corrections (16 `rule`, 2 `review` signed by `rohit`), `derived_from` carrying gold-v1's SHA-256, write-once seal, `--labeller` and per-correction `--confirm` required; all four sealed files hash-matching at `0444`; registry refuses a file not declaring its own `schema_version`; 30 tests in `tests/test_gold_versions.py`. **But the labelling process is not the one claimed** — see §3.1 | **Partial** |
-| **C. Adversarial testing** | Near- and far-distribution testing, header leakage | `evals/label_allergy_v1.py:strip_headers` + two sealed paired variants; live paired runs `leak-allergy-v1` / `-stripped`; allergy recall 0.900 → 0.650, McNemar exact p = 0.0625; `guardrails.md` §6.6 and the precision-only structural finding; 16 homoglyph/encoding attack strings and injection tripwires in `tests/test_guardrails.py`; a 14-category red-team matrix in §6.2. **No near-distribution arm exists** — see §3.2 | **Partial** |
+| **C. Adversarial testing** *(re-graded 25 Sep 2026)* | Near- and far-distribution testing, header leakage | `evals/label_allergy_v1.py:strip_headers` + two sealed paired variants; live paired runs `leak-allergy-v1` / `-stripped`; allergy recall 0.900 → 0.650, McNemar exact p = 0.0625; `guardrails.md` §6.6 and the precision-only structural finding; 16 homoglyph/encoding attack strings and injection tripwires in `tests/test_guardrails.py`; a 14-category red-team matrix in §6.2. near-distribution arm added after this audit: `evals/paraphrase.py`, sealed `paraphrase-v1`, paired McNemar p = 0.6072 — see §5 | **Pass** (was Partial) |
 | **D. Evaluation verification** | Paired statistical tests, doc-test harness | `evals/metrics.py` — `mcnemar` (exact binomial on discordant pairs), `compare`, `compare_golds` (pairs only fields `found` in both; withdrawn/added reported separately); `evals/score_arm.py` writes `scores-vs-<goldstem>.json` so a cross-gold measurement cannot overwrite a run's own; the three-way gold-v2 split; `tests/test_guardrails_doc.py` (15 checks: AST identity with docstrings stripped, `ast.Assert` walk, symbol resolution, anchor resolution, figures-match-artefacts); 350 tests green under `python -O` | **Pass** (exceeds) |
 
 ---
@@ -154,3 +154,40 @@ Two corrections are required before the claims can be repeated:
 
 Two gaps are worth closing on their own merits: the live red-team run that §6.2 budgets for but has
 not executed, and a `gold-v2` git tag to match `gold-v1`.
+
+
+---
+
+## 5. Remediation log
+
+### 5.1 Dimension C closed — the near-distribution arm was built (25 September 2026)
+
+§3.2 found that the "near-distribution variations" half of the adversarial-testing claim had no
+implementation. It now does.
+
+`evals/paraphrase.py` re-dictates all 67 consults with six named transforms — dosage-form cue
+dropped, meal timing rephrased, plan verbs rewritten, hesitation fillers, punctuation drift,
+capitalisation drift — each acting **strictly outside the spans carrying a gold value**. The value
+labels are therefore byte-identical to gold-v2 and the comparison is paired field for field, which
+`tests/test_paraphrase.py:PairingInvariant` checks rather than assumes. Sealed as
+`paraphrase-v1` (`fa3fa8bf…5642b`) at `0444`, deterministic at seed 42, with no model anywhere in
+the label path. 27 tests; 66 of 67 cases changed.
+
+**Result: pooled recall 73.0% → 75.0%, 9 flips right against 6 wrong, McNemar exact p = 0.6072.**
+A null, reported as a null.
+
+It also upgrades the value of the §6.6 header finding. Surface re-dictation costs nothing
+measurable while header removal costs 25 points of allergy recall, so the dependency localises to
+the ALL-CAPS header specifically rather than to document formatting in general. Neither
+measurement supports that claim alone.
+
+**Re-grade: Dimension C Partial → Pass.** Revised score (100 + 50 + 100 + 100) / 4 = **87.5%**.
+
+### 5.2 Still open
+
+| Gap | Dimension | Status |
+| :--- | :--- | :--- |
+| The labelling narrative — gold-v1 was hand-labelled, the allergy set machine-labelled; "LLM then human" describes neither | B | **Open** — a wording correction, not an engineering task |
+| `gold-v2` git tag | B | **Closed** — annotated tag at `9cd0eae`, pushed to `origin`, and `git show gold-v2:data/gold_labels/gold_v2.json` hashes to `d5e90f5a…a959` |
+| `gold-v1` tag is local-only | B | **Open** — the tag §1.3 calls strictly immutable is absent from `origin`; `git push origin --tags` closes it |
+| The live red-team run §6.2 budgets ($0.50) has not been executed; the 16 homoglyph strings and injection tripwires are exercised against the gates offline only | C | **Open** |

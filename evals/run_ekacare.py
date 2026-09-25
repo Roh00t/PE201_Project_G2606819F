@@ -115,6 +115,13 @@ REGISTRY: dict[str, SealedGold] = {
         "gold-v2", GOLD_DIR / "gold_v2.json", GOLD_DIR / "gold_v2.sha256", DATASET, "gold-v2",
         "gold-v1 with the 16 labels that contradict their own field rules corrected, "
         "plus slice tags. Registered, not yet sealed."),
+    "paraphrase-v1": SealedGold(
+        "paraphrase-v1", GOLD_DIR / "paraphrase_v1.json",
+        GOLD_DIR / "paraphrase_v1.sha256", DATASET, "paraphrase-v1",
+        "the same 67 consults re-dictated around byte-identical gold-v2 values: "
+        "the dosage-form cue dropped, meal timing rephrased, fillers and "
+        "punctuation drift added. Paired against the gold-v2 live run, this is "
+        "the near-distribution arm docs/forensic_audit.md section 3.2 found missing."),
     "allergy-v1": SealedGold(
         "allergy-v1", GOLD_DIR / "allergy_v1.json", GOLD_DIR / "allergy_v1.sha256",
         MTSAMPLES, "allergy-v1",
