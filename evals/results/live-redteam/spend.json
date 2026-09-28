@@ -1,0 +1,45 @@
+{
+  "run_id": "live-redteam-20260928T094208Z",
+  "calls": 26,
+  "cap_usd": 0.5,
+  "ceiling_usd": 8.0,
+  "billed_usd": 0.017301,
+  "cap_used": 0.0346,
+  "cost_per_call_usd": 0.000665,
+  "tokens": {
+    "input": 20227,
+    "output": 4494,
+    "cached": 0,
+    "reasoning": 0
+  },
+  "latency_ms": {
+    "p50": 1289.8,
+    "p95": 1870.3,
+    "max": 3864.8
+  },
+  "retried_calls": 0,
+  "failed_calls": 0,
+  "price_check": {
+    "calls_with_provider_cost": 26,
+    "estimate_total_usd": 0.017301,
+    "provider_total_usd": 0.017303,
+    "drift_usd": 2e-06
+  },
+  "by_model": {
+    "google/gemini-2.5-flash": {
+      "calls": 26,
+      "billed_usd": 0.017301,
+      "input_tokens": 20227,
+      "output_tokens": 4494
+    }
+  },
+  "destinations": [
+    {
+      "endpoint": "https://openrouter.ai/api/v1",
+      "provider": "Google",
+      "model_served": "google/gemini-2.5-flash"
+    }
+  ],
+  "model_drift": [],
+  "per_call_log": "data/cache/metrics/live-redteam-20260928T094208Z.jsonl"
+}
