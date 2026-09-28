@@ -1,7 +1,7 @@
 # MediExtract — executive summary and governance audit
 
 PE6201 End-of-Course Project · `google/gemini-2.5-flash` via OpenRouter · prompt fingerprint
-`a92d2abcb2af4294` · 377 tests green under both standard and `python -O` execution.
+`a92d2abcb2af4294` · 407 tests green under both standard and `python -O` execution.
 
 ---
 
@@ -25,6 +25,24 @@ it, or nothing at all.
 | Silent-failure rate | 0.2517 | the number that matters clinically: wrong *and* presented as verified |
 | Median latency | 1,293 ms | 66/67 inside the 3,000 ms persona budget |
 | Cost per note | **$0.000617** | cost per *correct field* $0.000383 — the honest unit |
+
+### 1.1 Ground-truth provenance, stated separately per corpus
+
+There is no single labelling story here, and reporting one would misdescribe both corpora.
+
+| Corpus | Method | Who | What this licenses |
+| :--- | :--- | :--- | :--- |
+| `gold-v1` → `gold-v2` | **hand-labelled from scratch**, then 16 rule-derived and 2 human-signed corrections | `rohit` | the headline recall figures |
+| `allergy-v1` (+ stripped twin) | **machine-labelled, no human review pass** | `claude-opus-5` — a different family from the system under test | the header-leakage finding only |
+
+`evals/label_gold_v1.py` is hand-labelling infrastructure: it makes zero model calls, and the
+commit that introduced the corpus records it as `gold-v1: 67 hand-labelled Eka Care cases`. The
+gate the pipeline runs at inference time was switched **on** during labelling, so a span a human
+could not ground was never accepted as gold.
+
+Neither corpus was produced by machine pre-labelling followed by human review. Human-first
+labelling is the stronger provenance and is claimed only for the corpus that has it; the allergy
+set's weaker provenance is stated wherever its result is used.
 
 ---
 

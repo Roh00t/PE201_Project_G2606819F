@@ -19,7 +19,7 @@ The persona and problem decomposition behind that are in [`docs/decomposition.md
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-./.venv/bin/python -m unittest discover -s tests          # 377 tests, no API key needed
+./.venv/bin/python -m unittest discover -s tests          # 407 tests, no API key needed
 ./.venv/bin/python src/extract.py --note gold/case_001.txt --mock
 ```
 
@@ -85,14 +85,19 @@ reported in three parts: 0.6452 (gold-v1) → 0.7230 (same outputs, corrected la
 ## Dataset integrity
 
 Every corpus is hash-sealed and mode `0444`. A seal is write-once; corrections go to a new version.
+**Labelling provenance differs by corpus and the two are never pooled.**
 
-| Version | SHA-256 | n | What it is |
-| :--- | :--- | ---: | :--- |
-| `gold-v1` | `1f594e46…` | 67 | 268 hand-labelled fields, Eka Care Latin-script split. **Never edited.** |
-| `gold-v2` | **`d5e90f5a…a959`** | 67 | gold-v1 + 18 corrections: 16 rule-derived, 2 signed by `rohit` |
-| `allergy-v1` | `10725be9…` | 20 | MTSamples notes with positive allergies (gold-v1 has zero) |
-| `allergy-v1-stripped` | `1d02348e…` | 20 | the same labels, ALL-CAPS headers removed — the leakage report |
-| `paraphrase-v1` | `fa3fa8bf…` | 67 | the same consults re-dictated around identical values — the near-distribution arm |
+| Version | SHA-256 | n | Labelled by | What it is |
+| :--- | :--- | ---: | :--- | :--- |
+| `gold-v1` | `1f594e46…` | 67 | **human, from scratch** (`rohit`) | 268 fields hand-labelled through `evals/label_gold_v1.py` with the production gate live during labelling. No model proposed any label. **Never edited.** |
+| `gold-v2` | **`d5e90f5a…a959`** | 67 | **rule + human** | gold-v1 + 18 corrections: 16 derived mechanically from `FIELD_RULES`, 2 signed by `rohit` for cases a rule could not decide |
+| `allergy-v1` | `10725be9…` | 20 | **machine, unreviewed** (`claude-opus-5`) | MTSamples notes with positive allergies (gold-v1 has zero). A different model family from the system under test, which is the prescribed remedy for circularity but **not a clinician's hand** |
+| `allergy-v1-stripped` | `1d02348e…` | 20 | same labels as above | ALL-CAPS headers removed — the leakage report |
+| `paraphrase-v1` | `fa3fa8bf…` | 67 | inherited from gold-v2, byte-identical | the same consults re-dictated around unchanged values — the near-distribution arm |
+
+No corpus here was machine-pre-labelled and then human-reviewed. `gold-v1`/`gold-v2` are
+human-first; `allergy-v1` is machine-only. Conflating the two would overstate the allergy set and
+understate gold-v1.
 
 ```bash
 cd data/gold_labels && shasum -a 256 -c *.sha256      # all five OK
@@ -101,7 +106,7 @@ cd data/gold_labels && shasum -a 256 -c *.sha256      # all five OK
 ## Reproducing
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests          # 377 tests
+./.venv/bin/python -m unittest discover -s tests          # 407 tests
 ./.venv/bin/python -O -m unittest discover -s tests       # again, assertions stripped
 ./.venv/bin/python -m unittest tests.test_guardrails_doc  # the spec checks itself
 ./.venv/bin/python -m pyflakes src evals evals/probes tests demo data/gazetteer data/allergy_set

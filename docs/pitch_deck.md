@@ -132,8 +132,8 @@ Then switch to `demo/review.html` and point at one highlighted span.
 {
   "scene_id": "09_ci_verification",
   "timestamp": "06:00-06:30",
-  "narration_text": "Last thing. Three hundred and seventy-seven tests, and I run them twice — the second time with python dash capital O, which strips every assert statement out of the bytecode. That is exactly why no safety gate in this codebase is allowed to be an assert, and an AST walk enforces it. And this one: my security document parses its own code snippets, resolves every symbol it cites against the real source, and compares every number it quotes to the artefact that produced it. Change a figure in the document without re-running the experiment and the test suite goes red and names the file that disagrees. The documentation cannot drift from the code, because the code refuses to let it.",
-  "latex_overlay_code": "\\begin{tikzpicture}\n  \\node[draw, thick, rounded corners, fill=black!92, text=green!75!black, font=\\ttfamily\\small, align=left, inner sep=10pt] {\n    \\$ python -O -m unittest discover -s tests\\\\\n    Ran 377 tests ... \\textbf{OK}\\\\[6pt]\n    \\$ python -m unittest tests.test\\_guardrails\\_doc\\\\\n    Ran 15 tests ... \\textbf{OK}\\\\[6pt]\n    \\textcolor{white}{-- every snippet parses}\\\\\n    \\textcolor{white}{-- every file:symbol resolves}\\\\\n    \\textcolor{white}{-- every quoted metric == its artefact}\n  };\n\\end{tikzpicture}"
+  "narration_text": "Last thing. Four hundred and seven tests, and I run them twice — the second time with python dash capital O, which strips every assert statement out of the bytecode. That is exactly why no safety gate in this codebase is allowed to be an assert, and an AST walk enforces it. And this one: my security document parses its own code snippets, resolves every symbol it cites against the real source, and compares every number it quotes to the artefact that produced it. Change a figure in the document without re-running the experiment and the test suite goes red and names the file that disagrees. The documentation cannot drift from the code, because the code refuses to let it.",
+  "latex_overlay_code": "\\begin{tikzpicture}\n  \\node[draw, thick, rounded corners, fill=black!92, text=green!75!black, font=\\ttfamily\\small, align=left, inner sep=10pt] {\n    \\$ python -O -m unittest discover -s tests\\\\\n    Ran 407 tests ... \\textbf{OK}\\\\[6pt]\n    \\$ python -m unittest tests.test\\_guardrails\\_doc\\\\\n    Ran 15 tests ... \\textbf{OK}\\\\[6pt]\n    \\textcolor{white}{-- every snippet parses}\\\\\n    \\textcolor{white}{-- every file:symbol resolves}\\\\\n    \\textcolor{white}{-- every quoted metric == its artefact}\n  };\n\\end{tikzpicture}"
 }
 ```
 
@@ -151,7 +151,7 @@ Then switch to `demo/review.html` and point at one highlighted span.
 | 6 | Header leakage | 0:55 | 0.900 → 0.650; every gate is precision-only |
 | 7 | Paired statistics | 0:45 | 7.8 pts labels / 0.7 pts system; p = 0.008 vs 0.373 |
 | 8 | The judge, refused | 0:35 | gate written first; 0.2093; loses to a rubber stamp |
-| 9 | Self-verifying CI | 0:30 | 377 tests under `-O`; the doc cannot drift |
+| 9 | Self-verifying CI | 0:30 | 407 tests under `-O`; the doc cannot drift |
 
 ## If you must cut to 5 minutes
 
