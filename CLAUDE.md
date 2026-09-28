@@ -202,7 +202,11 @@ gold-v2, not in a prompt or a loosened gate.
 
 `score_arm.py` prints the majority-class baseline beside every arm, because a recall figure with
 nothing to compare against says nothing: answering `not_stated` to everything already agrees
-with gold on 113 of 268 field decisions.
+with gold on 113 of 268 field decisions. **The baseline moves with the answer key**: it is 113/268
+against gold-v1 and **120/268 against gold-v2**, because the 18 corrections turned several doses
+into `not_stated`. Quote the one belonging to the gold the arm was scored against, and pass
+`--gold` explicitly — `score_arm.py` defaults to gold-v1, which scores the gold-v2 run at 0.6516
+instead of 0.7297.
 
 ### 5.6 Never report a gap without testing it
 

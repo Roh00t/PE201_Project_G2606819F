@@ -20,7 +20,7 @@ it, or nothing at all.
 | Measure | Result | Comparator |
 | :--- | ---: | :--- |
 | Pooled recall, sealed `gold-v2`, n = 67 | **0.7297** | regex + 14,689-name RxNorm gazetteer: **0.381** |
-| | | majority class (all `not_stated`): **0.000**, yet agrees with gold 113/268 |
+| | | majority class (all `not_stated`): **0.000**, yet agrees with gold 120/268 |
 | Precision | 0.7500 | — |
 | Silent-failure rate | 0.2517 | the number that matters clinically: wrong *and* presented as verified |
 | Median latency | 1,293 ms | 66/67 inside the 3,000 ms persona budget |

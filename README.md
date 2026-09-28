@@ -61,7 +61,7 @@ Against sealed `gold-v2`, 67 Eka Care consults, 268 field decisions.
 | :--- | ---: | :--- |
 | **gemini-2.5-flash, gated** | **0.7297** | — |
 | regex + RxNorm gazetteer (14,689 names) | 0.381 | the non-AI comparator |
-| majority class ("everything is not_stated") | 0.000 | agrees with gold on 113/268 anyway |
+| majority class ("everything is not_stated") | 0.000 | agrees with gold on 120/268 anyway |
 
 Cost **$0.000617 per note** → **~$3.58 per physician-year** at 24 notes/day (`docs/cost_to_serve.md` records $3.57 from the previous run at $0.000615/note; the 0.3% gap is run-to-run token variation, not a revision). Median latency
 1,293 ms; 66/67 inside the 3-second budget.
