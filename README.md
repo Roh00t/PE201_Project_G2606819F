@@ -68,7 +68,7 @@ values `Needs review` — retained and visible, neither accepted nor silently de
 Close the browser tab, then prove nothing survived:
 
 ```bash
-pgrep -fl "extract.py|build_ehr|build_review|run_ekacare|lowcode_arm|live_redteam|judge_calibration"
+pgrep -fl "python.*(src|evals|demo)/[a-z_0-9]*\.py"
 lsof -nP -iTCP -sTCP:LISTEN | grep python
 unset OPENROUTER_API_KEY && deactivate
 ```

@@ -78,11 +78,13 @@ python evals/run_ekacare.py --gold-version gold-v2 --experiment marker-check --r
 ```bash
 # 1. close the browser tab showing demo/ehr.html — it is a file, not a service
 # 2. prove no process of ours survived
-pgrep -fl "extract.py|build_ehr|build_review|run_ekacare|lowcode_arm|live_redteam|judge_calibration"
+pgrep -fl "python.*(src|evals|demo)/[a-z_0-9]*\.py"
 ```
 
 **No output means nothing is running.** `pgrep` exits 1 when it matches nothing, so an empty
-response is the clean result. Confirm nothing is listening either:
+response is the clean result. The pattern matches our own script *paths* rather than bare words
+deliberately — a list containing `diagnose` matches macOS's `sysdiagnosed` and reports a false
+alarm. Confirm nothing is listening either:
 
 ```bash
 lsof -nP -iTCP -sTCP:LISTEN | grep python
@@ -110,6 +112,7 @@ from the environment entirely:
 | `python src/extract.py --note … --mock` | runs; exit 0 or 1 |
 | `python demo/build_ehr.py` · `build_review.py` | both build |
 | `python evals/score_arm.py …` · `metrics.py` · `lowcode_arm.py` | all score saved artefacts |
+| `python evals/diagnose.py …` · `refused_controls.py` | attribution and the refusals, both offline |
 | `python src/extract.py --note …` *(live, no `--mock`)* | refuses with `ERR_CONFIG_NO_API_KEY` |
 
 That last row is the design: a missing key produces a named refusal, not a crash and not a silent
@@ -474,6 +477,54 @@ python evals/live_redteam.py --report evals/results/live-redteam
 ```
 
 Both recompute their statistics from saved verdicts and make **no calls**.
+
+### Why a field failed — the attribution
+
+A score says how much is wrong. This says *what* is wrong and which layer owns it.
+
+```bash
+python evals/diagnose.py evals/results/gold-v2-live
+```
+
+It assigns one cause to every field decision, and the result is the single most useful measurement
+in the project: **31 of the 36 silent failures (86%) are one defect — drug selection in a
+multi-drug note** (17 directly, 14 as the cascade of reporting that drug's dose and schedule).
+**Zero belong to the model layer and zero to the gate layer**, and all 36 returned values are
+present in the note, so there is no hallucination in the set. It also prints the split that sizes
+the prize: **recall 0.990 (101/102) where the drug choice agrees, 0.196 (9/46) where it does not.**
+
+> **Do not pass `--gold` unless you mean a cross-gold measurement.** It now reads the version the
+> run's `manifest.json` records. It used to default to gold-v1, so this exact bare invocation
+> attributed the gold-v2 run against v1 labels — 43 silent instead of 36, recall 0.652 instead of
+> 0.730, and 16 spurious "gold-v2 candidates" — while printing the path it used, so nothing looked
+> wrong. Same trap as `score_arm.py`'s default above, fixed the same way.
+
+### Two controls that were measured and refused
+
+```bash
+python evals/refused_controls.py
+python evals/refused_controls.py --report      # re-read the artefact
+```
+
+Both were proposed to reduce the 0.2517 silent-failure rate; neither can, and the measurement is
+the deliverable. No model calls.
+
+- **Proximity gate** on attribution and temporal cues: **0 of 36 caught at every window** (5, 10,
+  15, 25 words, whole note), because **15 of its 16 cue words appear zero times in all 67 notes**.
+  Broaden the lexicon until it fires and it inverts — 0 caught against **9** correct fields
+  destroyed — because in a dictated prescription the cue *is* the positive signal. `case_053` reads
+  *"has been taking Dolo 650"* and gold is `Dolo` / `650`, **found**.
+- **S-16 allergy recall check**: **sensitivity 0 of 4**. Its trigger word is `\ballerg\w*`, and on
+  the stripped corpus that word **is the header that was stripped** — it matches 20 of 20 intact
+  notes, where the model already succeeds, and none of the four it missed. Circular by
+  construction.
+
+The second refusal corrected the project's own earlier reading of the header-leakage result:
+**201** ALL-CAPS headers survive in the intact corpus against **1** stripped, and the stripped
+variant's labels are *carried over* from the intact notes rather than derived from the text they
+are scored against. The header was the clinical signal for that field, not a formatting crutch, so
+the 0.650 is a ceiling set by the input. `guardrails.md` §6.6 and §6.10 carry both, with eight
+figures checked against the artefact by the doc test.
 
 ---
 
