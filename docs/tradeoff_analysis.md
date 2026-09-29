@@ -27,7 +27,9 @@ change what the system *is*, invalidating the entire security specification. Tha
 saving, not a latency one.
 
 **The gates are the product.** A field that cannot be grounded is wiped to `null` — never to a
-display string. Precision 0.750, silent-failure rate 0.252. Enforcing verbatim evidence spans
+display string. Precision 0.750, silent-failure rate 0.252 — **31 of those 36 fields are one
+defect, drug selection in a multi-drug note, owned by the schema and reachable by no gate**;
+two controls proposed to reduce it were measured and refused. Enforcing verbatim evidence spans
 roughly doubles output tokens, about **$1.90 per physician-year**: the explicit cash price of the
 safety property.
 
@@ -86,7 +88,7 @@ probabilistic layer failed, the deterministic layer held.
 
 ## Verification
 
-485 tests pass standard and under `python -O`, which strips `assert` — the reason no runtime gate
+519 tests pass standard and under `python -O`, which strips `assert` — the reason no runtime gate
 may be one. `tests/test_guardrails_doc.py` parses the security specification with Python's `ast`
 module and fails if a quoted metric no longer equals the artefact it names. Five corpora are
 hash-sealed at `0444` and tagged. Total project spend: **$0.32 of an $8 ceiling**.

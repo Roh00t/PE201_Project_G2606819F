@@ -369,3 +369,43 @@ nowhere to put an injection tripwire, and the model obeyed 5 of 10 injections.
 `docs/lowcode_pack/` holds the exact prompt and schema exported from `extract.py` plus a converter,
 so a real console run can be scored by the same path. A test fails if the pack drifts from the live
 prompt.
+
+### 5.12 Refused controls, and where 0.2517 actually comes from
+
+```bash
+./.venv/bin/python evals/refused_controls.py            # no model calls
+./.venv/bin/python evals/refused_controls.py --report   # re-read the artefact
+./.venv/bin/python evals/diagnose.py evals/results/gold-v2-live   # reads the run's own gold
+```
+
+**Do not try to gate away the silent-failure rate.** Attributed by owning layer, **31 of the 36
+silent failures (86%) are one defect: drug selection in a multi-drug note** — 17 directly, 14 as
+the cascade of that drug's dose and schedule. Zero belong to the model layer and zero to the gate
+layer, and all 36 returned values are present in the note, so there is no hallucination in the set.
+`diagnose.py` sizes the prize: **recall 0.990 (101/102) where the drug choice agrees, 0.196 (9/46)
+where it does not.** The fix is the medication list and it needs a gold-v3.
+
+Two controls have been specified, measured and **refused**, and §6.10 keeps the numbers so the next
+person to propose one meets the measurement first:
+
+- **Proximity gate** on attribution/temporal cues: 0 of 36 caught at every window, because 15 of
+  its 16 cue words occur zero times in 67 notes. Broaden the lexicon and it inverts — 0 caught
+  against 9 correct fields destroyed, because in a dictated prescription the cue *is* the positive
+  signal (`case_053`: *"has been taking Dolo 650"*, gold `Dolo` / `650`, found).
+- **S-16 recall check**: sensitivity **0 of 4**. Its trigger word is `\ballerg\w*` and on the
+  stripped corpus that word **is the header that was stripped** — it matches 20 of 20 intact notes
+  and none of the four misses. Circular by construction.
+
+**S-16's refusal corrected §6.6.** The header was the *clinical signal* for the allergy field, not
+a formatting crutch: 201 ALL-CAPS headers survive intact against 1 stripped, and
+`label_allergy_v1.py` uses one `LABELS` dict for both variants and never reads the stripped text —
+so the stripped answers are carried over, not derivable from the notes they are scored against. The
+0.650 is a ceiling set by the input. **No recall control can recover information the text no longer
+contains**, and `tests/test_refused_controls.py:NeitherControlIsShipped` fails if either control
+creeps into `src/extract.py` later.
+
+**`diagnose.py` no longer defaults its gold.** It reads the version the run's `manifest.json`
+records. The old default was gold-v1, so the documented bare invocation attributed the gold-v2 run
+against v1 labels — 43 silent instead of 36, recall 0.652 instead of 0.730, 16 spurious gold-v2
+candidates — while printing the path it used. Same bug class as `score_arm.py`'s default (§5.5);
+pass `--gold` only when you mean a cross-gold measurement.

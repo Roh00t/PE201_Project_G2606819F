@@ -253,3 +253,40 @@ class CommandLine(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TheGoldComesFromTheRunNotADefault(unittest.TestCase):
+    """A silent default answer key is worse than no default.
+
+    `--gold` used to default to gold-v1. Attributing the gold-v2 run without the
+    flag therefore scored it against v1 labels and reported 43 silent failures
+    instead of 36, recall 0.652 instead of 0.730, and 16 spurious "gold-v2
+    candidates" - while printing the gold path it used, so nothing looked wrong.
+    Same bug class as `score_arm.py`'s default, recorded in CLAUDE.md 5.5.
+    """
+
+    def test_an_explicit_gold_always_wins(self):
+        asked = ROOT / "data" / "gold_labels" / "gold_v1.json"
+        got = diagnose.gold_for(ROOT / "evals" / "results" / "gold-v2-live", asked)
+        self.assertEqual(got, asked)
+
+    def test_without_a_flag_it_reads_the_runs_manifest(self):
+        got = diagnose.gold_for(ROOT / "evals" / "results" / "gold-v2-live", None)
+        self.assertEqual(got.name, "gold_v2.json")
+
+    def test_a_gold_v1_run_still_resolves_to_gold_v1(self):
+        run = ROOT / "evals" / "results" / "20260920T133717Z-gemini-2.5-flash"
+        if not (run / "manifest.json").is_file():
+            self.skipTest("that run is not on disk")
+        self.assertEqual(diagnose.gold_for(run, None).name, "gold_v1.json")
+
+    def test_a_run_without_a_manifest_falls_back_rather_than_crashing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(diagnose.gold_for(Path(tmp), None), diagnose.SEALED_PATH)
+
+    def test_attributing_the_gold_v2_run_bare_gives_its_own_taxonomy(self):
+        # The regression this exists to prevent: 17 MED_DIFFERENT_DRUG against
+        # gold-v2, 16 against gold-v1. The count is the tell.
+        run = ROOT / "evals" / "results" / "gold-v2-live"
+        report = diagnose.diagnose(run, diagnose.gold_for(run, None))
+        self.assertEqual(report["causes"]["MED_DIFFERENT_DRUG"], 17)

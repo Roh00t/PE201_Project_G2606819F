@@ -32,7 +32,7 @@ python3 -m venv .venv && source .venv/bin/activate && pip install -r requirement
 python -m unittest discover -s tests
 ```
 
-`OK` and **485 tests** means the whole system is verified — gates, scoring, statistics, both demo
+`OK` and **519 tests** means the whole system is verified — gates, scoring, statistics, both demo
 screens — with no key and no network.
 
 ```bash
@@ -165,7 +165,7 @@ cd data/gold_labels && shasum -a 256 -c *.sha256      # all five OK
 ## Reproducing
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests          # 485 tests
+./.venv/bin/python -m unittest discover -s tests          # 519 tests
 ./.venv/bin/python -O -m unittest discover -s tests       # again, assertions stripped
 ./.venv/bin/python -m unittest tests.test_guardrails_doc  # the spec checks itself
 ./.venv/bin/python -m pyflakes src evals evals/probes tests demo data/gazetteer data/allergy_set

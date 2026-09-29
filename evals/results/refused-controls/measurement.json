@@ -1,0 +1,166 @@
+{
+  "at": "2026-09-29T13:12:32+00:00",
+  "no_model_calls": true,
+  "headline": {
+    "proximity_literal_caught_5w": 0,
+    "proximity_literal_destroyed_25w": 2,
+    "proximity_extended_caught_5w": 0,
+    "proximity_extended_destroyed_5w": 9,
+    "proximity_extended_destroyed_10w": 17,
+    "literal_cues_absent_from_every_note": 15,
+    "s16_sensitivity_flagged": 0,
+    "s16_allergies_missed": 4,
+    "s16_hint_matches_intact": 20,
+    "s16_hint_matches_stripped": 9,
+    "caps_headers_intact": 201,
+    "caps_headers_stripped": 1
+  },
+  "proximity_gate": {
+    "verdict": "REFUSED",
+    "population": {
+      "silent_failures": 36,
+      "correct_verified": 107
+    },
+    "sweep": {
+      "literal": [
+        {
+          "window_words": 5,
+          "silent_caught": 0,
+          "correct_destroyed": 0
+        },
+        {
+          "window_words": 10,
+          "silent_caught": 0,
+          "correct_destroyed": 0
+        },
+        {
+          "window_words": 15,
+          "silent_caught": 0,
+          "correct_destroyed": 0
+        },
+        {
+          "window_words": 25,
+          "silent_caught": 0,
+          "correct_destroyed": 2
+        },
+        {
+          "window_words": null,
+          "silent_caught": 0,
+          "correct_destroyed": 2
+        }
+      ],
+      "extended": [
+        {
+          "window_words": 5,
+          "silent_caught": 0,
+          "correct_destroyed": 9
+        },
+        {
+          "window_words": 10,
+          "silent_caught": 1,
+          "correct_destroyed": 17
+        },
+        {
+          "window_words": 15,
+          "silent_caught": 1,
+          "correct_destroyed": 23
+        },
+        {
+          "window_words": 25,
+          "silent_caught": 1,
+          "correct_destroyed": 27
+        },
+        {
+          "window_words": null,
+          "silent_caught": 4,
+          "correct_destroyed": 31
+        }
+      ]
+    },
+    "literal_cue_prevalence_in_67_notes": {
+      "father": 0,
+      "mother": 0,
+      "son": 0,
+      "daughter": 0,
+      "husband": 0,
+      "wife": 0,
+      "brother": 0,
+      "sister": 0,
+      "stopped": 0,
+      "discontinued": 0,
+      "ceased": 0,
+      "until": 0,
+      "was on": 0,
+      "consider": 1,
+      "may start": 0,
+      "plan to start": 0
+    },
+    "notes_containing_any_literal_cue": 1,
+    "correct_fields_a_5_word_extended_gate_would_wipe": [
+      "case_006.dose",
+      "case_006.frequency",
+      "case_006.medication",
+      "case_030.frequency",
+      "case_030.medication",
+      "case_042.dose",
+      "case_042.medication",
+      "case_053.dose",
+      "case_053.medication"
+    ],
+    "why": "The literal lexicon catches nothing at any window because the words are absent from the corpus. The extended lexicon fires, and inverts: in a dictated prescription the cue introduces the drug being prescribed, so the gate wipes correct answers."
+  },
+  "s16": {
+    "verdict": "REFUSED",
+    "arms": {
+      "gold-v2-live": {
+        "role": "specificity: 0 allergy positives, so any firing is a false alarm",
+        "cases": 67,
+        "allergy_positives_in_gold": 0,
+        "trigger_fired": 1,
+        "fired_on": [
+          "case_039"
+        ],
+        "allergies_missed": 0,
+        "missed": [],
+        "missed_and_flagged": 0,
+        "hint_matches_note": 1,
+        "caps_headers_surviving": 0
+      },
+      "leak-allergy-v1": {
+        "role": "headers intact",
+        "cases": 20,
+        "allergy_positives_in_gold": 20,
+        "trigger_fired": 0,
+        "fired_on": [],
+        "allergies_missed": 0,
+        "missed": [],
+        "missed_and_flagged": 0,
+        "hint_matches_note": 20,
+        "caps_headers_surviving": 201
+      },
+      "leak-allergy-v1-stripped": {
+        "role": "sensitivity: the corpus where allergies are missed",
+        "cases": 20,
+        "allergy_positives_in_gold": 20,
+        "trigger_fired": 0,
+        "fired_on": [],
+        "allergies_missed": 4,
+        "missed": [
+          "allergy_011",
+          "allergy_014",
+          "allergy_017",
+          "allergy_020"
+        ],
+        "missed_and_flagged": 0,
+        "hint_matches_note": 9,
+        "caps_headers_surviving": 1
+      }
+    },
+    "sensitivity": {
+      "flagged": 0,
+      "missed": 4
+    },
+    "why": "The trigger word is the header that stripping removes. ALLERGY_HINTS matches 20 of 20 intact notes - where the model already finds the allergy - and none of the notes where it was missed. The control is loudest where it is unnecessary and silent where it is needed.",
+    "reframes_6_6": "After stripping, nothing marks a substance as an allergy rather than a medication: 201 ALL-CAPS headers survive intact against 1 stripped. The stripped variant's labels are carried over from the intact notes (evals/label_allergy_v1.py uses one LABELS dict for both and never reads the stripped text), so the answers are not derivable from the stripped notes. The header was the clinical signal, not a formatting crutch, and no recall control can recover information the text no longer contains."
+  }
+}

@@ -570,3 +570,74 @@ retyped, plus a converter, so a real twenty-minute console run can be scored by 
 a test fails if the pack drifts from the live prompt. The honest limit: the proxy still enjoys this
 project's `FIELD_RULES` prompt work, so it measures *this model and prompt without gates*, not
 Google AI Studio. The pack is what would close that, and it has not been run.
+
+**D23 · Two recall controls were specified, measured, and refused — and the second refusal
+corrects §6.6's own interpretation.** The brief was to engineer the 0.2517 silent-failure rate
+down with two deterministic gates. Neither can touch it, and measuring that was worth more than
+building them.
+
+**First, what 0.2517 is made of.** Attributed through `evals/metrics.py:failure_taxonomy`,
+restricted to the 36 fields coded `VERIFIED`: 17 `MED_DIFFERENT_DRUG`, 8 `FREQ_DIFFERENT_REGIMEN`,
+6 `DOSE_OTHER_DRUG`, 3 `DOSE_GOLD_SILENT`, 2 `FREQ_PHRASE_LENGTH`. **31 of 36 (86%) are one defect
+— drug selection in a multi-drug note** — 17 directly and 14 as the cascade of reporting that
+drug's dose and schedule. **Zero are owned by the model layer and zero by the gate layer.** All 36
+returned values are present in the note, so there is no hallucination in this set: every silent
+failure is a correctly-copied fact about the wrong drug. `evals/diagnose.py` sizes the prize —
+**recall 0.990 (101/102) where the drug choice agrees against 0.196 (9/46) where it does not.**
+The fix is the medication list, whose technical blocker `probe_v4_schema.py` already cleared; it is
+deferred because scoring it needs a gold-v3 with multi-drug containment labels.
+
+**G-32, the proximity gate: refused.** Wipe a field when an attribution, temporal or contemplation
+cue sits within five words of its evidence. It catches **0 of 36 at every window** (5, 10, 15, 25
+words, and the whole note), because **15 of the 16 specified words appear zero times in all 67
+notes** — `father`, `mother`, `stopped`, `discontinued`, `was on` and the rest. Broaden the lexicon
+until it fires and it inverts: **0 caught against 9 correct fields destroyed** at five words, 1
+against 17 at ten. The reason is structural and is the finding: in a dictated prescription the cue
+*is* the positive signal. `case_053` reads *"has been taking Dolo 650"* and gold is
+`medication: Dolo`, `dose: 650`, **found** — a gate wiping on that phrase destroys two correct
+fields.
+
+**S-16, the recall check: refused, and it was circular.** Flag an empty allergy field when the note
+carries an allergy hint with no denial nearby. The specification predicted 4 of the 5
+header-dependent flips. Measured sensitivity: **0 of 4**. Its hint pattern is `\ballerg\w*`, and on
+the stripped corpus **that word is the header that was stripped**. It matches **20 of 20** intact
+notes — where the model already finds the allergy — and **9 of 20** stripped ones, none of them the
+four that were missed. The control is loudest where it is unnecessary and silent where it is
+needed. The specification's prediction had been computed against the *intact* notes.
+
+**And that corrects D15's interpretation of the leakage result.** D15 concluded "a quarter of the
+allergy performance was reading `ALLERGIES:` rather than reading the sentence". The measurement does
+not support the implied shortcut. **201** ALL-CAPS `HEADER:` markers survive in the intact corpus
+against **1** in the stripped one, and in the stripped text a bare comma-separated drug name after
+a medication list is indistinguishable from another medication — `...Ancef IV., ACCUTANE., Denies
+smoking...`. Decisively, `evals/label_allergy_v1.py` uses one `LABELS` dict for both variants and
+never reads the stripped text, so **the stripped set's answers are carried over from the intact
+notes and are not derivable from the notes they are scored against**. A human labeller given only
+the stripped note could not recover those four either.
+
+The 0.900 → 0.650 drop stands, and so does "four of the five flips are the model going silent".
+What changes is why: the header *was* the clinical signal for this field, not a formatting crutch,
+and removing it removed the answer. That is a weaker claim about the model and a stronger one about
+the task — and it is why no recall control can close this gap. The 0.650 is a ceiling set by the
+input, not a defect to be gated away.
+
+**What was deliberately not shipped.** The `DENIAL` widening the specification proposes (allowing
+one intervening word, taking the gold-v2 trigger rate from 1 of 67 to 0 of 67) was verified and
+left out: with the control refused it would be dead code, and editing a pattern recorded in a
+sealed corpus's provenance would retroactively falsify how that corpus was built.
+`tests/test_refused_controls.py:NeitherControlIsShipped` fails if `needs_second_pass`,
+`ALLERGY_HINTS` or a denial pattern appears in `src/extract.py`.
+
+**Unchanged, and that is the result.** `recall 0.7297`, `precision 0.7500`,
+`silent_failure_rate 0.2517`, `gate_false_positive_rate 0.0`. §6.6's claim now has two failed
+candidates behind it rather than an enumeration: **every gate in this system is a precision
+control, none is a recall control**, the gap is real, and closing it needs a corpus where allergies
+are stated in prose or a schema change — not another gate. Measurement in
+`evals/refused_controls.py` (no model calls), artefact at
+`evals/results/refused-controls/measurement.json`, eight figures checked against it by the doc test.
+
+**One bug found on the way.** `evals/diagnose.py` defaulted `--gold` to gold-v1, so the invocation
+its own docstring documents attributed the gold-v2 run against v1 labels — 43 silent instead of 36,
+recall 0.652 instead of 0.730, 16 spurious gold-v2 candidates — while printing the path it used, so
+nothing looked wrong. It now reads the gold the run's manifest records. Same bug class as
+`score_arm.py`'s default (§5.5).

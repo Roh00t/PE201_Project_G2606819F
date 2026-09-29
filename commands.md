@@ -4,7 +4,7 @@ Every command below was executed on a clean checkout before this document was wr
 terminal output quoted is the output those commands actually produced. Paths are relative to the
 repository root.
 
-**You can verify the entire system — all 485 tests, the CLI, the safety gates, the scoring tools
+**You can verify the entire system — all 519 tests, the CLI, the safety gates, the scoring tools
 and the review screen — with no API key and no network access.** Only §3 and §5 spend money, and
 they are marked.
 
@@ -37,7 +37,7 @@ pip install -r requirements.txt
 python -m unittest discover -s tests
 ```
 
-`OK` and 485 tests means the whole system is verified — gates, scoring, statistics, both demo
+`OK` and 519 tests means the whole system is verified — gates, scoring, statistics, both demo
 screens — with no key and no network.
 
 ```bash
@@ -106,7 +106,7 @@ from the environment entirely:
 
 | Command | Without a key |
 | :--- | :--- |
-| `python -m unittest discover -s tests` | 485 tests, `OK` |
+| `python -m unittest discover -s tests` | 519 tests, `OK` |
 | `python src/extract.py --note … --mock` | runs; exit 0 or 1 |
 | `python demo/build_ehr.py` · `build_review.py` | both build |
 | `python evals/score_arm.py …` · `metrics.py` · `lowcode_arm.py` | all score saved artefacts |
@@ -375,7 +375,7 @@ python -m unittest discover -s tests
 python -O -m unittest discover -s tests
 ```
 
-Both must print `OK`. **485 tests**, and the second run is not optional. `python -O` strips every
+Both must print `OK`. **519 tests**, and the second run is not optional. `python -O` strips every
 `assert` statement from the bytecode — which is exactly why no safety gate in this codebase is
 allowed to be one. `tests/test_guardrails.py:NoAssertInRuntimeCode` walks the AST of `src/`,
 `evals/` and `demo/` so the ban cannot rot.

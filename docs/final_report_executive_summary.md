@@ -1,7 +1,7 @@
 # MediExtract — executive summary and governance audit
 
 PE6201 End-of-Course Project · `google/gemini-2.5-flash` via OpenRouter · prompt fingerprint
-`a92d2abcb2af4294` · 485 tests green under both standard and `python -O` execution.
+`a92d2abcb2af4294` · 519 tests green under both standard and `python -O` execution.
 
 ---
 
@@ -22,7 +22,7 @@ it, or nothing at all.
 | Pooled recall, sealed `gold-v2`, n = 67 | **0.7297** | regex + 14,689-name RxNorm gazetteer: **0.381** |
 | | | majority class (all `not_stated`): **0.000**, yet agrees with gold 120/268 |
 | Precision | 0.7500 | — |
-| Silent-failure rate | 0.2517 | the number that matters clinically: wrong *and* presented as verified |
+| Silent-failure rate | 0.2517 | wrong *and* presented as verified. **31 of these 36 fields are one defect** — drug selection in a multi-drug note — reachable by no gate; see §6 |
 | Median latency | 1,293 ms | 66/67 inside the 3,000 ms persona budget |
 | Cost per note | **$0.000617** | cost per *correct field* $0.000383 — the honest unit |
 
@@ -157,9 +157,24 @@ Enforcement and measurement are separate modules on purpose: `spend_guard.py` ca
   different model family; no clinician has reviewed either.
 - **The leakage benchmark is n = 20** and sits at the exact power floor (2/2⁵ = 0.0625). It is
   reported as a defect *count* (4 of 5 flips are the model going silent), not a separated rate.
-- **The single medication slot** explains most of the residual error: where labeller and model name
-  the same drug, dose is right 24/26 and frequency 30/30. That is a schema limitation, not a model
-  one, and it is the highest-value next change.
+- **The single medication slot** owns the residual error, measured rather than asserted: **31 of
+  the 36 silent failures (86%)** are drug selection in a multi-drug note — 17 directly, 14 as the
+  cascade of that drug's dose and schedule. Zero are owned by the model layer and zero by the gate
+  layer, and all 36 returned values are present in the note, so there is no hallucination in the
+  set. **Recall is 0.990 (101/102) where the drug choice agrees and 0.196 (9/46) where it does
+  not.** A schema limitation, and the highest-value next change.
+- **Two controls were specified to reduce that rate, measured, and refused.** A proximity gate on
+  attribution and temporal cues caught **0 of 36 at every window** (15 of its 16 cue words occur
+  zero times in the corpus, and broadening it destroys 9 correct fields to catch none); an allergy
+  recall check scored **sensitivity 0 of 4**, because its trigger word is the section header that
+  stripping removes — it fires on 20 of 20 intact notes and none of the four misses.
+  `guardrails.md` §6.10 carries both. **0.2517 is unchanged, and that is the result.**
+- **A correction to the leakage interpretation.** The earlier reading was that the model "was
+  reading the formatting, not the clinical text". Measurement does not support it: 201 ALL-CAPS
+  headers survive intact against 1 stripped, and the stripped variant's labels are carried over
+  from the intact notes rather than derived from the text they are scored against. The header *was*
+  the clinical signal for this field. The 0.650 is a ceiling set by the input, not a defect to gate
+  away.
 - **No local-model benchmark** was run; the hosting decision is reasoned, not measured.
 - **The live red-team battery** budgeted in `guardrails.md` §6.2 has not been executed; the 16
   homoglyph vectors and injection tripwires are exercised against the deterministic gates offline.

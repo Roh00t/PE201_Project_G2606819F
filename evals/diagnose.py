@@ -477,10 +477,38 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("run_dir", nargs="?", type=Path, default=None,
                         help="a directory under evals/results (default: the newest)")
-    parser.add_argument("--gold", type=Path, default=SEALED_PATH, help="gold file to score against")
+    # No default. The run's own manifest names the gold it was scored against, and
+    # silently falling back to gold-v1 attributed a gold-v2 run against the wrong
+    # answer key: 43 silent instead of 36, recall 0.652 instead of 0.730, and 16
+    # spurious "gold-v2 candidates". It printed the path it used and nothing
+    # refused the mismatch. Same bug class as score_arm.py's default (CLAUDE.md
+    # 5.5), and the registry already records which gold each run belongs to.
+    parser.add_argument("--gold", type=Path, default=None,
+                        help="gold file to score against (default: the one the run's "
+                             "manifest records)")
     parser.add_argument("--quiet", action="store_true", help="JSON on stdout only")
     parser.add_argument("--debug", action="store_true", help="traceback on an internal error")
     return parser.parse_args(argv)
+
+
+def gold_for(run_dir: Path, requested: Path | None) -> Path:
+    """The gold to attribute against: what was asked for, or what the run used.
+
+    A run's `manifest.json` records the gold it was scored against. Reading it
+    rather than defaulting is what stops a gold-v2 run being attributed against
+    gold-v1 labels, which changes every count in the taxonomy.
+    """
+    if requested is not None:
+        return requested
+    manifest_path = run_dir / "manifest.json"
+    if manifest_path.is_file():
+        recorded = (json.loads(manifest_path.read_text(encoding="utf-8"))
+                    .get("gold") or {}).get("path")
+        if recorded:
+            candidate = ROOT / recorded
+            if candidate.is_file():
+                return candidate
+    return SEALED_PATH
 
 
 def main(argv=None) -> int:
@@ -492,10 +520,11 @@ def main(argv=None) -> int:
             return EXIT_UNUSABLE
         missing = [name for name in ("manifest.json", "gated.jsonl", "ungated.jsonl")
                    if not (run_dir / name).is_file()]
-        if missing or not args.gold.is_file():
-            print(f"{run_dir}: missing {missing or [str(args.gold)]}", file=sys.stderr)
+        gold = gold_for(run_dir, args.gold)
+        if missing or not gold.is_file():
+            print(f"{run_dir}: missing {missing or [str(gold)]}", file=sys.stderr)
             return EXIT_UNUSABLE
-        report = diagnose(run_dir, args.gold)
+        report = diagnose(run_dir, gold)
     except Exception as exc:
         print(f"ERROR ERR_INTERNAL (exit {EXIT_INTERNAL}): {type(exc).__name__}", file=sys.stderr)
         if args.debug:

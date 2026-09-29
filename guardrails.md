@@ -3,7 +3,7 @@
 **System:** MediExtract. It turns a dictated consult note into four schema-valid fields (medication, dose, frequency, allergy), each with a verbatim quote behind it, and a blank where no quote can be found.
 **Course:** PE6201 Emerging AI Technologies, End-of-Course Project.
 **Document status:** version 1.2, 2026-09-21 (section 0 executive summary; section 2.3 agentic readiness thresholds; sections 6.6 header leakage and 6.7 label-versus-system delta; the document now verifies itself via tests/test_guardrails_doc.py) (transport moved to OpenRouter; batch loop, scoring and the gold-v1 seal built).
-**Verified against:** the working tree on top of commit `9cd0eae`. Uncommitted at verification time: `src/extract.py` (the single pipeline file per CLAUDE.md §1.1, now with the P0 prompt corrections and the end-to-end latency fix), `evals/` (`metrics.py`, `baseline.py`, `score_arm.py`, `diagnose.py`, the sealed-gold registry in `run_ekacare.py`, and `probes/probe_v4_schema.py`), `demo/build_review.py`, the documents under `docs/`, `README.md` and `project_proposal.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 485 tests, all passing, run offline and under `python -O`; `pyflakes` clean over `src/`, `evals/`, `evals/probes/`, `tests/`, `demo/` and `data/gazetteer/`.
+**Verified against:** the working tree on top of commit `9cd0eae`. Uncommitted at verification time: `src/extract.py` (the single pipeline file per CLAUDE.md §1.1, now with the P0 prompt corrections and the end-to-end latency fix), `evals/` (`metrics.py`, `baseline.py`, `score_arm.py`, `diagnose.py`, the sealed-gold registry in `run_ekacare.py`, and `probes/probe_v4_schema.py`), `demo/build_review.py`, the documents under `docs/`, `README.md` and `project_proposal.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 519 tests, all passing, run offline and under `python -O`; `pyflakes` clean over `src/`, `evals/`, `evals/probes/`, `tests/`, `demo/` and `data/gazetteer/`.
 
 **Live evidence behind the numbers in this document.** Two full batch runs over the sealed 67-case gold set and one schema probe, $0.081684 between them; the ledger's lifetime total is $0.082276 over 136 calls against the $8 ceiling, the difference being the single-note smoke test of 2026-09-18:
 
@@ -71,7 +71,7 @@ fails if the document and the artefact disagree.*
 | :--- | :--- | :--- | :--- |
 | 1 · Problem & significance | §1.1 philosophy, §1.3 boundary | one moment: a physician verifying four fields in under 3 s | — |
 | 2 · Business & technical trade-offs | §1.5 control inventory, §2.1 matrix, §2.2 agentic bound | 30 implemented controls, 18 specified, and the reason this is the LLM list and not the Agentic one | — |
-| 3 · Implementation | §3 deep dives, §6.1 battery, §6.6 leakage | recall 0.645 (gold-v1) / 0.730 (gold-v2); 485 tests green under `python -O` | `unittest discover -s tests` |
+| 3 · Implementation | §3 deep dives, §6.1 battery, §6.6 leakage | recall 0.645 (gold-v1) / 0.730 (gold-v2); 519 tests green under `python -O` | `unittest discover -s tests` |
 | 3 · Evaluation honesty | §6.6 | the label delta and the sampling delta reported apart | `evals/metrics.py <run> --gold … --gold-b …` |
 | 4 · Communication & limitations | §0 here, §6.6 honesty block, §1.6 abstention | every gate is a precision control; none is a recall control | — |
 
@@ -135,7 +135,7 @@ clinician's hand.
 ### Verification
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests          # 485 tests
+./.venv/bin/python -m unittest discover -s tests          # 519 tests
 ./.venv/bin/python -O -m unittest discover -s tests       # again, with assertions stripped
 ./.venv/bin/python -m unittest tests.test_guardrails_doc  # this document checks itself
 ```
@@ -169,6 +169,38 @@ clinician's hand.
   "leakage_pooled_stripped": {
     "artefact": "evals/results/leak-allergy-v1-stripped/scores.json",
     "path": ["pooled", "recall"], "value": 0.4889
+  },
+  "refused_proximity_silent_caught_5w": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "proximity_literal_caught_5w"], "value": 0
+  },
+  "refused_proximity_extended_destroyed_5w": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "proximity_extended_destroyed_5w"], "value": 9
+  },
+  "refused_s16_sensitivity_flagged": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "s16_sensitivity_flagged"], "value": 0
+  },
+  "refused_s16_allergies_missed": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "s16_allergies_missed"], "value": 4
+  },
+  "refused_s16_hint_matches_intact": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "s16_hint_matches_intact"], "value": 20
+  },
+  "refused_s16_hint_matches_stripped": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "s16_hint_matches_stripped"], "value": 9
+  },
+  "caps_headers_intact": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "caps_headers_intact"], "value": 201
+  },
+  "caps_headers_stripped": {
+    "artefact": "evals/results/refused-controls/measurement.json",
+    "path": ["headline", "caps_headers_stripped"], "value": 1
   },
   "redteam_billed_usd": {
     "artefact": "evals/results/live-redteam/redteam.json",
@@ -2095,7 +2127,7 @@ Before writing any record: `if find_secrets(json.dumps(record)): drop it and ale
 
 ### 6.1 Automated safety evaluation battery
 
-**Layer 1: deterministic tests** (IMPLEMENTED; offline; no key; no spend). Run with `./.venv/bin/python -m unittest discover -s tests`: 485 tests, all passing on 2026-09-18, including under `python -O`.
+**Layer 1: deterministic tests** (IMPLEMENTED; offline; no key; no spend). Run with `./.venv/bin/python -m unittest discover -s tests`: 519 tests, all passing on 2026-09-18, including under `python -O`.
 
 | File | Classes (test count) | What it proves |
 | --- | --- | --- |
@@ -2206,7 +2238,7 @@ Fourteen categories. The owner's draft specification contributed DAN variants, c
 | Directive: value-mismatch defence (the extracted value must align with the quote) | Closed | `verify_value` and the dose number/unit gate (G-02, G-03); tests `NameGate`, `DoseGate`, `FrequencyGate` |
 | Directive: strip Markdown wrappers before Pydantic | Closed | `_strip_code_fence` (G-08); `ModelCallRetryAndLedger.test_fenced_json_is_accepted` |
 | CLAUDE.md §2.3 / §3.2: the database receives only nulls and validated types; errors and evaluation tables go to stderr | Closed | stdout holds codes, numbers and identifiers only (G-22); error messages, gate reasons, display labels, breaker reasons and the evaluation table go to stderr (G-21). Pinned by `test_stdout_carries_no_human_readable_text`, `assertEnvelope`, and `test_a_refusal_prints_a_code_on_stdout_and_the_reason_on_stderr`. |
-| CLAUDE.md §1.1: the entire core pipeline in a single Python file | Closed | `src/extract.py` is the only file under `src/`; every top-level name of the former modules was carried over (checked by script), and all 485 tests pass against the merged file, also under `python -O`. |
+| CLAUDE.md §1.1: the entire core pipeline in a single Python file | Closed | `src/extract.py` is the only file under `src/`; every top-level name of the former modules was carried over (checked by script), and all 519 tests pass against the merged file, also under `python -O`. |
 
 ### 6.2.1 Live red-team execution, against the §6.2 allocation
 
@@ -2437,6 +2469,47 @@ section header at all (measured). Singapore polyclinic dictation *is* headerless
 lesson is therefore not mainly "beware header tampering" — it is that the header-assisted 0.900 is
 the number that does **not** transfer, and the headerless 0.650 is the regime this system actually
 operates in.
+
+#### Correction: the header was the clinical signal, not a formatting crutch
+
+*Added 2026-09-29, after attempting to build the recall control §6.10 refuses. The earlier reading
+of this section was that the model "was not reading the clinical text, it was reading the
+formatting". Measurement does not support that, and the correction matters more than the original
+claim.*
+
+Look at what stripping actually removes, in the four notes whose allergy was lost:
+
+```
+allergy_014  intact    ...Ancef IV.,ALLERGIES:,  ACCUTANE.,SOCIAL HISTORY...
+             stripped  ...Ancef IV., ACCUTANE., Denies smoking...
+allergy_017  intact    ...Zyrtec 10 mg daily.,ALLERGIES TO MEDICATIONS: , Naprosyn.,...
+             stripped  ...Zyrtec 10 mg daily., Naprosyn.,SOCIAL HISTORY...
+```
+
+`ACCUTANE` and `Naprosyn` survive. What does not survive is **the only thing that said they were
+allergies rather than more medications**. Measured: **201** ALL-CAPS `HEADER:` markers in the
+intact corpus against **1** in the stripped one. In the stripped text a bare comma-separated drug
+name following a medication list is indistinguishable from another medication — to a model, and to
+a reader.
+
+**The labels prove it, because of how the corpus was built.** `evals/label_allergy_v1.py` uses one
+`LABELS` dict for both variants and never reads the stripped text
+(`tests/test_gold_versions.py:test_the_two_variants_are_the_same_cases_with_the_same_labels`). The
+stripped set's answers are **carried over from the intact notes**, so they are not derivable from
+the notes they are scored against. A human labeller handed only the stripped note could not
+recover those four either.
+
+**What this changes, and what it does not.** The drop from 0.900 to 0.650 stands, and so does the
+observation that four of the five flips are the model going silent. What changes is the
+interpretation: the model is not ignoring clinical content in favour of formatting — the formatting
+*was* the clinical content for this field, and removing it removed the answer. The finding is
+therefore about **the information a headerless note carries**, not about a shortcut the model took.
+
+That is a weaker claim about the model and a stronger one about the task, and it is the reason no
+recall control can close this gap: **§6.10 measures a control that cannot recover information the
+text no longer contains.** It also sharpens the deployment consequence rather than softening it —
+Eka Care dictation is headerless, so an allergy stated in prose is the only kind this system can
+ever find, and the 0.650 is a ceiling set by the input rather than a defect to be gated away.
 
 #### S-16: a triggered second pass (SPECIFIED, build #13)
 
@@ -2669,3 +2742,115 @@ values would no longer be strictly paired. It does not model code-switched dicta
 romanised Hindi and was re-dictated only in its English portions) and it is not Singapore
 polyclinic phrasing. Six transforms are not the space of dictation variation; they are six
 plausible directions in it, chosen before the run and named so a failure attributes.
+
+### 6.10 Two controls specified, measured, and refused
+
+Both were proposed to reduce the **0.2517** silent-failure rate. Neither can, and the reasons are
+different. The measurement is `evals/refused_controls.py`, which makes **no model calls** — every
+number below is computed from sealed corpora and finished runs already on disk, and
+`tests/test_guardrails_doc.py` checks the figures quoted here against
+`evals/results/refused-controls/measurement.json`.
+
+**First, what 0.2517 is made of**, because neither control was aimed at it. Attributed through
+`evals/metrics.py:failure_taxonomy`, restricted to the 36 fields coded `VERIFIED`:
+
+| Cause | n | Layer that owns the fix |
+| :--- | ---: | :--- |
+| `MED_DIFFERENT_DRUG` — a different drug from the same note | **17** | schema (one slot, a median of three drugs) |
+| `FREQ_DIFFERENT_REGIMEN` — the regimen of the drug it picked | 8 | schema (cascade) |
+| `DOSE_OTHER_DRUG` — the strength of the drug it picked | 6 | schema (cascade) |
+| `DOSE_GOLD_SILENT` — gold says not stated, model proposed a strength | 3 | labels or model (disputed) |
+| `FREQ_PHRASE_LENGTH` — same interval, one phrase contains the other | 2 | labels |
+
+**31 of 36 (86%) are one defect: drug selection in a multi-drug note** — 17 directly and 14 as the
+cascade of reporting that drug's dose and schedule. **Zero are owned by the model layer and zero by
+the gate layer.** All 36 returned values are present in the note, so there is no hallucination in
+this set; every silent failure is a correctly-copied fact about the wrong drug. `diagnose.py` sizes
+the prize exactly: **recall 0.990 (101/102) where the drug choice agrees, 0.196 (9/46) where it does
+not.** The fix is the medication list (§1.6), not a gate — and `probe_v4_schema.py` has already
+cleared its technical blocker.
+
+#### G-32: proximity gate on attribution, temporal and contemplation cues — REFUSED
+
+*Specified:* wipe a field when a cue (`father`, `mother`, `stopped`, `discontinued`, `was on`,
+`consider`…) sits within five words of its evidence span.
+
+| Window | Silent failures caught | Correct fields destroyed |
+| :--- | ---: | ---: |
+| 5 words | **0 of 36** | 0 of 107 |
+| 10 words | **0 of 36** | 0 of 107 |
+| 15 words | **0 of 36** | 0 of 107 |
+| 25 words | **0 of 36** | 2 of 107 |
+| anywhere in the note | **0 of 36** | 2 of 107 |
+
+It catches nothing at any width, because **15 of the 16 specified words appear zero times in all
+67 notes** — `father`, `mother`, `son`, `daughter`, `husband`, `wife`, `stopped`, `discontinued`,
+`ceased`, `was on` and the rest. Only `consider` occurs at all, in one note. Eka Care is Indian
+polyclinic dictation; family history and discontinuation language do not sit beside a prescription.
+`gold/case_002_traps.txt` was *authored* to contain exactly this, is not part of gold-v2, and on it
+the live model already declines all three traps unaided.
+
+**Broadening the lexicon to make it fire inverts it.** With a corpus-realistic set (`previously`,
+`has been taking`, `already on`, `taper`, `suggested`, `should`, `start`, `family history`…):
+
+| Window | Caught | Destroyed |
+| :--- | ---: | ---: |
+| 5 words | **0** | **9** of 107 |
+| 10 words | 1 | 17 |
+| anywhere in the note | 4 | 31 |
+
+**The reason is structural, and it is the finding.** In a dictated prescription the cue *is* the
+positive signal — it introduces the drug being prescribed. `case_053` is decisive: the note reads
+*"chest pain for the last three days, **has been taking Dolo 650**, to manage the pain"*, and gold
+is `medication: Dolo`, `dose: 650`, **found**. A gate wiping on "has been taking" destroys two
+correct fields. `case_042` ("start Sibelium 10 mg at night") and `case_006`/`case_030` ("should",
+"suggested") are the same shape. Prescriptive language is where the answer lives.
+
+**Verdict: refused.** Zero true positives at every operating point, and a false-positive cost that
+grows with sensitivity. Registered rather than deleted, because the next person to propose it
+should meet the measurement first.
+
+#### S-16: triggered recall check on a suspected missed allergy — REFUSED
+
+*Specified* (§6.6, retained above for the record): when the allergy field is empty but the note
+carries an allergy hint with no denial nearby, flag it for review. The specification predicted it
+would catch **4 of the 5** header-dependent flips.
+
+| Corpus | Role | Hint matches | ALL-CAPS headers | Trigger fired | Allergies missed | Flagged |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| `gold-v2` | specificity — 0 allergy positives, so any firing is a false alarm | 1/67 | 0 | 1 | 0 | — |
+| `allergy-v1` | headers intact | **20/20** | 201 | 0 | 0 | — |
+| `allergy-v1-stripped` | **sensitivity** — the corpus where allergies are missed | **9/20** | 1 | 0 | **4** | **0** |
+
+**Sensitivity 0 of 4.** The trigger is circular: its hint pattern is `\ballerg\w*`, and on the
+stripped corpus **that word is the header that was stripped**. It matches 20 of 20 intact notes —
+where the model already finds the allergy, so the trigger's first condition is false and it
+correctly stays quiet — and none of the four notes where the allergy was lost. **The control is
+loudest where it is unnecessary and silent where it is needed.**
+
+The specification's "4 of the 5" was computed against the *intact* notes. That is the error, and it
+is an easy one to make: the trigger reads plausibly until you ask which text it reads.
+
+**Verdict: refused, and the reason generalises.** Per §6.6's correction, the stripped notes do not
+contain the information the control would need — the labels are carried over from the intact
+variant and are not derivable from the text they are scored against. **No recall control can
+recover information the text no longer contains.** The widening of `DENIAL` the specification
+proposes (allowing one intervening word, taking the gold-v2 trigger rate from 1 of 67 to 0 of 67)
+was verified and deliberately **not shipped**: with the control refused it would be dead code, and
+editing a pattern recorded in a sealed corpus's provenance would retroactively falsify how that
+corpus was built.
+
+`tests/test_refused_controls.py:NeitherControlIsShipped` fails if `needs_second_pass`,
+`ALLERGY_HINTS` or a denial pattern appears in `src/extract.py`, so a refused control cannot creep
+into the pipeline later without the suite saying so.
+
+#### What the two refusals leave standing
+
+**§6.6's claim is unchanged and now better supported: every gate in this system is a precision
+control, and none is a recall control.** Two candidate recall controls have now been specified and
+measured, and both failed for reasons that are about the corpus rather than the implementation. The
+honest position is that this system has no recall control, that the gap is real, and that closing
+it needs either a corpus where allergies are stated in prose or a schema change — not another gate.
+
+`gate_false_positive_rate` remains **0.0** on gold-v2: no gate in the shipped system has ever
+removed a correct value. Refusing both of these is what keeps that true.
