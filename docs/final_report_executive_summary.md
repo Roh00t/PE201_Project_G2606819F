@@ -1,7 +1,7 @@
 # MediExtract — executive summary and governance audit
 
 PE6201 End-of-Course Project · `google/gemini-2.5-flash` via OpenRouter · prompt fingerprint
-`a92d2abcb2af4294` · 407 tests green under both standard and `python -O` execution.
+`a92d2abcb2af4294` · 485 tests green under both standard and `python -O` execution.
 
 ---
 

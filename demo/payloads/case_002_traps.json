@@ -1,0 +1,86 @@
+{
+  "status": "ok",
+  "schema_version": "mediextract.output.v3",
+  "note": "gold/case_002_traps.txt",
+  "model": "google/gemini-2.5-flash",
+  "provenance": {
+    "called": true,
+    "requested_model": "google/gemini-2.5-flash",
+    "served_model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "response_id": "gen-1790662442-vn2FO2WLgcjPrCuv13fG",
+    "sdk": "openai 3.15.0",
+    "prompt_fingerprint": "a92d2abcb2af4294"
+  },
+  "gate_enabled": true,
+  "latency_ms": {
+    "api": 1429.4,
+    "local": 0.1,
+    "total": 1429.4
+  },
+  "latency_budget_ms": 3000,
+  "within_budget": true,
+  "usage": {
+    "called": true,
+    "input_tokens": 892,
+    "output_tokens": 134,
+    "reasoning_tokens": 0,
+    "cached_tokens": 0,
+    "est_cost_usd": 0.000603,
+    "provider_cost_usd": 0.000603,
+    "billed_usd": 0.000603,
+    "attempts": 1
+  },
+  "input_scan": {
+    "flags": [],
+    "review_required": false
+  },
+  "extraction": {
+    "medication": {
+      "evidence": null,
+      "value": null,
+      "status": "not_stated"
+    },
+    "dose": {
+      "evidence": null,
+      "value": null,
+      "status": "not_stated"
+    },
+    "frequency": {
+      "evidence": null,
+      "value": null,
+      "status": "not_stated"
+    },
+    "allergy": {
+      "evidence": "rash to penicillin",
+      "value": "penicillin",
+      "status": "found"
+    }
+  },
+  "gate": [
+    {
+      "field": "medication",
+      "outcome": "skipped",
+      "code": "NOT_STATED",
+      "near_miss": false
+    },
+    {
+      "field": "dose",
+      "outcome": "skipped",
+      "code": "NOT_STATED",
+      "near_miss": false
+    },
+    {
+      "field": "frequency",
+      "outcome": "skipped",
+      "code": "NOT_STATED",
+      "near_miss": false
+    },
+    {
+      "field": "allergy",
+      "outcome": "pass",
+      "code": "VERIFIED",
+      "near_miss": false
+    }
+  ]
+}

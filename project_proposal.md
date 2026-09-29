@@ -510,3 +510,63 @@ proving equivalence — but no named defect appeared that the intact run did not
 This is also the operationally reassuring half of the two. The deployment corpus is dictated
 speech with no headers at all (67/67 Eka Care notes are headerless), so §6.6 measures a condition
 the system is already in, and §6.9 measures the variation it will actually meet.
+
+**D22 · The low-code claim is measured at last, and the obvious way to measure it was wrong.**
+Section 5 records that "prompts and schemas were prototyped in Google AI Studio before migrating to
+Python", and the watch-outs ask for the measured version of that sentence — *"I tried X first, it
+broke on Y, so I built Z"*. The project had the sentence and not the number.
+
+`run_ekacare.py` already writes the arm. `ungated.jsonl` comes from the same cached call as
+`gated.jsonl` and holds the model's raw structured output with `gate_enabled: false` — the same
+model, the same prompt, the same strict JSON schema, with the deterministic layer removed. That is
+the capability boundary a configured console has, so `evals/lowcode_arm.py` materialises it as an
+arm the **pre-registered** scorer grades by the same rules as every other. **Zero model calls, zero
+spend.**
+
+**The first version of that script was worthless and green.** Copying `ungated.jsonl` verbatim
+scored *identically* to the coded pipeline — recall 0.7297, precision 0.7500, wiped 5. The ungated
+file retains the `gate` array: the verdicts are reported and simply not applied, and
+`evals/scoring.py:score` reads `proposed`, `verified` and `wiped` from those **codes** rather than
+from whether a value is null. So the arm compared the system with itself, and the null result was
+one edit away from being published as a finding. `lowcode_arm.py:console_payload` replaces the gate
+array with what a console reports — nothing — so every field carrying a value is delivered as
+stated. `tests/test_lowcode_arm.py:ItDiffersFromTheCodedArm` fails if that regresses, and reverting
+the fix fails four tests.
+
+| | Low-code console (no gate) | Coded pipeline |
+| :--- | ---: | ---: |
+| Values delivered | **147** | 144 |
+| Correct | 108 | 108 |
+| Silent failures | **39** | **36** |
+| Held back | **0** | 5 (+1 to review) |
+| Recall | 0.7297 | 0.7297 |
+| Precision | 0.7347 | **0.7500** |
+
+**Recall is identical to the field** — paired McNemar gives **0 flips either way, p = 1.000**. The
+gates cost no correct answers on this run, so there is nothing for a test to find and this is
+reported as a **count of three named values**, not a rate (§5.6). Those three:
+`case_004.dose` → `half`, `case_016.dose` → `not_stated`, `case_046.dose` → `not_stated`. All
+three wrong, and **two of them are the literal string `not_stated`** — the model emitting the word
+instead of an empty value, the defect D10 corrected in the prompt, still occurring at a low rate. A
+console would write the token `not_stated` into a clinical dose field and present it as verified.
+
+Two further held fields (`case_017.dose`, `case_017.allergy`) were already empty in the raw output,
+which is why five held fields yield only three extra displayed values — stated because the
+arithmetic otherwise looks wrong. **And the coded arm's own cost, for symmetry:**
+`case_040.medication` was routed to `REVIEW_MODEL_UNSURE`, and the value a console would have shown
+— `Minoxidil` — is **correct**. Three wrong values removed for one right answer questioned.
+
+**The routine case is not the argument.** Three wrong values at zero recall cost is real and
+modest, and on its own does not justify four weeks of Python. The argument is §6.2.1's battery: a
+console has **nowhere to put an injection tripwire**, the live model **obeyed 5 of 10 injections**,
+and with the tripwire **0 reached a payload as verified**. The `warfarin 10 mg daily` flagged red on
+the third chart of `demo/ehr.html` is what a low-code arm hands to the record as a clean value.
+Likewise the encoding pre-filter: a console cannot refuse a note before billing for it, and
+disabling that filter put a look-alike drug name into a verified field in 3 of 16 vectors.
+
+`docs/lowcode_arm.md` carries the write-up with nine figures pinned to the artefacts by test.
+`docs/lowcode_pack/` holds the prompt and schema **exported from `extract.py`** rather than
+retyped, plus a converter, so a real twenty-minute console run can be scored by the same path — and
+a test fails if the pack drifts from the live prompt. The honest limit: the proxy still enjoys this
+project's `FIELD_RULES` prompt work, so it measures *this model and prompt without gates*, not
+Google AI Studio. The pack is what would close that, and it has not been run.

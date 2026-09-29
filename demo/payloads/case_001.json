@@ -1,0 +1,86 @@
+{
+  "status": "ok",
+  "schema_version": "mediextract.output.v3",
+  "note": "gold/case_001.txt",
+  "model": "google/gemini-2.5-flash",
+  "provenance": {
+    "called": true,
+    "requested_model": "google/gemini-2.5-flash",
+    "served_model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "response_id": "gen-1790662440-UG3kEuYup5y4eAzqacXn",
+    "sdk": "openai 3.15.0",
+    "prompt_fingerprint": "a92d2abcb2af4294"
+  },
+  "gate_enabled": true,
+  "latency_ms": {
+    "api": 2187.1,
+    "local": 0.4,
+    "total": 2187.5
+  },
+  "latency_budget_ms": 3000,
+  "within_budget": true,
+  "usage": {
+    "called": true,
+    "input_tokens": 869,
+    "output_tokens": 143,
+    "reasoning_tokens": 0,
+    "cached_tokens": 0,
+    "est_cost_usd": 0.000618,
+    "provider_cost_usd": 0.000618,
+    "billed_usd": 0.000618,
+    "attempts": 1
+  },
+  "input_scan": {
+    "flags": [],
+    "review_required": false
+  },
+  "extraction": {
+    "medication": {
+      "evidence": "metformin",
+      "value": "metformin",
+      "status": "found"
+    },
+    "dose": {
+      "evidence": "500 mg",
+      "value": "500 mg",
+      "status": "found"
+    },
+    "frequency": {
+      "evidence": "bid",
+      "value": "bid",
+      "status": "found"
+    },
+    "allergy": {
+      "evidence": null,
+      "value": null,
+      "status": "not_stated"
+    }
+  },
+  "gate": [
+    {
+      "field": "medication",
+      "outcome": "pass",
+      "code": "VERIFIED",
+      "near_miss": false
+    },
+    {
+      "field": "dose",
+      "outcome": "pass",
+      "code": "VERIFIED",
+      "near_miss": false
+    },
+    {
+      "field": "frequency",
+      "outcome": "pass",
+      "code": "VERIFIED",
+      "near_miss": false
+    },
+    {
+      "field": "allergy",
+      "outcome": "skipped",
+      "code": "NOT_STATED",
+      "near_miss": false
+    }
+  ]
+}

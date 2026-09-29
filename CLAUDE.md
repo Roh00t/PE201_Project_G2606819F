@@ -309,3 +309,63 @@ Pair it with §6.6 or do not report it. Alone, "recall unchanged under paraphras
 beside "recall falls 25 points when an ALL-CAPS header is removed" it localises the dependency to
 the header rather than to formatting in general. **The p-value is 0.6072 and that is a null, not
 an equivalence** — 15 discordant pairs cannot resolve an effect under about 8 points.
+
+### 5.10 The two demonstration screens
+
+```bash
+./.venv/bin/python demo/build_review.py                     # evidence-grade: gate codes, cost
+./.venv/bin/python src/extract.py --note gold/case_001.txt > demo/payloads/case_001.json
+./.venv/bin/python demo/build_ehr.py && open demo/ehr.html  # chart-grade: what a physician sees
+```
+
+`review.html` renders a **batch run** (`gated.jsonl` + sealed gold). `ehr.html` renders
+**`src/extract.py`'s own stdout** — a CLI payload's `note` key is the note's *path*, where a batch
+payload's is the case id, so the EHR page reads the dictation from the file the payload itself
+names. That is deliberate: the page cannot display a value the CLI did not emit, and the pairing
+is checkable in one step. A hand-written mockup came first and claimed two behaviours the system
+does not have (an injection "BLOCKED" and blanked, and an attribution check that does not exist);
+generating from the payload makes both impossible.
+
+**Badge text comes from `extract.DISPLAY` and nowhere else**, and
+`tests/test_ehr.py:OnlyThePipelinesOwnVocabulary` fails on any string that does not. An unknown
+gate code renders as its own bare name rather than a reassuring sentence, so adding a code without
+adding the control is visible instead of flattering.
+
+Both pages are inert: no script, no form, no handler, `default-src 'none'`, case selection in CSS.
+`tests/test_ehr.py` mirrors every invariant `tests/test_review.py` pins.
+
+**Hostile fixtures live in `demo/notes/`, never in `gold/`.**
+`tests/test_guardrails.py:InjectionTripwire.test_quiet_on_the_local_synthetic_notes` asserts the
+tripwire is silent on every note in `gold/`, which is a false-positive check worth keeping. An
+injection fixture put there breaks it correctly.
+
+### 5.11 The low-code control arm
+
+```bash
+./.venv/bin/python evals/lowcode_arm.py build          # no model calls
+./.venv/bin/python evals/score_arm.py evals/results/lowcode-proxy \
+    --gold data/gold_labels/gold_v2.json
+./.venv/bin/python evals/metrics.py evals/results/lowcode-proxy \
+    evals/results/gold-v2-live --gold data/gold_labels/gold_v2.json
+```
+
+`run_ekacare.py` writes `ungated.jsonl` from the same cached call as `gated.jsonl`: the model's raw
+structured output with the deterministic layer removed. That is what a console gives you, so the
+low-code arm costs nothing to build. Write-up in `docs/lowcode_arm.md`.
+
+**The obvious implementation is wrong and scores green.** Copying `ungated.jsonl` verbatim scores
+*identically* to the coded pipeline, because the ungated file retains the `gate` array — the
+verdicts are reported and simply not applied — and `scoring.score` reads `proposed`, `verified` and
+`wiped` from those **codes**, not from whether a value is null. The first version of this arm
+compared the system with itself. `lowcode_arm.py:console_payload` replaces the gate array with what
+a console reports, which is nothing, and `tests/test_lowcode_arm.py:ItDiffersFromTheCodedArm` fails
+if that regresses.
+
+Measured: **recall identical** (0 flips, p = 1.000, so the gates cost no correct answers), three
+wrong values removed, silent failures 39 → 36. **Report it as a count of three named values, not a
+rate** — §5.6. The decisive comparison is not here but in `guardrails.md` §6.2.1: a console has
+nowhere to put an injection tripwire, and the model obeyed 5 of 10 injections.
+
+`docs/lowcode_pack/` holds the exact prompt and schema exported from `extract.py` plus a converter,
+so a real console run can be scored by the same path. A test fails if the pack drifts from the live
+prompt.

@@ -1,0 +1,33 @@
+{
+  "run_id": "lowcode-proxy",
+  "mode": "lowcode-proxy",
+  "model": "google/gemini-2.5-flash",
+  "experiment": "low-code control arm",
+  "derived_from": {
+    "run": "evals/results/gold-v2-live",
+    "file": "ungated.jsonl",
+    "run_id": "gold-v2-live"
+  },
+  "gold": {
+    "version": "gold-v2",
+    "dataset": "ekacare/clinical_note_generation_dataset",
+    "path": "data/gold_labels/gold_v2.json",
+    "sha256": "d5e90f5a016a542046745079766b6ef0c8cc088ee10fbb989200a05b319fa959",
+    "cases_total": 67,
+    "cases_run": 67,
+    "sealed_at": "2026-09-21T13:23:31+00:00",
+    "sealed_prompt_fingerprint": "a92d2abcb2af4294",
+    "dataset_revision": "662c58a1d03255e26461519be4c9c4e597fdd3fd"
+  },
+  "prompt": null,
+  "cases_run": 67,
+  "what_this_is": "The same model, prompt and strict JSON schema as the coded pipeline, with the deterministic gate layer removed. Stands in for a low-code console run (Google AI Studio), which can configure a prompt and a schema and cannot verify a span, wipe a field, or separate an abstention from a failure.",
+  "what_this_is_not": "A measurement of Google AI Studio. The payloads still benefit from this project's FIELD_RULES prompt engineering, which a console could also be given. docs/lowcode_pack/ closes that gap with the exact prompt, schema and a converter for a real console run.",
+  "no_model_calls": true,
+  "transformation": "Values are the ungated ones, copied unchanged. The gate array is replaced with what a console reports - nothing - so every field carrying a value is delivered as stated. Without this the scorer reads the retained gate codes and grades the coded pipeline twice.",
+  "built_at": "2026-09-29T06:38:41+00:00",
+  "spend": {
+    "billed_this_run_usd": 0.0,
+    "note": "no calls: payloads copied from the source run"
+  }
+}

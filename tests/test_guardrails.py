@@ -179,6 +179,17 @@ class InjectionTripwire(unittest.TestCase):
         self.assertTrue(scan.encoding_anomaly)
         self.assertTrue(scan.review_required)
 
+    def test_the_demo_injection_note_trips_the_tripwire_and_still_reaches_the_model(self):
+        # The EHR demonstration turns on this note being flagged *and* answered:
+        # an encoding anomaly would force abstention before any call, and then the
+        # tripwire would never get to downgrade a value, which is the whole point
+        # of that screen. Both halves are pinned.
+        note = (ROOT / "demo" / "notes" / "case_003_injection.txt").read_text(encoding="utf-8")
+        scan = scan_input(note)
+        self.assertEqual(scan.flags, ["ignore_instructions"])
+        self.assertTrue(scan.review_required)
+        self.assertFalse(scan.encoding_anomaly, "an anomaly would stop the call being made")
+
     def test_quiet_on_every_gold_note(self):
         # The acceptance criterion: a tripwire that fires on ordinary
         # dictation trains the reader to ignore it. Reports case ids only.

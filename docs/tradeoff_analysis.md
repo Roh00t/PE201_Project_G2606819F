@@ -86,7 +86,7 @@ probabilistic layer failed, the deterministic layer held.
 
 ## Verification
 
-407 tests pass standard and under `python -O`, which strips `assert` — the reason no runtime gate
+485 tests pass standard and under `python -O`, which strips `assert` — the reason no runtime gate
 may be one. `tests/test_guardrails_doc.py` parses the security specification with Python's `ast`
 module and fails if a quoted metric no longer equals the artefact it names. Five corpora are
 hash-sealed at `0444` and tagged. Total project spend: **$0.32 of an $8 ceiling**.

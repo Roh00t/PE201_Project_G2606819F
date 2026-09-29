@@ -1,0 +1,129 @@
+{
+  "additionalProperties": false,
+  "description": "The whole payload the model is constrained to emit.",
+  "properties": {
+    "medication": {
+      "additionalProperties": false,
+      "description": "Field order here is the order Gemini emits, and that is deliberate.\n\nEvidence first: with thinking disabled, the token order IS the reasoning\norder, so the model must copy a span out of the dictation before it is\nallowed to commit to a value or a confidence. Asking for the value first\ninvites it to decide the answer and then hunt for justification.\n\nNothing is optional. A Pydantic default would drop the key from the\n`required` list in the generated Gemini schema, which lets the model\nsilently omit `evidence` - exactly the field the whole design rests on.\nAn explicit empty string is a claim; a missing key is an ambiguity.\n\nUnknown keys are rejected (extra=\"forbid\"): a model that invents a\nfourth subfield has not followed the contract, and its output is not\ntrusted in part.",
+      "properties": {
+        "evidence": {
+          "description": "VERBATIM substring of the dictation supporting the value. Copy character for character - do not fix spelling, expand shorthand, change case or re-wrap whitespace. Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The clinical fact, lightly normalised (e.g. 'Metformin', '500 mg', 'twice daily'). Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "status": {
+          "description": "Why a field looks the way it does.",
+          "enum": [
+            "found",
+            "not_stated",
+            "unsure"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence",
+        "value",
+        "status"
+      ],
+      "type": "object"
+    },
+    "dose": {
+      "additionalProperties": false,
+      "description": "Field order here is the order Gemini emits, and that is deliberate.\n\nEvidence first: with thinking disabled, the token order IS the reasoning\norder, so the model must copy a span out of the dictation before it is\nallowed to commit to a value or a confidence. Asking for the value first\ninvites it to decide the answer and then hunt for justification.\n\nNothing is optional. A Pydantic default would drop the key from the\n`required` list in the generated Gemini schema, which lets the model\nsilently omit `evidence` - exactly the field the whole design rests on.\nAn explicit empty string is a claim; a missing key is an ambiguity.\n\nUnknown keys are rejected (extra=\"forbid\"): a model that invents a\nfourth subfield has not followed the contract, and its output is not\ntrusted in part.",
+      "properties": {
+        "evidence": {
+          "description": "VERBATIM substring of the dictation supporting the value. Copy character for character - do not fix spelling, expand shorthand, change case or re-wrap whitespace. Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The clinical fact, lightly normalised (e.g. 'Metformin', '500 mg', 'twice daily'). Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "status": {
+          "description": "Why a field looks the way it does.",
+          "enum": [
+            "found",
+            "not_stated",
+            "unsure"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence",
+        "value",
+        "status"
+      ],
+      "type": "object"
+    },
+    "frequency": {
+      "additionalProperties": false,
+      "description": "Field order here is the order Gemini emits, and that is deliberate.\n\nEvidence first: with thinking disabled, the token order IS the reasoning\norder, so the model must copy a span out of the dictation before it is\nallowed to commit to a value or a confidence. Asking for the value first\ninvites it to decide the answer and then hunt for justification.\n\nNothing is optional. A Pydantic default would drop the key from the\n`required` list in the generated Gemini schema, which lets the model\nsilently omit `evidence` - exactly the field the whole design rests on.\nAn explicit empty string is a claim; a missing key is an ambiguity.\n\nUnknown keys are rejected (extra=\"forbid\"): a model that invents a\nfourth subfield has not followed the contract, and its output is not\ntrusted in part.",
+      "properties": {
+        "evidence": {
+          "description": "VERBATIM substring of the dictation supporting the value. Copy character for character - do not fix spelling, expand shorthand, change case or re-wrap whitespace. Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The clinical fact, lightly normalised (e.g. 'Metformin', '500 mg', 'twice daily'). Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "status": {
+          "description": "Why a field looks the way it does.",
+          "enum": [
+            "found",
+            "not_stated",
+            "unsure"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence",
+        "value",
+        "status"
+      ],
+      "type": "object"
+    },
+    "allergy": {
+      "additionalProperties": false,
+      "description": "Field order here is the order Gemini emits, and that is deliberate.\n\nEvidence first: with thinking disabled, the token order IS the reasoning\norder, so the model must copy a span out of the dictation before it is\nallowed to commit to a value or a confidence. Asking for the value first\ninvites it to decide the answer and then hunt for justification.\n\nNothing is optional. A Pydantic default would drop the key from the\n`required` list in the generated Gemini schema, which lets the model\nsilently omit `evidence` - exactly the field the whole design rests on.\nAn explicit empty string is a claim; a missing key is an ambiguity.\n\nUnknown keys are rejected (extra=\"forbid\"): a model that invents a\nfourth subfield has not followed the contract, and its output is not\ntrusted in part.",
+      "properties": {
+        "evidence": {
+          "description": "VERBATIM substring of the dictation supporting the value. Copy character for character - do not fix spelling, expand shorthand, change case or re-wrap whitespace. Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The clinical fact, lightly normalised (e.g. 'Metformin', '500 mg', 'twice daily'). Empty string if status is not_stated.",
+          "type": "string"
+        },
+        "status": {
+          "description": "Why a field looks the way it does.",
+          "enum": [
+            "found",
+            "not_stated",
+            "unsure"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence",
+        "value",
+        "status"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "medication",
+    "dose",
+    "frequency",
+    "allergy"
+  ],
+  "type": "object"
+}

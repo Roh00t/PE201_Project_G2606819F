@@ -15,16 +15,75 @@ The persona and problem decomposition behind that are in [`docs/decomposition.md
 
 ---
 
-## Quick start
+## Running it
+
+> **There is no server to start and nothing to shut down.** This is a command-line pipeline plus
+> two static HTML files. `src/extract.py` makes one API call and exits; `demo/build_ehr.py` writes a
+> file and exits. Nothing listens on a port, nothing runs in the background, and nothing holds your
+> API key between commands.
+
+### 1 · Bring it up — two minutes, no API key
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-./.venv/bin/python -m unittest discover -s tests          # 407 tests, no API key needed
-./.venv/bin/python src/extract.py --note gold/case_001.txt --mock
 ```
 
-No key is required for the test suite, the offline CLI, the scoring tools or the demo screen.
-Full manual, including live runs and costs: **[`commands.md`](commands.md)**.
+```bash
+python -m unittest discover -s tests
+```
+
+`OK` and **485 tests** means the whole system is verified — gates, scoring, statistics, both demo
+screens — with no key and no network.
+
+```bash
+python src/extract.py --note gold/case_001.txt --mock
+python demo/build_ehr.py && open demo/ehr.html
+```
+
+One JSON document on stdout, and a chart where every value sits beside the words it came from.
+**Exit code 1 is not an error** — it means the pipeline abstained on a field, which is the product
+working.
+
+### 2 · Run it live — about $0.002
+
+Only this step spends money.
+
+```bash
+export OPENROUTER_API_KEY="<your-openrouter-key>"
+```
+
+```bash
+python src/extract.py --note gold/case_001.txt          > demo/payloads/case_001.json
+python src/extract.py --note gold/case_002_traps.txt    > demo/payloads/case_002_traps.json
+python src/extract.py --note demo/notes/case_003_injection.txt > demo/payloads/case_003_injection.json
+python demo/build_ehr.py && open demo/ehr.html
+```
+
+Three calls, ≈ **$0.0018**. The third chart is the one worth seeing: the model **obeyed** a prompt
+injection and returned `warfarin 10 mg daily`, and the deterministic tripwire flagged all three
+values `Needs review` — retained and visible, neither accepted nor silently deleted.
+
+### 3 · Bring it down
+
+Close the browser tab, then prove nothing survived:
+
+```bash
+pgrep -fl "extract.py|build_ehr|build_review|run_ekacare|lowcode_arm|live_redteam|judge_calibration"
+lsof -nP -iTCP -sTCP:LISTEN | grep python
+unset OPENROUTER_API_KEY && deactivate
+```
+
+Empty output from both checks is the clean result — `pgrep` exits 1 when nothing matches. No
+daemon to kill, no port to free, no container to stop. To take the key off disk as well, blank the
+`OPENROUTER_API_KEY` line in `.env` (gitignored, never in this repository).
+
+### Fully offline
+
+Everything except step 2 runs with **no key and no network** — the suite, the CLI under `--mock`,
+both demo screens, and every scoring tool. A live call without a key refuses with a named
+`ERR_CONFIG_NO_API_KEY` rather than crashing or silently falling back.
+
+Full manual, with costs, exit codes and troubleshooting: **[`commands.md`](commands.md)**.
 
 ## Architecture
 
@@ -106,7 +165,7 @@ cd data/gold_labels && shasum -a 256 -c *.sha256      # all five OK
 ## Reproducing
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests          # 407 tests
+./.venv/bin/python -m unittest discover -s tests          # 485 tests
 ./.venv/bin/python -O -m unittest discover -s tests       # again, assertions stripped
 ./.venv/bin/python -m unittest tests.test_guardrails_doc  # the spec checks itself
 ./.venv/bin/python -m pyflakes src evals evals/probes tests demo data/gazetteer data/allergy_set

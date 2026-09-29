@@ -3,7 +3,7 @@
 **System:** MediExtract. It turns a dictated consult note into four schema-valid fields (medication, dose, frequency, allergy), each with a verbatim quote behind it, and a blank where no quote can be found.
 **Course:** PE6201 Emerging AI Technologies, End-of-Course Project.
 **Document status:** version 1.2, 2026-09-21 (section 0 executive summary; section 2.3 agentic readiness thresholds; sections 6.6 header leakage and 6.7 label-versus-system delta; the document now verifies itself via tests/test_guardrails_doc.py) (transport moved to OpenRouter; batch loop, scoring and the gold-v1 seal built).
-**Verified against:** the working tree on top of commit `9cd0eae`. Uncommitted at verification time: `src/extract.py` (the single pipeline file per CLAUDE.md §1.1, now with the P0 prompt corrections and the end-to-end latency fix), `evals/` (`metrics.py`, `baseline.py`, `score_arm.py`, `diagnose.py`, the sealed-gold registry in `run_ekacare.py`, and `probes/probe_v4_schema.py`), `demo/build_review.py`, the documents under `docs/`, `README.md` and `project_proposal.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 282 tests, all passing, run offline and under `python -O`; `pyflakes` clean over `src/`, `evals/`, `evals/probes/`, `tests/`, `demo/` and `data/gazetteer/`.
+**Verified against:** the working tree on top of commit `9cd0eae`. Uncommitted at verification time: `src/extract.py` (the single pipeline file per CLAUDE.md §1.1, now with the P0 prompt corrections and the end-to-end latency fix), `evals/` (`metrics.py`, `baseline.py`, `score_arm.py`, `diagnose.py`, the sealed-gold registry in `run_ekacare.py`, and `probes/probe_v4_schema.py`), `demo/build_review.py`, the documents under `docs/`, `README.md` and `project_proposal.md`. Environment: Python 3.14.5, `openai` 3.15.0 (pointed at OpenRouter), `pydantic` 2.13.5. Test suite: 485 tests, all passing, run offline and under `python -O`; `pyflakes` clean over `src/`, `evals/`, `evals/probes/`, `tests/`, `demo/` and `data/gazetteer/`.
 
 **Live evidence behind the numbers in this document.** Two full batch runs over the sealed 67-case gold set and one schema probe, $0.081684 between them; the ledger's lifetime total is $0.082276 over 136 calls against the $8 ceiling, the difference being the single-note smoke test of 2026-09-18:
 
@@ -71,7 +71,7 @@ fails if the document and the artefact disagree.*
 | :--- | :--- | :--- | :--- |
 | 1 · Problem & significance | §1.1 philosophy, §1.3 boundary | one moment: a physician verifying four fields in under 3 s | — |
 | 2 · Business & technical trade-offs | §1.5 control inventory, §2.1 matrix, §2.2 agentic bound | 30 implemented controls, 18 specified, and the reason this is the LLM list and not the Agentic one | — |
-| 3 · Implementation | §3 deep dives, §6.1 battery, §6.6 leakage | recall 0.645 (gold-v1) / 0.730 (gold-v2); 267 tests green under `python -O` | `unittest discover -s tests` |
+| 3 · Implementation | §3 deep dives, §6.1 battery, §6.6 leakage | recall 0.645 (gold-v1) / 0.730 (gold-v2); 485 tests green under `python -O` | `unittest discover -s tests` |
 | 3 · Evaluation honesty | §6.6 | the label delta and the sampling delta reported apart | `evals/metrics.py <run> --gold … --gold-b …` |
 | 4 · Communication & limitations | §0 here, §6.6 honesty block, §1.6 abstention | every gate is a precision control; none is a recall control | — |
 
@@ -135,7 +135,7 @@ clinician's hand.
 ### Verification
 
 ```bash
-./.venv/bin/python -m unittest discover -s tests          # 347 tests
+./.venv/bin/python -m unittest discover -s tests          # 485 tests
 ./.venv/bin/python -O -m unittest discover -s tests       # again, with assertions stripped
 ./.venv/bin/python -m unittest tests.test_guardrails_doc  # this document checks itself
 ```
@@ -2095,7 +2095,7 @@ Before writing any record: `if find_secrets(json.dumps(record)): drop it and ale
 
 ### 6.1 Automated safety evaluation battery
 
-**Layer 1: deterministic tests** (IMPLEMENTED; offline; no key; no spend). Run with `./.venv/bin/python -m unittest discover -s tests`: 107 tests, all passing on 2026-09-18, including under `python -O`.
+**Layer 1: deterministic tests** (IMPLEMENTED; offline; no key; no spend). Run with `./.venv/bin/python -m unittest discover -s tests`: 485 tests, all passing on 2026-09-18, including under `python -O`.
 
 | File | Classes (test count) | What it proves |
 | --- | --- | --- |
@@ -2206,7 +2206,7 @@ Fourteen categories. The owner's draft specification contributed DAN variants, c
 | Directive: value-mismatch defence (the extracted value must align with the quote) | Closed | `verify_value` and the dose number/unit gate (G-02, G-03); tests `NameGate`, `DoseGate`, `FrequencyGate` |
 | Directive: strip Markdown wrappers before Pydantic | Closed | `_strip_code_fence` (G-08); `ModelCallRetryAndLedger.test_fenced_json_is_accepted` |
 | CLAUDE.md §2.3 / §3.2: the database receives only nulls and validated types; errors and evaluation tables go to stderr | Closed | stdout holds codes, numbers and identifiers only (G-22); error messages, gate reasons, display labels, breaker reasons and the evaluation table go to stderr (G-21). Pinned by `test_stdout_carries_no_human_readable_text`, `assertEnvelope`, and `test_a_refusal_prints_a_code_on_stdout_and_the_reason_on_stderr`. |
-| CLAUDE.md §1.1: the entire core pipeline in a single Python file | Closed | `src/extract.py` is the only file under `src/`; every top-level name of the former modules was carried over (checked by script), and all 107 tests pass against the merged file, also under `python -O`. |
+| CLAUDE.md §1.1: the entire core pipeline in a single Python file | Closed | `src/extract.py` is the only file under `src/`; every top-level name of the former modules was carried over (checked by script), and all 485 tests pass against the merged file, also under `python -O`. |
 
 ### 6.2.1 Live red-team execution, against the §6.2 allocation
 
