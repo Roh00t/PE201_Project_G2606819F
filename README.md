@@ -17,9 +17,9 @@ The persona and problem decomposition behind that are in [`docs/decomposition.md
 ## Product Demo Videos
 THere are two videos, one comprehensive and one condensed to 5 minutes.
 
-[![Watch the condensed 5 minute video](https://youtube.com)](https://youtu.be/o1MD7TiE52Y)
+[![Watch the condensed 5 minute video](https://youtube.com)](https://youtu.be/9eFQuvgt4cI)
 
-[![Watch the comprehensive video](https://youtube.com)](https://youtu.be/o1MD7TiE52Y)
+[![Watch the comprehensive video](https://youtube.com)](https://youtu.be/9eFQuvgt4cI)
 
 
 
