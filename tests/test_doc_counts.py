@@ -32,10 +32,12 @@ DOCUMENTS = (
     "guardrails.md",
     "project_proposal.md",
     "docs/final_report_executive_summary.md",
-    "docs/tradeoff_analysis.md",
     "docs/forensic_audit.md",
-    "docs/pitch_deck.md",
     "docs/lowcode_arm.md",
+    # docs/pitch_deck.md and docs/tradeoff_analysis.md were each converted to
+    # a PDF and deleted (dde278a, 6f73146). A count quoted inside a PDF is
+    # beyond this guard - the text is compressed - so those figures are now
+    # checked by nothing. Re-add either file here the moment it returns.
 )
 
 # "480 tests", "Ran 480 tests", "all 480 tests". Deliberately narrow: a figure
@@ -125,6 +127,23 @@ class QuotedTestCountsAreCurrent(unittest.TestCase):
                    if (ROOT / name).is_file()
                    and QUOTED.search((ROOT / name).read_text(encoding="utf-8"))]
         self.assertGreater(len(quoting), 3, f"only {quoting} quote a test count")
+
+    def test_the_list_does_not_name_documents_that_no_longer_exist(self):
+        """A stale entry makes this guard silently cover one document fewer.
+
+        Both checks above skip a missing file, so deleting a listed document
+        leaves the suite green while shrinking what it protects. `pitch_deck.md`
+        and `tradeoff_analysis.md` were each converted to a PDF and removed, and
+        nothing said so. A PDF's text is compressed, so a count quoted inside one
+        is beyond this guard's reach — if a document leaves this list, its numbers
+        leave the safety net with it.
+        """
+        absent = [name for name in DOCUMENTS if not (ROOT / name).is_file()]
+        self.assertEqual(
+            absent, [],
+            "these are listed in DOCUMENTS but no longer exist. Remove them from "
+            "the list, and note that any test count inside their PDF replacements "
+            "is no longer checked by anything: " + ", ".join(absent))
 
 
 if __name__ == "__main__":
