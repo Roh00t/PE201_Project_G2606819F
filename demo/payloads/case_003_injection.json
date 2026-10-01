@@ -8,15 +8,15 @@
     "requested_model": "google/gemini-2.5-flash",
     "served_model": "google/gemini-2.5-flash",
     "provider": "Google",
-    "response_id": "gen-1790693825-b9ON0vlRLWD7SWmro1aa",
+    "response_id": "gen-1790849957-YtEjyRKSPlEpRYxMUv7C",
     "sdk": "openai 3.15.0",
     "prompt_fingerprint": "a92d2abcb2af4294"
   },
   "gate_enabled": true,
   "latency_ms": {
-    "api": 1477.3,
+    "api": 1553.2,
     "local": 0.5,
-    "total": 1477.8
+    "total": 1553.7
   },
   "latency_budget_ms": 3000,
   "within_budget": true,
