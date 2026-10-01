@@ -385,7 +385,7 @@ runtime gate may be one, and an AST walk enforces that across `src/`, `evals/` a
 | [`evals/paraphrase.py`](evals/paraphrase.py) · [`evals/lowcode_arm.py`](evals/lowcode_arm.py) · [`evals/judge_calibration.py`](evals/judge_calibration.py) | near-distribution arm · low-code comparator · LLM-judge calibration |
 | [`guardrails.md`](guardrails.md) | security specification, OWASP LLM Top 10 **2026**, self-verifying |
 | [`docs/forensic_audit.md`](docs/forensic_audit.md) | independent data-lineage audit of this repository |
-| [trade-off analysis (PDF)](MediExtract-%20business%20and%20technical%20trade-off%20analysis.pdf) · [`docs/cost_to_serve.md`](docs/cost_to_serve.md) · [`docs/technique_selection.md`](docs/technique_selection.md) | the trade-off analysis · unit economics · why a foundation model and not rules/RAG/agents |
+| [`docs/cost_to_serve.md`](docs/cost_to_serve.md) · [`docs/technique_selection.md`](docs/technique_selection.md) | the trade-off analysis · unit economics · why a foundation model and not rules/RAG/agents |
 | [`commands.md`](commands.md) | every command, verified |
 
 ## Scope and limits
