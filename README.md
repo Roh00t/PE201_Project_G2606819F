@@ -8,13 +8,13 @@
 </p>
 
 <p align="center">
-  <a href="https://youtu.be/blKnaWL_Ph0"><img src="https://img.youtube.com/vi/blKnaWL_Ph0/maxresdefault.jpg" width="47%" alt="Watch the 5-minute demo"></a>
-  <a href="https://youtu.be/9eFQuvgt4cI"><img src="https://img.youtube.com/vi/9eFQuvgt4cI/maxresdefault.jpg" width="47%" alt="Watch the full walkthrough"></a>
+  <a href="https://youtu.be/EtTjQZDcFD0"><img src="https://img.youtube.com/vi/EtTjQZDcFD0/maxresdefault.jpg" width="47%" alt="Watch the 6-minute demo"></a>
+  <a href="https://youtu.be/QyUPtdLv6kA"><img src="https://img.youtube.com/vi/9eFQuvgt4cI/maxresdefault.jpg" width="47%" alt="Product walkthrough Only"></a>
 </p>
 
 <p align="center">
-  <a href="https://youtu.be/blKnaWL_Ph0"><b>▶ 5-minute demo</b></a> &nbsp;·&nbsp;
-  <a href="https://youtu.be/9eFQuvgt4cI"><b>▶ Full walkthrough</b></a>
+  <a href="https://youtu.be/EtTjQZDcFD0"><b>▶ 6-minute demo</b></a> &nbsp;·&nbsp;
+  <a href="https://youtu.be/QyUPtdLv6kA"><b>▶ Product walkthrough Only</b></a>
 </p>
 
 <p align="center">
