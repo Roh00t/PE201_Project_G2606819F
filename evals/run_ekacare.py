@@ -113,8 +113,7 @@ REGISTRY: dict[str, SealedGold] = {
         "67 Latin-script Eka Care cases, 268 hand labels, sealed 2026-09-20"),
     "gold-v2": SealedGold(
         "gold-v2", GOLD_DIR / "gold_v2.json", GOLD_DIR / "gold_v2.sha256", DATASET, "gold-v2",
-        "gold-v1 with the 16 labels that contradict their own field rules corrected, "
-        "plus slice tags. Registered, not yet sealed."),
+        "gold-v1 with the 18 corrections, 16 rule-derived and 2 signed. Sealed"),
     "paraphrase-v1": SealedGold(
         "paraphrase-v1", GOLD_DIR / "paraphrase_v1.json",
         GOLD_DIR / "paraphrase_v1.sha256", DATASET, "paraphrase-v1",

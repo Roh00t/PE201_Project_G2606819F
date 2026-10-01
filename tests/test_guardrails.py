@@ -341,5 +341,44 @@ class NoAssertInRuntimeCode(unittest.TestCase):
         self.assertEqual(offenders, [])
 
 
+class EveryModuleSaysWhatItIsFor(unittest.TestCase):
+    """A file with no module docstring is a file the next reader has to run to
+    understand. Every one of them already carries one; this is what keeps that
+    true when the next file arrives, rather than discovering it at submission.
+
+    Scanned the same way `NoAssertInRuntimeCode` is scanned - by directory, not
+    by a list - so a new script is covered on arrival instead of when someone
+    remembers to add it.
+    """
+
+    DIRECTORIES = ("src", "evals", "evals/probes", "demo", "tests",
+                   "data/gazetteer", "data/allergy_set", "docs/lowcode_pack")
+
+    def sources(self):
+        for name in self.DIRECTORIES:
+            directory = ROOT / name
+            if directory.is_dir():
+                yield from sorted(directory.glob("*.py"))
+
+    def test_every_script_carries_a_module_docstring(self):
+        bare = [str(path.relative_to(ROOT)) for path in self.sources()
+                if not (ast.get_docstring(ast.parse(
+                    path.read_text(encoding="utf-8"), filename=str(path))) or "").strip()]
+        self.assertEqual(bare, [], "no module docstring:\n  " + "\n  ".join(bare))
+
+    def test_the_scan_is_not_vacuous(self):
+        # A typo in a directory name would silently check nothing.
+        self.assertGreater(len(list(self.sources())), 30)
+
+    # There is deliberately no check on docstring *length*. Two were tried and
+    # both were wrong: a floor on the first line failed three of the best
+    # docstrings in the repository for opening with a crisp title, and a floor
+    # on the whole docstring failed the test modules, whose one-line summaries
+    # are clear precisely because they are short. A threshold tuned until the
+    # current tree passes measures the tree, not the writing, and would still
+    # wave through a padded docstring that says nothing. Presence is the part
+    # that can be checked mechanically; substance is what review is for.
+
+
 if __name__ == "__main__":
     unittest.main()

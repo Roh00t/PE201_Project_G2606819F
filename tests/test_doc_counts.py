@@ -34,6 +34,9 @@ DOCUMENTS = (
     "docs/final_report_executive_summary.md",
     "docs/forensic_audit.md",
     "docs/lowcode_arm.md",
+    "PE6201_Final_Report.md",
+    "data/README.md",
+    "evals/README.md",
     # docs/pitch_deck.md and docs/tradeoff_analysis.md were each converted to
     # a PDF and deleted (dde278a, 6f73146). A count quoted inside a PDF is
     # beyond this guard - the text is compressed - so those figures are now

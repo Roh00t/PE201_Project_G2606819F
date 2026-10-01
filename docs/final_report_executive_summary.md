@@ -1,7 +1,7 @@
 # MediExtract — executive summary and governance audit
 
 PE6201 End-of-Course Project · `google/gemini-2.5-flash` via OpenRouter · prompt fingerprint
-`a92d2abcb2af4294` · 520 tests green under both standard and `python -O` execution.
+`a92d2abcb2af4294` · 579 tests green under both standard and `python -O` execution.
 
 ---
 
@@ -19,7 +19,7 @@ it, or nothing at all.
 
 | Measure | Result | Comparator |
 | :--- | ---: | :--- |
-| Pooled recall, sealed `gold-v2`, n = 67 | **0.7297** | regex + 14,689-name RxNorm gazetteer: **0.381** |
+| Pooled recall, sealed `gold-v2`, n = 67 | **0.7297** | regex + 14,689-name RxNorm gazetteer, **re-scored on the same answer key**: **0.4324**. Paired exact McNemar: 52 flips right against 8 wrong, **p = 5.2e-09**, separated |
 | | | majority class (all `not_stated`): **0.000**, yet agrees with gold 120/268 |
 | Precision | 0.7500 | — |
 | Silent-failure rate | 0.2517 | wrong *and* presented as verified. **31 of these 36 fields are one defect** — drug selection in a multi-drug note — reachable by no gate; see §6 |
@@ -52,7 +52,7 @@ Documented in full at [`technique_selection.md`](technique_selection.md) §2.
 
 | Decision | Chosen | Rejected | Why, measured |
 | :--- | :--- | :--- | :--- |
-| **Extractor** | Foundation model, prompted, strict structured output | Rules/lookup as the primary extractor | 0.730 against 0.381 for the committed regex+gazetteer baseline. Rules were **kept for the gates**, where deterministic `if` statements are checkable and a wrong dose is expensive. |
+| **Extractor** | Foundation model, prompted, strict structured output | Rules/lookup as the primary extractor | 0.730 against 0.432 for the committed regex+gazetteer baseline on the same gold (+29.7pp, p = 5.2e-09). Separated on medication and dose; **frequency is not** (+11.3pp, p = 0.180), which is where rules were already strong. Rules were **kept for the gates**, where deterministic `if` statements are checkable and a wrong dose is expensive. |
 | **Retrieval** | None | RAG | There is nothing to retrieve: the answer is always inside the note being processed. Retrieval could only add a failure mode — a wrong chunk — for zero possible recall gain, plus non-deterministic latency against a 3-second budget. |
 | **Orchestration** | One call, no tools, no memory | Multi-agent / agentic framework | Cost and latency, but principally **threat model**: OWASP's component-versus-actor boundary means the LLM Top 10 applies and the Agentic Top 10 does not. Adding one tool would change what this system *is*, not just its bill. `guardrails.md` §2 carries the crosswalk and the threshold at which each agentic control activates. |
 | **Framework** | None — one file | LangChain / LlamaIndex | Every request parameter is line-by-line auditable, which is what made the cost model checkable against the provider to **0.005% drift**. |

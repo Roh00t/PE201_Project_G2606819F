@@ -4,7 +4,7 @@ Every command below was executed on a clean checkout before this document was wr
 terminal output quoted is the output those commands actually produced. Paths are relative to the
 repository root.
 
-**You can verify the entire system — all 520 tests, the CLI, the safety gates, the scoring tools
+**You can verify the entire system — all 579 tests, the CLI, the safety gates, the scoring tools
 and the review screen — with no API key and no network access.** Only §3 and §5 spend money, and
 they are marked.
 
@@ -19,11 +19,16 @@ they are marked.
 The rest of this document is reference. This section is the whole loop, and it is worth reading the
 first paragraph even if you skip everything else.
 
-> **There is no server to start and nothing to shut down.** MediExtract is a command-line pipeline
-> and two static HTML files. `src/extract.py` makes one API call and exits. `demo/build_ehr.py`
-> writes a file and exits. Nothing listens on a port, nothing runs in the background, nothing holds
-> your API key between commands. "Bringing it down" means closing a browser tab — §0.3 shows how to
-> prove that rather than take my word for it.
+> **Almost nothing here is a service.** MediExtract is a command-line pipeline and two static HTML
+> files. `src/extract.py` makes one API call and exits. `demo/build_ehr.py` writes a file and exits.
+> Neither runs in the background, and no process of ours keeps your key in memory. A key in `.env`,
+> though, stays readable by every later command — §0.3 step 5 is about that.
+>
+> **One component does listen on a port:** `demo/serve.py`, the live-dictation console. It runs in
+> the foreground, binds `127.0.0.1` only, and stops on Ctrl-C. Everything else is a browser tab.
+>
+> **§0.2 brings the whole stack up in six checked steps. §0.3 takes it down in five** — and proves
+> each one rather than asking you to take my word for it.
 
 ### 0.1 Bring it up (about two minutes, no API key)
 
@@ -37,7 +42,7 @@ pip install -r requirements.txt
 python -m unittest discover -s tests
 ```
 
-`OK` and 520 tests means the whole system is verified — gates, scoring, statistics, both demo
+`OK` and 579 tests means the whole system is verified — gates, scoring, statistics, both demo
 screens — with no key and no network.
 
 ```bash
@@ -49,68 +54,257 @@ That is the product: one JSON document on stdout, and a chart where every value 
 words it came from. **Exit code 1 here is not an error** — it means the pipeline abstained on at
 least one field, which is §4.
 
-### 0.2 Run it live (about $0.002 for the three demo notes)
+### 0.2 Bring everything live
 
-Only this section spends money. Set the key once:
+Six steps, in order. Each one has a check, so you never move on wondering. **Only steps 2 and 4
+spend money**, and together they cost about half a cent.
+
+#### Step 1 — the key
 
 ```bash
 export OPENROUTER_API_KEY="<your-openrouter-key>"
 ```
 
+Or put it in `.env` at the repository root, which is gitignored. Confirm it loaded **without
+spending anything and without printing any of it**:
+
 ```bash
-python src/extract.py --note gold/case_001.txt          > demo/payloads/case_001.json
-python src/extract.py --note gold/case_002_traps.txt    > demo/payloads/case_002_traps.json
+python -c "import sys; sys.path.insert(0,'src'); import extract; extract.load_api_key(); print('key ok')"
+```
+
+`key ok` means the pipeline can find a key. Any other output is a named refusal, not a crash — a
+placeholder value is rejected as loudly as a missing one.
+
+#### Step 2 — the three recorded cases (about $0.002)
+
+```bash
+python src/extract.py --note gold/case_001.txt                 > demo/payloads/case_001.json
+python src/extract.py --note gold/case_002_traps.txt           > demo/payloads/case_002_traps.json
 python src/extract.py --note demo/notes/case_003_injection.txt > demo/payloads/case_003_injection.json
+```
+
+Three calls, roughly **$0.0018**. Expect **exit 0 or 1** from each — exit 1 means the pipeline
+abstained on a field, which is the product working, not a failure. Check all three landed:
+
+```bash
+ls -l demo/payloads/*.json
+```
+
+#### Step 3 — the chart
+
+```bash
 python demo/build_ehr.py && open demo/ehr.html
 ```
 
-Three calls, roughly **$0.0018**. The page now shows live output; the third chart is the one to
-look at (§5).
+Expect `3 cases` on stderr and the path on stdout. Three charts: one where everything grounds, one
+dictation full of stopped and third-party drugs, and one carrying a live prompt injection — that
+third one is the one to look at (§5).
 
-A full 67-case batch, if you want the headline reproduced, is **$0.041**:
+#### Step 4 — the live console (one billed call per run)
+
+```bash
+python demo/serve.py
+```
+
+```
+MediExtract console on http://127.0.0.1:8000  [live]
+  /        the dictation box
+  /chart   the recorded cases (demo/ehr.html, served unchanged)
+Ctrl-C to stop.
+```
+
+**`[live]` is the word to check.** `[mock]` means no call will be made and every field will come
+back blank; `[no API key]` means step 1 did not take. Leave this terminal running — the server is
+foreground and stops when you close it.
+
+**If it refuses to start with `Address already in use`**, port 8000 belongs to something else on
+your machine. That is a clean exit 2, not a crash; see §0.4 and start it on another port:
+
+```bash
+lsof -nP -iTCP:8000 -sTCP:LISTEN      # find the occupant first
+python demo/serve.py --port 8099
+```
+
+Every `8000` below then becomes `8099`.
+
+#### Step 5 — confirm it is actually up
+
+In a second terminal:
+
+```bash
+curl -s http://127.0.0.1:8000/health
+```
+
+```json
+{"ok": true, "mock": false, "calls_used": 0, "max_calls": 25}
+```
+
+`"mock": false` is the one to read. Then open `http://127.0.0.1:8000`, type or dictate a
+consultation into the empty box, and press **Run MediExtract**.
+
+#### Step 6 — know what you are spending
+
+```bash
+python -c "import sys,json; sys.path.insert(0,'src'); import extract; print(json.loads(extract.DEFAULT_LEDGER.read_text()))"
+```
+
+The `$8` project ceiling belongs to `extract.SpendLedger` and is cumulative across every run ever
+made. The console adds a second bound of its own: `--max-calls` (default **25**) is the most times
+*this process* will run the pipeline, so a stuck browser refresh cannot drain the ceiling.
+
+**Everything live, at a glance:**
+
+| What | State | How to tell |
+| :--- | :--- | :--- |
+| virtualenv | activated | `which python` ends in `.venv/bin/python` |
+| API key | loaded | `key ok` from step 1 |
+| three payloads | written | `demo/payloads/*.json`, three files |
+| `demo/ehr.html` | built | the browser tab opened in step 3 |
+| `demo/serve.py` | **listening on 127.0.0.1:8000** | `/health` returns `"ok": true` |
+
+That is the whole stack. One foreground process, one HTML file, one virtualenv — nothing
+daemonised, nothing installed system-wide, nothing holding the key between commands.
+
+A full 67-case batch, if you want the headline reproduced, is **$0.041** and is not part of the
+demo path:
 
 ```bash
 python evals/run_ekacare.py --gold-version gold-v2 --experiment marker-check --run-cap-usd 0.10
 ```
 
-### 0.3 Bring it down
+### 0.3 Shut everything down
+
+Five steps, in the reverse order. The first is the only one that matters; the rest are proof.
+
+#### Step 1 — stop the console
+
+**Ctrl-C** in the terminal running `demo/serve.py`. It prints `stopped.` and releases the port. If
+that terminal is gone:
 
 ```bash
-# 1. close the browser tab showing demo/ehr.html — it is a file, not a service
-# 2. prove no process of ours survived
+pkill -f demo/serve.py
+```
+
+#### Step 2 — close the browser tabs
+
+`demo/ehr.html` is a file on disk, not a service — closing the tab is the whole of it. The console
+page at `127.0.0.1:8000` will simply stop answering once step 1 is done.
+
+#### Step 3 — prove nothing of ours is still running
+
+```bash
 pgrep -fl "python.*(src|evals|demo)/[a-z_0-9]*\.py"
 ```
 
-**No output means nothing is running.** `pgrep` exits 1 when it matches nothing, so an empty
-response is the clean result. The pattern matches our own script *paths* rather than bare words
-deliberately — a list containing `diagnose` matches macOS's `sysdiagnosed` and reports a false
-alarm. Confirm nothing is listening either:
+**No output is the clean result** — `pgrep` exits 1 when it matches nothing. The pattern matches our
+own script *paths* rather than bare words on purpose: a pattern containing `diagnose` also matches
+macOS's own `sysdiagnosed` and reports a false alarm.
+
+#### Step 4 — prove the port is released
 
 ```bash
-lsof -nP -iTCP -sTCP:LISTEN | grep python
+lsof -nP -iTCP:8000 -sTCP:LISTEN
 ```
 
-Empty again. There is no daemon to kill, no port to free, no container to stop.
+Empty means the port is free. If something is still there, check it is actually ours before killing
+it — port 8000 is a common default and may belong to another project entirely:
 
 ```bash
-# 3. take the key out of the environment
+lsof -nP -iTCP:8000 -sTCP:LISTEN      # read the COMMAND and PID columns first
+```
+
+#### Step 5 — take the key back out
+
+```bash
 unset OPENROUTER_API_KEY
 deactivate
 ```
 
-If you also want the key off the disk, delete or blank the `OPENROUTER_API_KEY` line in `.env`. It
-is gitignored and is not in this repository, so nothing needs undoing in git.
+**`unset` alone may not be enough, and this is the one step that quietly looks finished when it is
+not.** `extract.load_api_key` reads the environment *and then* `.env` at the repository root, so a
+shell where `echo "$OPENROUTER_API_KEY"` prints nothing can still make billed calls. This was
+demonstrated the expensive way while writing this section: a live `src/extract.py` run launched from
+`/tmp` with `OPENROUTER_API_KEY` unset completed a real, billed call anyway, because `.env` is found
+relative to the *script's* location and not the working directory. One call, $0.000618, and entirely
+my own fault — which is the point of writing it down. To take the key
+out of reach entirely, delete or blank the `OPENROUTER_API_KEY` line in `.env`, then confirm with
+the second row of the table below — a named refusal is the clean result. `.env` is gitignored and
+has never been in this repository, so nothing needs undoing in git.
 
-### 0.4 Run it fully offline
+**Shut down, at a glance:**
+
+| What | Check | Clean result |
+| :--- | :--- | :--- |
+| console | `pgrep -fl "python.*demo/serve\.py"` | no output |
+| port 8000 | `lsof -nP -iTCP:8000 -sTCP:LISTEN` | no output |
+| any script of ours | `pgrep -fl "python.*(src\|evals\|demo)/.*\.py"` | no output |
+| key in the shell | `echo "${OPENROUTER_API_KEY:-unset}"` | `unset` |
+| key still reachable at all | `python -c "import sys;sys.path.insert(0,'src');import extract;extract.load_api_key()"` | a named refusal |
+| virtualenv | `which python` | a system path, not `.venv` |
+
+**Nothing persists that needs clearing.** The console writes no state; the temporary file holding a
+dictation is deleted when its run finishes. The only things on disk that outlive a session are the
+ones meant to: the payloads in `demo/payloads/`, the chart, the run artefacts under
+`evals/results/`, and the cumulative spend ledger.
+
+### 0.4 The console in detail
+
+`demo/ehr.html` renders notes that were *already* run. The console adds the one thing a generated
+page cannot have: an empty box, and a button that runs the pipeline over whatever is typed or
+dictated into it.
+
+```bash
+python demo/serve.py --mock                 # free: the real gates, a canned reply
+python demo/serve.py                        # live: one billed call per run
+python demo/serve.py --port 8099 --max-calls 5
+```
+
+| Flag | What it does |
+| :--- | :--- |
+| `--mock` | no call, no spend; the real gates against a canned reply |
+| `--port N` | default 8000 |
+| `--max-calls N` | pipeline runs this process will allow, default 25 |
+| `--timeout S` | seconds before a run is abandoned, default 90 |
+
+**Under `--mock` every field comes back blank, and that is correct rather than broken.** The canned
+reply's values are deliberately ungroundable, so the grounding gate wipes all four and the page
+reports `exit 1`. It is the abstention path demonstrated for free — and it is **not** the chart to
+put on camera. Use a real key for that.
+
+**If port 8000 is already taken** the server refuses rather than starting half-up, and says so:
+
+```
+cannot bind 127.0.0.1:8000 (Address already in use). Another server may already be running; try --port.
+```
+
+That is **exit 2**. Find the occupant, then pick another port:
+
+```bash
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+python demo/serve.py --port 8099
+```
+
+**Four routes exist and nothing else does.** `/` the box, `/extract` the POST, `/chart` the recorded
+cases served byte-for-byte, `/health` a status line. Any other path is a 404 regardless of what is
+on disk — `.env` lives in this repository holding the API key, and a server that routed from the
+filesystem would hand it to anyone who asked. `.gitignore` is not an HTTP control.
+
+The socket binds `127.0.0.1` only and there is no `--host` flag, because a server that shells a
+subprocess over posted text should not be reachable from the network. The page carries no
+JavaScript, no event handler and no remote origin, exactly like the chart: the round trip is a plain
+HTML form POST and a freshly rendered page. The only CSP relaxation is `form-action 'self'`.
+
+### 0.5 Run it fully offline
 
 Everything except §0.2 and §8 works with **no key and no network**. Verified by removing the key
 from the environment entirely:
 
 | Command | Without a key |
 | :--- | :--- |
-| `python -m unittest discover -s tests` | 520 tests, `OK` |
+| `python -m unittest discover -s tests` | 579 tests, `OK` |
 | `python src/extract.py --note … --mock` | runs; exit 0 or 1 |
 | `python demo/build_ehr.py` · `build_review.py` | both build |
+| `python demo/serve.py --mock` | serves and runs the gates; no call, no spend |
 | `python evals/score_arm.py …` · `metrics.py` · `lowcode_arm.py` | all score saved artefacts |
 | `python evals/diagnose.py …` · `refused_controls.py` | attribution and the refusals, both offline |
 | `python src/extract.py --note …` *(live, no `--mock`)* | refuses with `ERR_CONFIG_NO_API_KEY` |
@@ -378,7 +572,7 @@ python -m unittest discover -s tests
 python -O -m unittest discover -s tests
 ```
 
-Both must print `OK`. **520 tests**, and the second run is not optional. `python -O` strips every
+Both must print `OK`. **579 tests**, and the second run is not optional. `python -O` strips every
 `assert` statement from the bytecode — which is exactly why no safety gate in this codebase is
 allowed to be one. `tests/test_guardrails.py:NoAssertInRuntimeCode` walks the AST of `src/`,
 `evals/` and `demo/` so the ban cannot rot.

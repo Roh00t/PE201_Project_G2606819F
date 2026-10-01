@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-520%20passing-brightgreen" alt="520 tests">
+  <img src="https://img.shields.io/badge/tests-579%20passing-brightgreen" alt="579 tests">
   <img src="https://img.shields.io/badge/python%20--O-passes-brightgreen" alt="passes under python -O">
   <img src="https://img.shields.io/badge/cost-%240.000617%2Fnote-blue" alt="cost per note">
   <img src="https://img.shields.io/badge/gold%20sets-5%20hash--sealed-informational" alt="5 sealed corpora">
@@ -36,6 +36,22 @@ Generative AI scribes promise to alleviate this, but they introduce a dangerous 
 MediExtract solves this by enforcing a deterministic software perimeter around a probabilistic LLM (Gemini). It extracts four core clinical fields (Medication, Dose, Frequency, Allergy) and pairs every extracted value directly with its verbatim evidence quote from the source text. 
 
 **Zero Ungrounded Claims:** If our Python gates cannot mathematically prove a value against the raw text, the system does not guess. It wipes the field to `null` and triggers an active **Grounding Failure Warning**. The system guarantees every output is grounded in a quote; it refuses to silently hallucinate facts not in the transcript.
+
+## Who it is for
+
+**Dr. Aisha, a GP at a Singapore polyclinic.** Twenty-minute consults, back to back, and a chart
+that has to be closed before the next patient sits down. She will not read a transcript twice. She
+will give a machine-written field about **three seconds** of attention, and if she cannot confirm it
+in that time she retypes it by hand — which is slower than never having been offered it.
+
+Everything in this repository is downstream of that budget.
+
+| | |
+| :--- | :--- |
+| **In** | one raw dictation transcript, UTF-8 text, read-only and never cleaned or corrected |
+| **Out** | four fields — `medication`, `dose`, `frequency`, `allergy` — each with `value`, a **verbatim `evidence` quote** taken from that transcript, and a `status` |
+| **If it cannot prove a value** | the field is wiped to `null` and the gate code says which check refused it. Never a placeholder string, never a guess |
+| **On screen** | the quote is highlighted *in the dictation*, beside the value, so verification is a glance rather than a search |
 
 ## Core Design Principles
 
@@ -80,7 +96,7 @@ honest unit, because a system that fails cheaply looks cheap on the first figure
 clinician time, five points of accuracy are worth **561×** a token-price saving, which is why this
 project optimises accuracy and not tokens.
 
-🧪 **520 tests, and the documentation tests itself.** The suite runs twice — the second time under
+🧪 **579 tests, and the documentation tests itself.** The suite runs twice — the second time under
 `python -O`, which strips every `assert` and is exactly why no safety gate here is one.
 `tests/test_guardrails_doc.py` parses the security specification and **fails the build if a quoted
 metric no longer equals the artefact that produced it.**
@@ -93,11 +109,48 @@ the original is never edited.
 
 Against sealed `gold-v2` — 67 consults, 268 field decisions:
 
-| Arm | Pooled recall | |
-| :--- | ---: | :--- |
-| **MediExtract, gated** | **0.7297** | precision 0.7500 |
-| Regex + 14,689-name RxNorm gazetteer | 0.381 | the committed non-AI baseline |
-| Answer "not stated" to everything | 0.000 | still agrees with gold 120/268 |
+| Arm | Pooled recall | Precision | |
+| :--- | ---: | ---: | :--- |
+| **MediExtract, gated** | **0.7297** | 0.7500 | |
+| Regex, pattern only | 0.4324 | 0.5714 | the committed non-AI baseline |
+| Regex + 14,689-name RxNorm gazetteer | 0.4324 | 0.5289 | **the gazetteer bought no recall and cost precision** |
+| Answer "not stated" to everything | 0.000 | n/a | still agrees with gold on 120/268 |
+
+**The gap against the baseline is the one comparison in this project that separates.** Both arms
+ran the same 67 consults against the same answer key, so the fields that *changed* are the only ones
+carrying information, and an exact McNemar over them gives **52 flips right against 8 wrong,
+p = 5.2 × 10⁻⁹**. Reported at the level the evidence supports:
+
+| Field | Regex | MediExtract | Δ | Flips r/w | p | |
+| :--- | ---: | ---: | ---: | :--- | ---: | :--- |
+| **pooled** | 43.2% | **73.0%** | +29.7pp | 52 / 8 | **5.2e-09** | separated |
+| medication | 31.6% | 70.2% | +38.6pp | 24 / 2 | 1.0e-05 | separated |
+| dose | 23.7% | 65.8% | +42.1pp | 18 / 2 | 4.0e-04 | separated |
+| frequency | 69.8% | 81.1% | +11.3pp | 10 / 4 | 0.180 | **not separated** |
+
+Frequency is where the regex was already good, and an 11-point lead over 14 discordant fields does
+not clear α 0.05. So the honest claim is **not** "the LLM beats regex"; it is *the LLM beats regex on
+drug name and dose, decisively, and on frequency the evaluation cannot tell.*
+
+### Targeted versus reached
+
+Every figure is from `evals/results/gold-v2-live/` and reproducible with the commands below. The
+uncomfortable cells are left in, because a target table that only reports its wins is a brochure.
+
+| | Targeted | Reached | |
+| :--- | :--- | :--- | :--- |
+| **Verification latency** | under 3,000 ms per note | **p50 1,293 ms**, p95 1,834 ms | **66 of 67** inside budget. One note took **12,325 ms** |
+| **Recall** | beat the majority class | **0.7297** CI [0.653, 0.795] | the majority class is 120/268 = **0.448** |
+| **Precision** | high, and honest about misses | **0.7500** CI [0.673, 0.814] | |
+| **Silent failure** | drive it toward zero | **0.2517** (36/143) | **not reached**, and §6.10 shows why no gate can reach it |
+| **Abstention** | never wrong when it abstains | rate 0.0336, **precision 1.000** | gate false positives **0.000**: no correct value was ever wiped |
+| **Injection containment** | nothing ungrounded reaches a payload | **0 of 10** reached a payload as verified | the model itself obeyed **5 of 10** |
+| **Cost** | under a cent per note | **$0.000617** per note | $0.041 for the whole 67-case run |
+
+**The one target that was missed is the one worth reading.** 0.2517 means that of 143 values the
+system presented as verified, 36 were wrong — and every one of those 36 is a value that genuinely
+appears in the note, quoted correctly, belonging to a different drug. There is no hallucination in
+the set. It is a schema defect, diagnosed below.
 
 **And four results this project went looking for and did not like.** They are in the README because
 a number you cannot check is worth nothing:
@@ -131,7 +184,7 @@ python3 -m venv .venv && source .venv/bin/activate && pip install -r requirement
 python -m unittest discover -s tests
 ```
 
-`OK` and **520 tests** verifies the whole system — gates, scoring, statistics, both demo screens —
+`OK` and **579 tests** verifies the whole system — gates, scoring, statistics, both demo screens —
 with no key and no network. Then see it work:
 
 ```bash
@@ -141,6 +194,41 @@ python demo/build_ehr.py && open demo/ehr.html
 
 **Exit code 1 is not an error.** It means the pipeline abstained on a field, which is the product
 working.
+
+<details>
+<summary><b>Live dictation on localhost</b> — type or dictate a note and watch the gates run</summary>
+
+The chart above renders *recorded* cases. This serves the same chart at `/chart` and adds an empty
+box at `/` where a consultation is typed or dictated, with a button that runs `src/extract.py` over
+whatever arrives:
+
+```bash
+python demo/serve.py --mock            # http://127.0.0.1:8000 — no key, no spend
+```
+
+`--mock` exercises the real gates against a canned reply, so every field correctly comes back
+blanked: the canned values are deliberately ungroundable, which is the abstention path working.
+Drop `--mock`, with a key set, to see values verify against the words you actually dictated.
+
+```bash
+python demo/serve.py                   # live; each run is a real billed call
+python demo/serve.py --port 8080 --max-calls 5
+```
+
+Stop it with **Ctrl-C** in that terminal. To confirm the port is clear — or to find out who already
+has it, since a busy port makes the server refuse to start with **exit 2** rather than half-start:
+
+```bash
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+```
+
+**It binds `127.0.0.1` only** and has no `--host` flag, because a server that shells a subprocess
+over posted text should not be reachable from the network. Routing is a four-entry allowlist rather
+than the filesystem — `.env` sits in this repo holding the API key, and a static handler rooted here
+would serve it to anyone who asked. Like the chart, the page carries **no JavaScript**: the round
+trip is a plain form POST.
+
+</details>
 
 <details>
 <summary><b>Run it live (~$0.002), and bring it down</b></summary>
@@ -159,15 +247,19 @@ Three calls, ≈ **$0.0018**. The third chart is the one worth seeing: the model
 injection and returned `warfarin 10 mg daily`, and the tripwire flagged all three values
 `Needs review` — retained and visible, neither accepted nor silently deleted.
 
-**There is no server to start and nothing to shut down.** `src/extract.py` makes one API call and
-exits; `demo/build_ehr.py` writes a file and exits. Nothing listens on a port. Close the browser
-tab, then prove nothing survived:
+**Nothing here runs in the background.** `src/extract.py` makes one API call and exits;
+`demo/build_ehr.py` writes a file and exits. The one component that does listen on a port is
+`demo/serve.py`, which runs in the foreground and stops on Ctrl-C. Close the browser tab, then
+prove nothing survived:
 
 ```bash
 pgrep -fl "python.*(src|evals|demo)/[a-z_0-9]*\.py"
 lsof -nP -iTCP -sTCP:LISTEN | grep python
 unset OPENROUTER_API_KEY && deactivate
 ```
+
+If the console was left running, that second command is the one that finds it; `pkill -f demo/serve.py`
+ends it.
 
 Empty output from both is the clean result — `pgrep` exits 1 when nothing matches. The pattern
 matches our own script paths rather than bare words deliberately: a list containing `diagnose`
@@ -205,6 +297,41 @@ flowchart TD
     J --> K["demo/ehr.html<br/>evidence beside value"]
 ```
 
+<details>
+<summary><b>The same flow as plain text</b> (for a raw-file or PDF reader, where Mermaid does not render)</summary>
+
+```text
+  dictated note (.txt)                 read-only: never cleaned, scrubbed or corrected
+         |
+         v
+  [ 1. INPUT SCAN ]  size - encoding - script
+         |--- rejected ------------------> exit 2   error envelope, no model call
+         |--- bidi / homoglyph ----------> exit 1   forced safe abstention, no model call
+         v  clean
+  [ 2. ONE OpenRouter CALL ]  google/gemini-2.5-flash - temp 0 - seed 0
+         |                    strict json_schema - no tools - no retrieval
+         |--- timeout / 429 -------------> exit 3   NEVER exit 1
+         v
+  [ 3. PARSE ]  strip markdown fence -> Pydantic ClinicalExtraction
+         |--- schema invalid ------------> exit 4   one retry, then refuse
+         v
+  [ 4. DETERMINISTIC GATES ]  plain if/elif/else - no assert, so python -O cannot strip them
+         |   is the evidence span verbatim in the note?
+         |   is the value grounded in its own evidence?
+         |   are the dose number and unit paired?
+         |   does the note carry injection phrasing?
+         |
+         +--- all verified -------------> exit 0   value + evidence
+         +--- any refused --------------> exit 1   HARD WIPE to None
+         +--- injection phrasing -------> REVIEW   value kept, explicitly disowned
+         v
+  [ 5. OUTPUT ]  stdout: one pure JSON document     stderr: every byte of telemetry
+         v
+  demo/ehr.html  (recorded cases)  |  demo/serve.py  (live dictation on localhost)
+```
+
+</details>
+
 Four fields — `medication`, `dose`, `frequency`, `allergy` — each carrying `value`, `evidence` and
 `status`. **Exit codes are separated on purpose:** a safe abstention is `1` and an API failure is
 `3`, because collapsing them would let every network blip inflate the measured abstention rate.
@@ -232,7 +359,7 @@ cd data/gold_labels && shasum -a 256 -c *.sha256      # all five OK
 ## Reproducing every number above
 
 ```bash
-python -m unittest discover -s tests          # 520 tests
+python -m unittest discover -s tests          # 579 tests
 python -O -m unittest discover -s tests       # again, assertions stripped
 python -m unittest tests.test_guardrails_doc  # the spec checks itself
 python evals/score_arm.py evals/results/gold-v2-live --gold data/gold_labels/gold_v2.json
@@ -248,6 +375,9 @@ runtime gate may be one, and an AST walk enforces that across `src/`, `evals/` a
 | Path | What |
 | :--- | :--- |
 | [`src/extract.py`](src/extract.py) | the entire pipeline — config, schema, prompt, gates, ledger, CLI |
+| [`demo/serve.py`](demo/serve.py) | the localhost console: live dictation, loopback-only, no JavaScript |
+| [`PE6201_Final_Report.md`](PE6201_Final_Report.md) | the written report — what changed, what the metrics say, what was refused |
+| [`data/README.md`](data/README.md) · [`evals/README.md`](evals/README.md) | corpus provenance and sealing · how every number was produced |
 | [`evals/run_ekacare.py`](evals/run_ekacare.py) | batch harness + the sealed-gold registry |
 | [`evals/scoring.py`](evals/scoring.py) · [`evals/metrics.py`](evals/metrics.py) | pre-registered scoring · paired statistics, κ/AC₁, cost provenance |
 | [`evals/spend_guard.py`](evals/spend_guard.py) | can *refuse* a call — deliberately not the module that scores one |
